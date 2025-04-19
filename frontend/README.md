@@ -1,243 +1,205 @@
-<p align="center">
-  <img width="320" src="https://wpimg.wallstcn.com/ecc53a42-d79b-42e2-8852-5126b810a4c8.svg">
-</p>
+# [Vue-Black Dashboard](https://demos.creative-tim.com/vue-black-dashboard) [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social&logo=twitter)](https://twitter.com/intent/tweet?text=Black%20Dashboard%20by%20Creative%20Tim&url=https%3A%2F%2Fdemos.creative-tim.com%2Fblack-dashboard%2Fexamples%2Fdashboard.html&via=CreativeTim)
 
-<p align="center">
-  <a href="https://github.com/vuejs/vue">
-    <img src="https://img.shields.io/badge/vue-2.6.10-brightgreen.svg" alt="vue">
-  </a>
-  <a href="https://github.com/ElemeFE/element">
-    <img src="https://img.shields.io/badge/element--ui-2.7.0-brightgreen.svg" alt="element-ui">
-  </a>
-  <a href="https://travis-ci.org/PanJiaChen/vue-element-admin" rel="nofollow">
-    <img src="https://travis-ci.org/PanJiaChen/vue-element-admin.svg?branch=master" alt="Build Status">
-  </a>
-  <a href="https://github.com/PanJiaChen/vue-element-admin/blob/master/LICENSE">
-    <img src="https://img.shields.io/github/license/mashape/apistatus.svg" alt="license">
-  </a>
-  <a href="https://github.com/PanJiaChen/vue-element-admin/releases">
-    <img src="https://img.shields.io/github/release/PanJiaChen/vue-element-admin.svg" alt="GitHub release">
-  </a>
-  <a href="https://gitter.im/vue-element-admin/discuss">
-    <img src="https://badges.gitter.im/Join%20Chat.svg" alt="gitter">
-  </a>
-  <a href="https://panjiachen.github.io/vue-element-admin-site/donate">
-    <img src="https://img.shields.io/badge/%24-donate-ff69b4.svg" alt="donate">
-  </a>
-</p>
+![version](https://img.shields.io/badge/version-1.1.3-blue.svg) ![license](https://img.shields.io/badge/license-MIT-blue.svg) [![GitHub issues open](https://img.shields.io/github/issues/creativetimofficial/black-dashboard/issues.svg?maxAge=2592000)](https://github.com/creativetimofficial/black-dashboard/issues/issues?q=is%3Aopen+is%3Aissue) [![GitHub issues closed](https://img.shields.io/github/issues-closed-raw/creativetimofficial/black-dashboard/issues.svg?maxAge=2592000)](https://github.com/creativetimofficial/black-dashboard/issues/issues?q=is%3Aissue+is%3Aclosed) [![Join the chat at https://gitter.im/NIT-dgp/General](https://badges.gitter.im/NIT-dgp/General.svg)](https://gitter.im/creative-tim-general/Lobby) [![Chat](https://img.shields.io/badge/chat-on%20discord-7289da.svg)](https://discord.gg/E4aHAQy)
 
-English | [简体中文](./README.zh-CN.md) | [日本語](./README.ja.md) | [Spanish](./README.es.md)
+![Product Gif](https://github.com/creativetimofficial/vue-black-dashboard/blob/live-demo/src/assets/demo/product-gif.gif?raw=true)
 
-<!-- <p align="center">
-  <b>SPONSORED BY</b>
-</p>
-<table align="center" cellspacing="0" cellpadding="0">
-  <tbody>
-    <tr>
-      <td align="center" valign="middle">
-       <a href="" title="" target="_blank" style="padding-right: 20px;">
-        <img height="200px" style="padding-right: 20px;" src="" title="variantForm">
-        </a>
-      </td>
-    </tr>
-  </tbody> 
-</table>-->
+**Vue Black Dashboard** is a beautiful Bootstrap 4 Admin Dashboard with a huge number of components built to fit together and look amazing. If you are looking for a tool to manage and visualize data about your business, this dashboard is the thing for you. It combines colors that are easy on the eye, spacious cards, beautiful typography, and graphics.
 
-## Introduction
+**Vue Black Dashboard** comes packed with all plugins that you might need inside a project and documentation on how to get started. It is light and easy to use, and also very powerful.
 
-[vue-element-admin](https://panjiachen.github.io/vue-element-admin) is a production-ready front-end solution for admin interfaces. It is based on [vue](https://github.com/vuejs/vue) and uses the UI Toolkit [element-ui](https://github.com/ElemeFE/element).
+Vue Black Dashboard features over 16 individual components, giving you the freedom of choosing and combining. This means that there are thousands of possible combinations. All components can take variations in color, that you can easily modify using SASS files. You will save a lot of time going from prototyping to full-functional code because all elements are implemented.
+We thought about everything, so this dashboard comes with 2 versions, Dark Mode and Light Mode.
 
-[vue-element-admin](https://panjiachen.github.io/vue-element-admin) is based on the newest development stack of vue and it has a built-in i18n solution, typical templates for enterprise applications, and lots of awesome features. It helps you build large and complex Single-Page Applications. I believe whatever your needs are, this project will help you.
+We are very excited to share this dashboard with you and we look forward to hearing your feedback!
 
-- [Preview](https://panjiachen.github.io/vue-element-admin)
+## Table of Contents
 
-- [Documentation](https://panjiachen.github.io/vue-element-admin-site/)
+- [Demo](#demo)
+- [Quick Start](#quick-start)
+- [Deploy](#deploy)
+- [Documentation](#documentation)
+- [File Structure](#file-structure)
+- [Browser Support](#browser-support)
+- [Resources](#resources)
+- [Reporting Issues](#reporting-issues)
+- [Technical Support or Questions](#technical-support-or-questions)
+- [Licensing](#licensing)
+- [Useful Links](#useful-links)
 
-- [Gitter](https://gitter.im/vue-element-admin/discuss)
+## Demo
 
-- [Donate](https://panjiachen.github.io/vue-element-admin-site/donate/)
+- [Start page](https://demos.creative-tim.com/vue-black-dashboard)
+- [User profile page](https://demos.creative-tim.com/vue-black-dashboard/#/profile)
+- [Tables page ](https://demos.creative-tim.com/vue-black-dashboard/#/table-list)
+- [Maps Page](https://demos.creative-tim.com/vue-black-dashboard/#/maps)
+- [Notifications page](https://demos.creative-tim.com//vue-black-dashboard/#/notifications)
 
-- [Wiki](https://github.com/PanJiaChen/vue-element-admin/wiki)
+[View More](https://demos.creative-tim.com/vue-black-dashboard).
 
-- [Gitee](https://panjiachen.gitee.io/vue-element-admin/) 国内用户可访问该地址在线预览
+## Quick start
 
-- Base template recommends using: [vue-admin-template](https://github.com/PanJiaChen/vue-admin-template)
-- Desktop: [electron-vue-admin](https://github.com/PanJiaChen/electron-vue-admin)
-- Typescript: [vue-typescript-admin-template](https://github.com/Armour/vue-typescript-admin-template) (Credits: [@Armour](https://github.com/Armour))
-- [awesome-project](https://github.com/PanJiaChen/vue-element-admin/issues/2312)
+- Clone the repo: `git clone https://github.com/creativetimofficial/vue-black-dashboard.git`.
+- [Download from Github](https://github.com/creativetimofficial/vue-black-dashboard/archive/master.zip).
+- [Download from Creative Tim](https://www.creative-tim.com/product/vue-black-dashboard).
 
-**After the `v4.1.0+` version, the default master branch will not support i18n. Please use [i18n Branch](https://github.com/PanJiaChen/vue-element-admin/tree/i18n), it will keep up with the master update**
+## Deploy
 
-**The current version is `v4.0+` build on `vue-cli`. If you find a problem, please put [issue](https://github.com/PanJiaChen/vue-element-admin/issues/new). If you want to use the old version , you can switch branch to [tag/3.11.0](https://github.com/PanJiaChen/vue-element-admin/tree/tag/3.11.0), it does not rely on `vue-cli`**
+:rocket: You can deploy your own version of the template to Genezio with one click:
 
-**This project does not support low version browsers (e.g. IE). Please add polyfill by yourself.**
+[![Deploy to Genezio](https://raw.githubusercontent.com/Genez-io/graphics/main/svg/deploy-button.svg)](https://app.genez.io/start/deploy?repository=https://github.com/creativetimofficial/vue-black-dashboard&utm_source=github&utm_medium=referral&utm_campaign=github-creativetim&utm_term=deploy-project&utm_content=button-head)
 
-## Preparation
+## Documentation
 
-You need to install [node](https://nodejs.org/) and [git](https://git-scm.com/) locally. The project is based on [ES2015+](https://es6.ruanyifeng.com/), [vue](https://cn.vuejs.org/index.html), [vuex](https://vuex.vuejs.org/zh-cn/), [vue-router](https://router.vuejs.org/zh-cn/), [vue-cli](https://github.com/vuejs/vue-cli) , [axios](https://github.com/axios/axios) and [element-ui](https://github.com/ElemeFE/element), all request data is simulated using [Mock.js](https://github.com/nuysoft/Mock).
-Understanding and learning this knowledge in advance will greatly help the use of this project.
+The documentation for the Vue Black Dashboard is hosted at our [website](https://demos.creative-tim.com/vue-black-dashboard/documentation).
 
-[![Edit on CodeSandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/github/PanJiaChen/vue-element-admin/tree/CodeSandbox)
+## File Structure
 
-<p align="center">
-  <img width="900" src="https://wpimg.wallstcn.com/a5894c1b-f6af-456e-82df-1151da0839bf.png">
-</p>
-
-## Sponsors
-
-Become a sponsor and get your logo on our README on GitHub with a link to your site. [[Become a sponsor]](https://www.patreon.com/panjiachen)
-
-### Akveo
-<a href="https://store.akveo.com/products/vue-java-admin-dashboard-spring?utm_campaign=akveo_store-Vue-Vue_demo%2Fgithub&utm_source=vue_admin&utm_medium=referral&utm_content=github_banner"><img width="500px" src="https://raw.githubusercontent.com/PanJiaChen/vue-element-admin-site/master/docs/.vuepress/public/images/vue-java-banner.png" /></a><p>Get Java backend for Vue admin with 20% discount for 39$ use coupon code SWB0RAZPZR1M
-</p>
-
-### Flatlogic
-
-<a href="https://flatlogic.com/admin-dashboards?from=vue-element-admin"><img width="150px" src="https://wpimg.wallstcn.com/9c0b719b-5551-4c1e-b776-63994632d94a.png" /></a><p>Admin Dashboard Templates made with Vue, React and Angular.</p>
-
-## Features
+Within the download you'll find the following directories and files:
 
 ```
-- Login / Logout
+|-- Vue Black Dashboard
+    |-- .babelrc
+    |-- .env
+    |-- .eslintrc
+    |-- .gitattributes
+    |-- .gitignore
+    |-- CHANGELOG.md
+    |-- CONTRIBUTING.md
+    |-- LICENSE.md
+    |-- README.md
+    |-- package.json
+    |-- vue.config.js
+    |-- src
+        |-- App.vue
+        |-- i18n.js
+        |-- main.js
+        |-- assets
+        |   |-- css
+        |   |   |-- nucleo-icons.css
+        |   |-- demo
+        |   |   |-- demo.css
+        |   |-- fonts
+        |   |   |-- nucleo.eot
+        |   |   |-- nucleo.ttf
+        |   |   |-- nucleo.woff
+        |   |   |-- nucleo.woff2
+        |   |-- sass
+        |       |-- black-dashboard.scss
+        |       |-- black-dashboard
+        |           |-- bootstrap
+        |           |-- custom
+        |           |-- plugins
+        |-- components
+        |   |-- BaseAlert.vue
+        |   |-- BaseButton.vue
+        |   |-- BaseCheckbox.vue
+        |   |-- BaseDropdown.vue
+        |   |-- BaseNav.vue
+        |   |-- BaseTable.vue
+        |   |-- CloseButton.vue
+        |   |-- Modal.vue
+        |   |-- NavbarToggleButton.vue
+        |   |-- index.js
+        |   |-- Cards
+        |   |   |-- Card.vue
+        |   |   |-- StatsCard.vue
+        |   |-- Charts
+        |   |   |-- BarChart.js
+        |   |   |-- LineChart.js
+        |   |   |-- config.js
+        |   |   |-- utils.js
+        |   |-- Inputs
+        |   |   |-- BaseInput.vue
+        |   |-- NotificationPlugin
+        |   |   |-- Notification.vue
+        |   |   |-- Notifications.vue
+        |   |   |-- index.js
+        |   |-- SidebarPlugin
+        |       |-- SideBar.vue
+        |       |-- SidebarLink.vue
+        |       |-- index.js
+        |-- directives
+        |   |-- click-ouside.js
+        |-- layout
+        |   |-- dashboard
+        |       |-- Content.vue
+        |       |-- ContentFooter.vue
+        |       |-- DashboardLayout.vue
+        |       |-- MobileMenu.vue
+        |       |-- SidebarSharePlugin.vue
+        |       |-- TopNavbar.vue
+        |-- locales
+        |   |-- ar.json
+        |   |-- en.json
+        |-- pages
+        |   |-- Dashboard.vue
+        |   |-- Icons.vue
+        |   |-- Maps.vue
+        |   |-- NotFoundPage.vue
+        |   |-- Notifications.vue
+        |   |-- Profile.vue
+        |   |-- TableList.vue
+        |   |-- Typography.vue
+        |   |-- Dashboard
+        |   |   |-- TaskList.vue
+        |   |   |-- UserTable.vue
+        |   |-- Notifications
+        |   |   |-- NotificationTemplate.vue
+        |   |-- Profile
+        |       |-- EditProfileForm.vue
+        |       |-- UserCard.vue
+        |-- plugins
+        |   |-- RTLPlugin.js
+        |   |-- blackDashboard.js
+        |   |-- globalComponents.js
+        |   |-- globalDirectives.js
+        |   |-- liveDemo.js
+        |-- router
+            |-- index.js
+            |-- routes.js
 
-- Permission Authentication
-  - Page permission
-  - Directive permission
-  - Permission configuration page
-  - Two-step login
-
-- Multi-environment build
-  - Develop (dev)
-  - sit
-  - Stage Test (stage)
-  - Production (prod)
-
-- Global Features
-  - I18n
-  - Multiple dynamic themes
-  - Dynamic sidebar (supports multi-level routing)
-  - Dynamic breadcrumb
-  - Tags-view (Tab page Support right-click operation)
-  - Svg Sprite
-  - Mock data
-  - Screenfull
-  - Responsive Sidebar
-
-- Editor
-  - Rich Text Editor
-  - Markdown Editor
-  - JSON Editor
-
-- Excel
-  - Export Excel
-  - Upload Excel
-  - Visualization Excel
-  - Export zip
-
-- Table
-  - Dynamic Table
-  - Drag And Drop Table
-  - Inline Edit Table
-
-- Error Page
-  - 401
-  - 404
-
-- Components
-  - Avatar Upload
-  - Back To Top
-  - Drag Dialog
-  - Drag Select
-  - Drag Kanban
-  - Drag List
-  - SplitPane
-  - Dropzone
-  - Sticky
-  - CountTo
-
-- Advanced Example
-- Error Log
-- Dashboard
-- Guide Page
-- ECharts
-- Clipboard
-- Markdown to html
 ```
 
-## Getting started
+## Browser Support
 
-```bash
-# clone the project
-git clone https://github.com/PanJiaChen/vue-element-admin.git
+At present, we officially aim to support the last two versions of the following browsers:
 
-# enter the project directory
-cd vue-element-admin
+<img src="https://s3.amazonaws.com/creativetim_bucket/github/browser/chrome.png" width="64" height="64"> <img src="https://s3.amazonaws.com/creativetim_bucket/github/browser/firefox.png" width="64" height="64"> <img src="https://s3.amazonaws.com/creativetim_bucket/github/browser/edge.png" width="64" height="64"> <img src="https://s3.amazonaws.com/creativetim_bucket/github/browser/safari.png" width="64" height="64"> <img src="https://s3.amazonaws.com/creativetim_bucket/github/browser/opera.png" width="64" height="64">
 
-# install dependency
-npm install
+## Reporting Issues
 
-# develop
-npm run dev
-```
+We use GitHub Issues as the official bug tracker for the Vue Black Dashboard. Here are some advices for our users that want to report an issue:
 
-This will automatically open http://localhost:9527
+1. Make sure that you are using the latest version of the Vue Black Dashboard. Check the CHANGELOG from your dashboard on our [website](https://www.creative-tim.com/).
+2. Providing us reproducible steps for the issue will shorten the time it takes for it to be fixed.
+3. Some issues may be browser specific, so specifying in what browser you encountered the issue might help.
 
-## Build
+## Technical Support or Questions
 
-```bash
-# build for test environment
-npm run build:stage
+If you have questions or need help integrating the product please [contact us](https://www.creative-tim.com/contact-us) instead of opening an issue.
 
-# build for production environment
-npm run build:prod
-```
+## Licensing
 
-## Advanced
+- Copyright 2024 Creative Tim (https://www.creative-tim.com/)
 
-```bash
-# preview the release environment effect
-npm run preview
+- Licensed under MIT (https://github.com/creativetimofficial/vue-black-dashboard/issues/blob/master/LICENSE.md)
 
-# preview the release environment effect + static resource analysis
-npm run preview -- --report
+## Useful Links
 
-# code format check
-npm run lint
+- [More products](https://www.creative-tim.com/bootstrap-themes) from Creative Tim
+- [Tutorials](https://www.youtube.com/channel/UCVyTG4sCw-rOvB9oHkzZD1w)
+- [Freebies](https://www.creative-tim.com/bootstrap-themes/free) from Creative Tim
+- [Affiliate Program](https://www.creative-tim.com/affiliates/new) (earn money)
 
-# code format check and auto fix
-npm run lint -- --fix
-```
+##### Social Media
 
-Refer to [Documentation](https://panjiachen.github.io/vue-element-admin-site/guide/essentials/deploy.html) for more information
+Twitter: <https://twitter.com/CreativeTim>
 
-## Changelog
+Facebook: <https://www.facebook.com/CreativeTim>
 
-Detailed changes for each release are documented in the [release notes](https://github.com/PanJiaChen/vue-element-admin/releases).
+Dribbble: <https://dribbble.com/creativetim>
 
-## Online Demo
+Google+: <https://plus.google.com/+CreativetimPage>
 
-[Preview](https://panjiachen.github.io/vue-element-admin)
-
-## Donate
-
-If you find this project useful, you can buy author a glass of juice :tropical_drink:
-
-![donate](https://wpimg.wallstcn.com/bd273f0d-83a0-4ef2-92e1-9ac8ed3746b9.png)
-
-[Paypal Me](https://www.paypal.me/panfree23)
-
-[Buy me a coffee](https://www.buymeacoffee.com/Pan)
-
-## Browsers support
-
-Modern browsers and Internet Explorer 10+.
-
-| [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/edge/edge_48x48.png" alt="IE / Edge" width="24px" height="24px" />](https://godban.github.io/browsers-support-badges/)</br>IE / Edge | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png" alt="Firefox" width="24px" height="24px" />](https://godban.github.io/browsers-support-badges/)</br>Firefox | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png" alt="Chrome" width="24px" height="24px" />](https://godban.github.io/browsers-support-badges/)</br>Chrome | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png" alt="Safari" width="24px" height="24px" />](https://godban.github.io/browsers-support-badges/)</br>Safari |
-| --------- | --------- | --------- | --------- |
-| IE10, IE11, Edge | last 2 versions | last 2 versions | last 2 versions |
-
-## License
-
-[MIT](https://github.com/PanJiaChen/vue-element-admin/blob/master/LICENSE)
-
-Copyright (c) 2017-present PanJiaChen
+Instagram: <https://instagram.com/creativetimofficial>
