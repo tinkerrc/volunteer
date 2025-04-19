@@ -1,6 +1,10 @@
 package schema
 
-import "entgo.io/ent"
+import (
+	"entgo.io/ent"
+	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
+)
 
 // Volunteer holds the schema definition for the Volunteer entity.
 type Volunteer struct {
@@ -9,7 +13,16 @@ type Volunteer struct {
 
 // Fields of the Volunteer.
 func (Volunteer) Fields() []ent.Field {
-	return nil
+	return []ent.Field{
+		field.UUID("id", uuid.UUID{}).Default(uuid.New).Unique(),
+		field.String("email").Unique(),
+		field.String("first_name"),
+		field.String("middle_name"),
+		field.String("last_name"),
+		field.String("phone"),
+		field.String("address"),
+		field.String("notes"),
+	}
 }
 
 // Edges of the Volunteer.

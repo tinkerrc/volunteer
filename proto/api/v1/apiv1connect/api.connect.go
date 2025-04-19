@@ -39,12 +39,18 @@ const (
 	// VolunteerServiceGetVolunteerProcedure is the fully-qualified name of the VolunteerService's
 	// GetVolunteer RPC.
 	VolunteerServiceGetVolunteerProcedure = "/api.v1.VolunteerService/GetVolunteer"
+	// VolunteerServiceGetVolunteerProfileProcedure is the fully-qualified name of the
+	// VolunteerService's GetVolunteerProfile RPC.
+	VolunteerServiceGetVolunteerProfileProcedure = "/api.v1.VolunteerService/GetVolunteerProfile"
 	// VolunteerServiceListVolunteersProcedure is the fully-qualified name of the VolunteerService's
 	// ListVolunteers RPC.
 	VolunteerServiceListVolunteersProcedure = "/api.v1.VolunteerService/ListVolunteers"
 	// VolunteerServiceUpdateVolunteerProcedure is the fully-qualified name of the VolunteerService's
 	// UpdateVolunteer RPC.
 	VolunteerServiceUpdateVolunteerProcedure = "/api.v1.VolunteerService/UpdateVolunteer"
+	// VolunteerServiceUpdateVolunteerProfileProcedure is the fully-qualified name of the
+	// VolunteerService's UpdateVolunteerProfile RPC.
+	VolunteerServiceUpdateVolunteerProfileProcedure = "/api.v1.VolunteerService/UpdateVolunteerProfile"
 	// VolunteerServiceCreateTimeLogProcedure is the fully-qualified name of the VolunteerService's
 	// CreateTimeLog RPC.
 	VolunteerServiceCreateTimeLogProcedure = "/api.v1.VolunteerService/CreateTimeLog"
@@ -109,40 +115,49 @@ const (
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
-	volunteerServiceServiceDescriptor                     = v1.File_api_v1_api_proto.Services().ByName("VolunteerService")
-	volunteerServiceCreateVolunteerMethodDescriptor       = volunteerServiceServiceDescriptor.Methods().ByName("CreateVolunteer")
-	volunteerServiceGetVolunteerMethodDescriptor          = volunteerServiceServiceDescriptor.Methods().ByName("GetVolunteer")
-	volunteerServiceListVolunteersMethodDescriptor        = volunteerServiceServiceDescriptor.Methods().ByName("ListVolunteers")
-	volunteerServiceUpdateVolunteerMethodDescriptor       = volunteerServiceServiceDescriptor.Methods().ByName("UpdateVolunteer")
-	volunteerServiceCreateTimeLogMethodDescriptor         = volunteerServiceServiceDescriptor.Methods().ByName("CreateTimeLog")
-	volunteerServiceListTimeLogsMethodDescriptor          = volunteerServiceServiceDescriptor.Methods().ByName("ListTimeLogs")
-	volunteerServiceUpdateTimeLogMethodDescriptor         = volunteerServiceServiceDescriptor.Methods().ByName("UpdateTimeLog")
-	volunteerServiceDeleteTimeLogMethodDescriptor         = volunteerServiceServiceDescriptor.Methods().ByName("DeleteTimeLog")
-	volunteerServiceStartTrainingMethodDescriptor         = volunteerServiceServiceDescriptor.Methods().ByName("StartTraining")
-	volunteerServiceFinishTrainingMethodDescriptor        = volunteerServiceServiceDescriptor.Methods().ByName("FinishTraining")
-	volunteerServiceListTrainingsMethodDescriptor         = volunteerServiceServiceDescriptor.Methods().ByName("ListTrainings")
-	volunteerServiceDeleteTrainingMethodDescriptor        = volunteerServiceServiceDescriptor.Methods().ByName("DeleteTraining")
-	volunteerServiceCreateCertMethodDescriptor            = volunteerServiceServiceDescriptor.Methods().ByName("CreateCert")
-	volunteerServiceListCertsMethodDescriptor             = volunteerServiceServiceDescriptor.Methods().ByName("ListCerts")
-	volunteerServiceGetCertMethodDescriptor               = volunteerServiceServiceDescriptor.Methods().ByName("GetCert")
-	volunteerServiceUpdateCertMethodDescriptor            = volunteerServiceServiceDescriptor.Methods().ByName("UpdateCert")
-	volunteerServiceDeleteCertMethodDescriptor            = volunteerServiceServiceDescriptor.Methods().ByName("DeleteCert")
-	volunteerServiceCreateEventMethodDescriptor           = volunteerServiceServiceDescriptor.Methods().ByName("CreateEvent")
-	volunteerServiceListEventsMethodDescriptor            = volunteerServiceServiceDescriptor.Methods().ByName("ListEvents")
-	volunteerServiceUpdateEventMethodDescriptor           = volunteerServiceServiceDescriptor.Methods().ByName("UpdateEvent")
-	volunteerServiceDeleteEventMethodDescriptor           = volunteerServiceServiceDescriptor.Methods().ByName("DeleteEvent")
-	volunteerServiceListEventVolunteersMethodDescriptor   = volunteerServiceServiceDescriptor.Methods().ByName("ListEventVolunteers")
-	volunteerServiceAddEventVolunteersMethodDescriptor    = volunteerServiceServiceDescriptor.Methods().ByName("AddEventVolunteers")
-	volunteerServiceRemoveEventVolunteersMethodDescriptor = volunteerServiceServiceDescriptor.Methods().ByName("RemoveEventVolunteers")
+	volunteerServiceServiceDescriptor                      = v1.File_api_v1_api_proto.Services().ByName("VolunteerService")
+	volunteerServiceCreateVolunteerMethodDescriptor        = volunteerServiceServiceDescriptor.Methods().ByName("CreateVolunteer")
+	volunteerServiceGetVolunteerMethodDescriptor           = volunteerServiceServiceDescriptor.Methods().ByName("GetVolunteer")
+	volunteerServiceGetVolunteerProfileMethodDescriptor    = volunteerServiceServiceDescriptor.Methods().ByName("GetVolunteerProfile")
+	volunteerServiceListVolunteersMethodDescriptor         = volunteerServiceServiceDescriptor.Methods().ByName("ListVolunteers")
+	volunteerServiceUpdateVolunteerMethodDescriptor        = volunteerServiceServiceDescriptor.Methods().ByName("UpdateVolunteer")
+	volunteerServiceUpdateVolunteerProfileMethodDescriptor = volunteerServiceServiceDescriptor.Methods().ByName("UpdateVolunteerProfile")
+	volunteerServiceCreateTimeLogMethodDescriptor          = volunteerServiceServiceDescriptor.Methods().ByName("CreateTimeLog")
+	volunteerServiceListTimeLogsMethodDescriptor           = volunteerServiceServiceDescriptor.Methods().ByName("ListTimeLogs")
+	volunteerServiceUpdateTimeLogMethodDescriptor          = volunteerServiceServiceDescriptor.Methods().ByName("UpdateTimeLog")
+	volunteerServiceDeleteTimeLogMethodDescriptor          = volunteerServiceServiceDescriptor.Methods().ByName("DeleteTimeLog")
+	volunteerServiceStartTrainingMethodDescriptor          = volunteerServiceServiceDescriptor.Methods().ByName("StartTraining")
+	volunteerServiceFinishTrainingMethodDescriptor         = volunteerServiceServiceDescriptor.Methods().ByName("FinishTraining")
+	volunteerServiceListTrainingsMethodDescriptor          = volunteerServiceServiceDescriptor.Methods().ByName("ListTrainings")
+	volunteerServiceDeleteTrainingMethodDescriptor         = volunteerServiceServiceDescriptor.Methods().ByName("DeleteTraining")
+	volunteerServiceCreateCertMethodDescriptor             = volunteerServiceServiceDescriptor.Methods().ByName("CreateCert")
+	volunteerServiceListCertsMethodDescriptor              = volunteerServiceServiceDescriptor.Methods().ByName("ListCerts")
+	volunteerServiceGetCertMethodDescriptor                = volunteerServiceServiceDescriptor.Methods().ByName("GetCert")
+	volunteerServiceUpdateCertMethodDescriptor             = volunteerServiceServiceDescriptor.Methods().ByName("UpdateCert")
+	volunteerServiceDeleteCertMethodDescriptor             = volunteerServiceServiceDescriptor.Methods().ByName("DeleteCert")
+	volunteerServiceCreateEventMethodDescriptor            = volunteerServiceServiceDescriptor.Methods().ByName("CreateEvent")
+	volunteerServiceListEventsMethodDescriptor             = volunteerServiceServiceDescriptor.Methods().ByName("ListEvents")
+	volunteerServiceUpdateEventMethodDescriptor            = volunteerServiceServiceDescriptor.Methods().ByName("UpdateEvent")
+	volunteerServiceDeleteEventMethodDescriptor            = volunteerServiceServiceDescriptor.Methods().ByName("DeleteEvent")
+	volunteerServiceListEventVolunteersMethodDescriptor    = volunteerServiceServiceDescriptor.Methods().ByName("ListEventVolunteers")
+	volunteerServiceAddEventVolunteersMethodDescriptor     = volunteerServiceServiceDescriptor.Methods().ByName("AddEventVolunteers")
+	volunteerServiceRemoveEventVolunteersMethodDescriptor  = volunteerServiceServiceDescriptor.Methods().ByName("RemoveEventVolunteers")
 )
 
 // VolunteerServiceClient is a client for the api.v1.VolunteerService service.
 type VolunteerServiceClient interface {
+	// users
+	// rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+	// rpc GetUser(GetUserRequest) returns (GetUserResponse);
+	// rpc ListUsers(GetUserRequest) returns (GetUserResponse);
+	// rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
 	// volunteers
 	CreateVolunteer(context.Context, *connect.Request[v1.CreateVolunteerRequest]) (*connect.Response[v1.CreateVolunteerResponse], error)
 	GetVolunteer(context.Context, *connect.Request[v1.GetVolunteerRequest]) (*connect.Response[v1.GetVolunteerResponse], error)
+	GetVolunteerProfile(context.Context, *connect.Request[v1.GetVolunteerProfileRequest]) (*connect.Response[v1.GetVolunteerProfileResponse], error)
 	ListVolunteers(context.Context, *connect.Request[v1.ListVolunteersRequest]) (*connect.Response[v1.ListVolunteersResponse], error)
 	UpdateVolunteer(context.Context, *connect.Request[v1.UpdateVolunteerRequest]) (*connect.Response[v1.UpdateVolunteerResponse], error)
+	UpdateVolunteerProfile(context.Context, *connect.Request[v1.UpdateVolunteerProfileRequest]) (*connect.Response[v1.UpdateVolunteerProfileResponse], error)
 	// time logs
 	CreateTimeLog(context.Context, *connect.Request[v1.CreateTimeLogRequest]) (*connect.Response[v1.CreateTimeLogResponse], error)
 	ListTimeLogs(context.Context, *connect.Request[v1.ListTimeLogsRequest]) (*connect.Response[v1.ListTimeLogsResponse], error)
@@ -192,6 +207,12 @@ func NewVolunteerServiceClient(httpClient connect.HTTPClient, baseURL string, op
 			connect.WithSchema(volunteerServiceGetVolunteerMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		getVolunteerProfile: connect.NewClient[v1.GetVolunteerProfileRequest, v1.GetVolunteerProfileResponse](
+			httpClient,
+			baseURL+VolunteerServiceGetVolunteerProfileProcedure,
+			connect.WithSchema(volunteerServiceGetVolunteerProfileMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 		listVolunteers: connect.NewClient[v1.ListVolunteersRequest, v1.ListVolunteersResponse](
 			httpClient,
 			baseURL+VolunteerServiceListVolunteersProcedure,
@@ -202,6 +223,12 @@ func NewVolunteerServiceClient(httpClient connect.HTTPClient, baseURL string, op
 			httpClient,
 			baseURL+VolunteerServiceUpdateVolunteerProcedure,
 			connect.WithSchema(volunteerServiceUpdateVolunteerMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		updateVolunteerProfile: connect.NewClient[v1.UpdateVolunteerProfileRequest, v1.UpdateVolunteerProfileResponse](
+			httpClient,
+			baseURL+VolunteerServiceUpdateVolunteerProfileProcedure,
+			connect.WithSchema(volunteerServiceUpdateVolunteerProfileMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
 		createTimeLog: connect.NewClient[v1.CreateTimeLogRequest, v1.CreateTimeLogResponse](
@@ -329,30 +356,32 @@ func NewVolunteerServiceClient(httpClient connect.HTTPClient, baseURL string, op
 
 // volunteerServiceClient implements VolunteerServiceClient.
 type volunteerServiceClient struct {
-	createVolunteer       *connect.Client[v1.CreateVolunteerRequest, v1.CreateVolunteerResponse]
-	getVolunteer          *connect.Client[v1.GetVolunteerRequest, v1.GetVolunteerResponse]
-	listVolunteers        *connect.Client[v1.ListVolunteersRequest, v1.ListVolunteersResponse]
-	updateVolunteer       *connect.Client[v1.UpdateVolunteerRequest, v1.UpdateVolunteerResponse]
-	createTimeLog         *connect.Client[v1.CreateTimeLogRequest, v1.CreateTimeLogResponse]
-	listTimeLogs          *connect.Client[v1.ListTimeLogsRequest, v1.ListTimeLogsResponse]
-	updateTimeLog         *connect.Client[v1.UpdateTimeLogRequest, v1.UpdateTimeLogResponse]
-	deleteTimeLog         *connect.Client[v1.DeleteTimeLogRequest, v1.DeleteTimeLogResponse]
-	startTraining         *connect.Client[v1.StartTrainingRequest, v1.StartTrainingResponse]
-	finishTraining        *connect.Client[v1.FinishTrainingRequest, v1.FinishTrainingResponse]
-	listTrainings         *connect.Client[v1.ListTrainingsRequest, v1.ListTrainingsResponse]
-	deleteTraining        *connect.Client[v1.DeleteTrainingRequest, v1.DeleteTrainingResponse]
-	createCert            *connect.Client[v1.CreateCertRequest, v1.CreateCertResponse]
-	listCerts             *connect.Client[v1.ListCertsRequest, v1.ListCertsResponse]
-	getCert               *connect.Client[v1.GetCertRequest, v1.GetCertResponse]
-	updateCert            *connect.Client[v1.UpdateCertRequest, v1.UpdateCertResponse]
-	deleteCert            *connect.Client[v1.DeleteCertRequest, v1.DeleteCertResponse]
-	createEvent           *connect.Client[v1.CreateEventRequest, v1.CreateEventResponse]
-	listEvents            *connect.Client[v1.ListEventsRequest, v1.ListEventsResponse]
-	updateEvent           *connect.Client[v1.UpdateEventRequest, v1.UpdateEventResponse]
-	deleteEvent           *connect.Client[v1.DeleteEventRequest, v1.DeleteEventResponse]
-	listEventVolunteers   *connect.Client[v1.ListEventVolunteersRequest, v1.ListEventVolunteersResponse]
-	addEventVolunteers    *connect.Client[v1.AddEventVolunteersRequest, v1.AddEventVolunteersResponse]
-	removeEventVolunteers *connect.Client[v1.RemoveEventVolunteersRequest, v1.RemoveEventVolunteersResponse]
+	createVolunteer        *connect.Client[v1.CreateVolunteerRequest, v1.CreateVolunteerResponse]
+	getVolunteer           *connect.Client[v1.GetVolunteerRequest, v1.GetVolunteerResponse]
+	getVolunteerProfile    *connect.Client[v1.GetVolunteerProfileRequest, v1.GetVolunteerProfileResponse]
+	listVolunteers         *connect.Client[v1.ListVolunteersRequest, v1.ListVolunteersResponse]
+	updateVolunteer        *connect.Client[v1.UpdateVolunteerRequest, v1.UpdateVolunteerResponse]
+	updateVolunteerProfile *connect.Client[v1.UpdateVolunteerProfileRequest, v1.UpdateVolunteerProfileResponse]
+	createTimeLog          *connect.Client[v1.CreateTimeLogRequest, v1.CreateTimeLogResponse]
+	listTimeLogs           *connect.Client[v1.ListTimeLogsRequest, v1.ListTimeLogsResponse]
+	updateTimeLog          *connect.Client[v1.UpdateTimeLogRequest, v1.UpdateTimeLogResponse]
+	deleteTimeLog          *connect.Client[v1.DeleteTimeLogRequest, v1.DeleteTimeLogResponse]
+	startTraining          *connect.Client[v1.StartTrainingRequest, v1.StartTrainingResponse]
+	finishTraining         *connect.Client[v1.FinishTrainingRequest, v1.FinishTrainingResponse]
+	listTrainings          *connect.Client[v1.ListTrainingsRequest, v1.ListTrainingsResponse]
+	deleteTraining         *connect.Client[v1.DeleteTrainingRequest, v1.DeleteTrainingResponse]
+	createCert             *connect.Client[v1.CreateCertRequest, v1.CreateCertResponse]
+	listCerts              *connect.Client[v1.ListCertsRequest, v1.ListCertsResponse]
+	getCert                *connect.Client[v1.GetCertRequest, v1.GetCertResponse]
+	updateCert             *connect.Client[v1.UpdateCertRequest, v1.UpdateCertResponse]
+	deleteCert             *connect.Client[v1.DeleteCertRequest, v1.DeleteCertResponse]
+	createEvent            *connect.Client[v1.CreateEventRequest, v1.CreateEventResponse]
+	listEvents             *connect.Client[v1.ListEventsRequest, v1.ListEventsResponse]
+	updateEvent            *connect.Client[v1.UpdateEventRequest, v1.UpdateEventResponse]
+	deleteEvent            *connect.Client[v1.DeleteEventRequest, v1.DeleteEventResponse]
+	listEventVolunteers    *connect.Client[v1.ListEventVolunteersRequest, v1.ListEventVolunteersResponse]
+	addEventVolunteers     *connect.Client[v1.AddEventVolunteersRequest, v1.AddEventVolunteersResponse]
+	removeEventVolunteers  *connect.Client[v1.RemoveEventVolunteersRequest, v1.RemoveEventVolunteersResponse]
 }
 
 // CreateVolunteer calls api.v1.VolunteerService.CreateVolunteer.
@@ -365,6 +394,11 @@ func (c *volunteerServiceClient) GetVolunteer(ctx context.Context, req *connect.
 	return c.getVolunteer.CallUnary(ctx, req)
 }
 
+// GetVolunteerProfile calls api.v1.VolunteerService.GetVolunteerProfile.
+func (c *volunteerServiceClient) GetVolunteerProfile(ctx context.Context, req *connect.Request[v1.GetVolunteerProfileRequest]) (*connect.Response[v1.GetVolunteerProfileResponse], error) {
+	return c.getVolunteerProfile.CallUnary(ctx, req)
+}
+
 // ListVolunteers calls api.v1.VolunteerService.ListVolunteers.
 func (c *volunteerServiceClient) ListVolunteers(ctx context.Context, req *connect.Request[v1.ListVolunteersRequest]) (*connect.Response[v1.ListVolunteersResponse], error) {
 	return c.listVolunteers.CallUnary(ctx, req)
@@ -373,6 +407,11 @@ func (c *volunteerServiceClient) ListVolunteers(ctx context.Context, req *connec
 // UpdateVolunteer calls api.v1.VolunteerService.UpdateVolunteer.
 func (c *volunteerServiceClient) UpdateVolunteer(ctx context.Context, req *connect.Request[v1.UpdateVolunteerRequest]) (*connect.Response[v1.UpdateVolunteerResponse], error) {
 	return c.updateVolunteer.CallUnary(ctx, req)
+}
+
+// UpdateVolunteerProfile calls api.v1.VolunteerService.UpdateVolunteerProfile.
+func (c *volunteerServiceClient) UpdateVolunteerProfile(ctx context.Context, req *connect.Request[v1.UpdateVolunteerProfileRequest]) (*connect.Response[v1.UpdateVolunteerProfileResponse], error) {
+	return c.updateVolunteerProfile.CallUnary(ctx, req)
 }
 
 // CreateTimeLog calls api.v1.VolunteerService.CreateTimeLog.
@@ -477,11 +516,18 @@ func (c *volunteerServiceClient) RemoveEventVolunteers(ctx context.Context, req 
 
 // VolunteerServiceHandler is an implementation of the api.v1.VolunteerService service.
 type VolunteerServiceHandler interface {
+	// users
+	// rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+	// rpc GetUser(GetUserRequest) returns (GetUserResponse);
+	// rpc ListUsers(GetUserRequest) returns (GetUserResponse);
+	// rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
 	// volunteers
 	CreateVolunteer(context.Context, *connect.Request[v1.CreateVolunteerRequest]) (*connect.Response[v1.CreateVolunteerResponse], error)
 	GetVolunteer(context.Context, *connect.Request[v1.GetVolunteerRequest]) (*connect.Response[v1.GetVolunteerResponse], error)
+	GetVolunteerProfile(context.Context, *connect.Request[v1.GetVolunteerProfileRequest]) (*connect.Response[v1.GetVolunteerProfileResponse], error)
 	ListVolunteers(context.Context, *connect.Request[v1.ListVolunteersRequest]) (*connect.Response[v1.ListVolunteersResponse], error)
 	UpdateVolunteer(context.Context, *connect.Request[v1.UpdateVolunteerRequest]) (*connect.Response[v1.UpdateVolunteerResponse], error)
+	UpdateVolunteerProfile(context.Context, *connect.Request[v1.UpdateVolunteerProfileRequest]) (*connect.Response[v1.UpdateVolunteerProfileResponse], error)
 	// time logs
 	CreateTimeLog(context.Context, *connect.Request[v1.CreateTimeLogRequest]) (*connect.Response[v1.CreateTimeLogResponse], error)
 	ListTimeLogs(context.Context, *connect.Request[v1.ListTimeLogsRequest]) (*connect.Response[v1.ListTimeLogsResponse], error)
@@ -527,6 +573,12 @@ func NewVolunteerServiceHandler(svc VolunteerServiceHandler, opts ...connect.Han
 		connect.WithSchema(volunteerServiceGetVolunteerMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	volunteerServiceGetVolunteerProfileHandler := connect.NewUnaryHandler(
+		VolunteerServiceGetVolunteerProfileProcedure,
+		svc.GetVolunteerProfile,
+		connect.WithSchema(volunteerServiceGetVolunteerProfileMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	volunteerServiceListVolunteersHandler := connect.NewUnaryHandler(
 		VolunteerServiceListVolunteersProcedure,
 		svc.ListVolunteers,
@@ -537,6 +589,12 @@ func NewVolunteerServiceHandler(svc VolunteerServiceHandler, opts ...connect.Han
 		VolunteerServiceUpdateVolunteerProcedure,
 		svc.UpdateVolunteer,
 		connect.WithSchema(volunteerServiceUpdateVolunteerMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	volunteerServiceUpdateVolunteerProfileHandler := connect.NewUnaryHandler(
+		VolunteerServiceUpdateVolunteerProfileProcedure,
+		svc.UpdateVolunteerProfile,
+		connect.WithSchema(volunteerServiceUpdateVolunteerProfileMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
 	volunteerServiceCreateTimeLogHandler := connect.NewUnaryHandler(
@@ -665,10 +723,14 @@ func NewVolunteerServiceHandler(svc VolunteerServiceHandler, opts ...connect.Han
 			volunteerServiceCreateVolunteerHandler.ServeHTTP(w, r)
 		case VolunteerServiceGetVolunteerProcedure:
 			volunteerServiceGetVolunteerHandler.ServeHTTP(w, r)
+		case VolunteerServiceGetVolunteerProfileProcedure:
+			volunteerServiceGetVolunteerProfileHandler.ServeHTTP(w, r)
 		case VolunteerServiceListVolunteersProcedure:
 			volunteerServiceListVolunteersHandler.ServeHTTP(w, r)
 		case VolunteerServiceUpdateVolunteerProcedure:
 			volunteerServiceUpdateVolunteerHandler.ServeHTTP(w, r)
+		case VolunteerServiceUpdateVolunteerProfileProcedure:
+			volunteerServiceUpdateVolunteerProfileHandler.ServeHTTP(w, r)
 		case VolunteerServiceCreateTimeLogProcedure:
 			volunteerServiceCreateTimeLogHandler.ServeHTTP(w, r)
 		case VolunteerServiceListTimeLogsProcedure:
@@ -726,12 +788,20 @@ func (UnimplementedVolunteerServiceHandler) GetVolunteer(context.Context, *conne
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.VolunteerService.GetVolunteer is not implemented"))
 }
 
+func (UnimplementedVolunteerServiceHandler) GetVolunteerProfile(context.Context, *connect.Request[v1.GetVolunteerProfileRequest]) (*connect.Response[v1.GetVolunteerProfileResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.VolunteerService.GetVolunteerProfile is not implemented"))
+}
+
 func (UnimplementedVolunteerServiceHandler) ListVolunteers(context.Context, *connect.Request[v1.ListVolunteersRequest]) (*connect.Response[v1.ListVolunteersResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.VolunteerService.ListVolunteers is not implemented"))
 }
 
 func (UnimplementedVolunteerServiceHandler) UpdateVolunteer(context.Context, *connect.Request[v1.UpdateVolunteerRequest]) (*connect.Response[v1.UpdateVolunteerResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.VolunteerService.UpdateVolunteer is not implemented"))
+}
+
+func (UnimplementedVolunteerServiceHandler) UpdateVolunteerProfile(context.Context, *connect.Request[v1.UpdateVolunteerProfileRequest]) (*connect.Response[v1.UpdateVolunteerProfileResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.VolunteerService.UpdateVolunteerProfile is not implemented"))
 }
 
 func (UnimplementedVolunteerServiceHandler) CreateTimeLog(context.Context, *connect.Request[v1.CreateTimeLogRequest]) (*connect.Response[v1.CreateTimeLogResponse], error) {

@@ -9,6 +9,7 @@ import (
 	"log"
 	"reflect"
 
+	"github.com/google/uuid"
 	"github.com/tinkerrc/volunteer/ent/migrate"
 
 	"entgo.io/ent"
@@ -696,7 +697,7 @@ func (c *UserClient) UpdateOne(u *User) *UserUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *UserClient) UpdateOneID(id int) *UserUpdateOne {
+func (c *UserClient) UpdateOneID(id uuid.UUID) *UserUpdateOne {
 	mutation := newUserMutation(c.config, OpUpdateOne, withUserID(id))
 	return &UserUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -713,7 +714,7 @@ func (c *UserClient) DeleteOne(u *User) *UserDeleteOne {
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *UserClient) DeleteOneID(id int) *UserDeleteOne {
+func (c *UserClient) DeleteOneID(id uuid.UUID) *UserDeleteOne {
 	builder := c.Delete().Where(user.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -730,12 +731,12 @@ func (c *UserClient) Query() *UserQuery {
 }
 
 // Get returns a User entity by its id.
-func (c *UserClient) Get(ctx context.Context, id int) (*User, error) {
+func (c *UserClient) Get(ctx context.Context, id uuid.UUID) (*User, error) {
 	return c.Query().Where(user.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *UserClient) GetX(ctx context.Context, id int) *User {
+func (c *UserClient) GetX(ctx context.Context, id uuid.UUID) *User {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -829,7 +830,7 @@ func (c *VolunteerClient) UpdateOne(v *Volunteer) *VolunteerUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *VolunteerClient) UpdateOneID(id int) *VolunteerUpdateOne {
+func (c *VolunteerClient) UpdateOneID(id uuid.UUID) *VolunteerUpdateOne {
 	mutation := newVolunteerMutation(c.config, OpUpdateOne, withVolunteerID(id))
 	return &VolunteerUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -846,7 +847,7 @@ func (c *VolunteerClient) DeleteOne(v *Volunteer) *VolunteerDeleteOne {
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *VolunteerClient) DeleteOneID(id int) *VolunteerDeleteOne {
+func (c *VolunteerClient) DeleteOneID(id uuid.UUID) *VolunteerDeleteOne {
 	builder := c.Delete().Where(volunteer.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -863,12 +864,12 @@ func (c *VolunteerClient) Query() *VolunteerQuery {
 }
 
 // Get returns a Volunteer entity by its id.
-func (c *VolunteerClient) Get(ctx context.Context, id int) (*Volunteer, error) {
+func (c *VolunteerClient) Get(ctx context.Context, id uuid.UUID) (*Volunteer, error) {
 	return c.Query().Where(volunteer.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *VolunteerClient) GetX(ctx context.Context, id int) *Volunteer {
+func (c *VolunteerClient) GetX(ctx context.Context, id uuid.UUID) *Volunteer {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)

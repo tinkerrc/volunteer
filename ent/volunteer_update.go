@@ -27,6 +27,104 @@ func (vu *VolunteerUpdate) Where(ps ...predicate.Volunteer) *VolunteerUpdate {
 	return vu
 }
 
+// SetEmail sets the "email" field.
+func (vu *VolunteerUpdate) SetEmail(s string) *VolunteerUpdate {
+	vu.mutation.SetEmail(s)
+	return vu
+}
+
+// SetNillableEmail sets the "email" field if the given value is not nil.
+func (vu *VolunteerUpdate) SetNillableEmail(s *string) *VolunteerUpdate {
+	if s != nil {
+		vu.SetEmail(*s)
+	}
+	return vu
+}
+
+// SetFirstName sets the "first_name" field.
+func (vu *VolunteerUpdate) SetFirstName(s string) *VolunteerUpdate {
+	vu.mutation.SetFirstName(s)
+	return vu
+}
+
+// SetNillableFirstName sets the "first_name" field if the given value is not nil.
+func (vu *VolunteerUpdate) SetNillableFirstName(s *string) *VolunteerUpdate {
+	if s != nil {
+		vu.SetFirstName(*s)
+	}
+	return vu
+}
+
+// SetMiddleName sets the "middle_name" field.
+func (vu *VolunteerUpdate) SetMiddleName(s string) *VolunteerUpdate {
+	vu.mutation.SetMiddleName(s)
+	return vu
+}
+
+// SetNillableMiddleName sets the "middle_name" field if the given value is not nil.
+func (vu *VolunteerUpdate) SetNillableMiddleName(s *string) *VolunteerUpdate {
+	if s != nil {
+		vu.SetMiddleName(*s)
+	}
+	return vu
+}
+
+// SetLastName sets the "last_name" field.
+func (vu *VolunteerUpdate) SetLastName(s string) *VolunteerUpdate {
+	vu.mutation.SetLastName(s)
+	return vu
+}
+
+// SetNillableLastName sets the "last_name" field if the given value is not nil.
+func (vu *VolunteerUpdate) SetNillableLastName(s *string) *VolunteerUpdate {
+	if s != nil {
+		vu.SetLastName(*s)
+	}
+	return vu
+}
+
+// SetPhone sets the "phone" field.
+func (vu *VolunteerUpdate) SetPhone(s string) *VolunteerUpdate {
+	vu.mutation.SetPhone(s)
+	return vu
+}
+
+// SetNillablePhone sets the "phone" field if the given value is not nil.
+func (vu *VolunteerUpdate) SetNillablePhone(s *string) *VolunteerUpdate {
+	if s != nil {
+		vu.SetPhone(*s)
+	}
+	return vu
+}
+
+// SetAddress sets the "address" field.
+func (vu *VolunteerUpdate) SetAddress(s string) *VolunteerUpdate {
+	vu.mutation.SetAddress(s)
+	return vu
+}
+
+// SetNillableAddress sets the "address" field if the given value is not nil.
+func (vu *VolunteerUpdate) SetNillableAddress(s *string) *VolunteerUpdate {
+	if s != nil {
+		vu.SetAddress(*s)
+	}
+	return vu
+}
+
+// SetNotes sets the "notes" field.
+func (vu *VolunteerUpdate) SetNotes(s string) *VolunteerUpdate {
+	vu.mutation.SetNotes(s)
+	return vu
+}
+
+// SetNillableNotes sets the "notes" field if the given value is not nil.
+func (vu *VolunteerUpdate) SetNillableNotes(s *string) *VolunteerUpdate {
+	if s != nil {
+		vu.SetNotes(*s)
+	}
+	return vu
+}
+
 // Mutation returns the VolunteerMutation object of the builder.
 func (vu *VolunteerUpdate) Mutation() *VolunteerMutation {
 	return vu.mutation
@@ -60,13 +158,34 @@ func (vu *VolunteerUpdate) ExecX(ctx context.Context) {
 }
 
 func (vu *VolunteerUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	_spec := sqlgraph.NewUpdateSpec(volunteer.Table, volunteer.Columns, sqlgraph.NewFieldSpec(volunteer.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(volunteer.Table, volunteer.Columns, sqlgraph.NewFieldSpec(volunteer.FieldID, field.TypeUUID))
 	if ps := vu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := vu.mutation.Email(); ok {
+		_spec.SetField(volunteer.FieldEmail, field.TypeString, value)
+	}
+	if value, ok := vu.mutation.FirstName(); ok {
+		_spec.SetField(volunteer.FieldFirstName, field.TypeString, value)
+	}
+	if value, ok := vu.mutation.MiddleName(); ok {
+		_spec.SetField(volunteer.FieldMiddleName, field.TypeString, value)
+	}
+	if value, ok := vu.mutation.LastName(); ok {
+		_spec.SetField(volunteer.FieldLastName, field.TypeString, value)
+	}
+	if value, ok := vu.mutation.Phone(); ok {
+		_spec.SetField(volunteer.FieldPhone, field.TypeString, value)
+	}
+	if value, ok := vu.mutation.Address(); ok {
+		_spec.SetField(volunteer.FieldAddress, field.TypeString, value)
+	}
+	if value, ok := vu.mutation.Notes(); ok {
+		_spec.SetField(volunteer.FieldNotes, field.TypeString, value)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, vu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -86,6 +205,104 @@ type VolunteerUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *VolunteerMutation
+}
+
+// SetEmail sets the "email" field.
+func (vuo *VolunteerUpdateOne) SetEmail(s string) *VolunteerUpdateOne {
+	vuo.mutation.SetEmail(s)
+	return vuo
+}
+
+// SetNillableEmail sets the "email" field if the given value is not nil.
+func (vuo *VolunteerUpdateOne) SetNillableEmail(s *string) *VolunteerUpdateOne {
+	if s != nil {
+		vuo.SetEmail(*s)
+	}
+	return vuo
+}
+
+// SetFirstName sets the "first_name" field.
+func (vuo *VolunteerUpdateOne) SetFirstName(s string) *VolunteerUpdateOne {
+	vuo.mutation.SetFirstName(s)
+	return vuo
+}
+
+// SetNillableFirstName sets the "first_name" field if the given value is not nil.
+func (vuo *VolunteerUpdateOne) SetNillableFirstName(s *string) *VolunteerUpdateOne {
+	if s != nil {
+		vuo.SetFirstName(*s)
+	}
+	return vuo
+}
+
+// SetMiddleName sets the "middle_name" field.
+func (vuo *VolunteerUpdateOne) SetMiddleName(s string) *VolunteerUpdateOne {
+	vuo.mutation.SetMiddleName(s)
+	return vuo
+}
+
+// SetNillableMiddleName sets the "middle_name" field if the given value is not nil.
+func (vuo *VolunteerUpdateOne) SetNillableMiddleName(s *string) *VolunteerUpdateOne {
+	if s != nil {
+		vuo.SetMiddleName(*s)
+	}
+	return vuo
+}
+
+// SetLastName sets the "last_name" field.
+func (vuo *VolunteerUpdateOne) SetLastName(s string) *VolunteerUpdateOne {
+	vuo.mutation.SetLastName(s)
+	return vuo
+}
+
+// SetNillableLastName sets the "last_name" field if the given value is not nil.
+func (vuo *VolunteerUpdateOne) SetNillableLastName(s *string) *VolunteerUpdateOne {
+	if s != nil {
+		vuo.SetLastName(*s)
+	}
+	return vuo
+}
+
+// SetPhone sets the "phone" field.
+func (vuo *VolunteerUpdateOne) SetPhone(s string) *VolunteerUpdateOne {
+	vuo.mutation.SetPhone(s)
+	return vuo
+}
+
+// SetNillablePhone sets the "phone" field if the given value is not nil.
+func (vuo *VolunteerUpdateOne) SetNillablePhone(s *string) *VolunteerUpdateOne {
+	if s != nil {
+		vuo.SetPhone(*s)
+	}
+	return vuo
+}
+
+// SetAddress sets the "address" field.
+func (vuo *VolunteerUpdateOne) SetAddress(s string) *VolunteerUpdateOne {
+	vuo.mutation.SetAddress(s)
+	return vuo
+}
+
+// SetNillableAddress sets the "address" field if the given value is not nil.
+func (vuo *VolunteerUpdateOne) SetNillableAddress(s *string) *VolunteerUpdateOne {
+	if s != nil {
+		vuo.SetAddress(*s)
+	}
+	return vuo
+}
+
+// SetNotes sets the "notes" field.
+func (vuo *VolunteerUpdateOne) SetNotes(s string) *VolunteerUpdateOne {
+	vuo.mutation.SetNotes(s)
+	return vuo
+}
+
+// SetNillableNotes sets the "notes" field if the given value is not nil.
+func (vuo *VolunteerUpdateOne) SetNillableNotes(s *string) *VolunteerUpdateOne {
+	if s != nil {
+		vuo.SetNotes(*s)
+	}
+	return vuo
 }
 
 // Mutation returns the VolunteerMutation object of the builder.
@@ -134,7 +351,7 @@ func (vuo *VolunteerUpdateOne) ExecX(ctx context.Context) {
 }
 
 func (vuo *VolunteerUpdateOne) sqlSave(ctx context.Context) (_node *Volunteer, err error) {
-	_spec := sqlgraph.NewUpdateSpec(volunteer.Table, volunteer.Columns, sqlgraph.NewFieldSpec(volunteer.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(volunteer.Table, volunteer.Columns, sqlgraph.NewFieldSpec(volunteer.FieldID, field.TypeUUID))
 	id, ok := vuo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Volunteer.id" for update`)}
@@ -158,6 +375,27 @@ func (vuo *VolunteerUpdateOne) sqlSave(ctx context.Context) (_node *Volunteer, e
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := vuo.mutation.Email(); ok {
+		_spec.SetField(volunteer.FieldEmail, field.TypeString, value)
+	}
+	if value, ok := vuo.mutation.FirstName(); ok {
+		_spec.SetField(volunteer.FieldFirstName, field.TypeString, value)
+	}
+	if value, ok := vuo.mutation.MiddleName(); ok {
+		_spec.SetField(volunteer.FieldMiddleName, field.TypeString, value)
+	}
+	if value, ok := vuo.mutation.LastName(); ok {
+		_spec.SetField(volunteer.FieldLastName, field.TypeString, value)
+	}
+	if value, ok := vuo.mutation.Phone(); ok {
+		_spec.SetField(volunteer.FieldPhone, field.TypeString, value)
+	}
+	if value, ok := vuo.mutation.Address(); ok {
+		_spec.SetField(volunteer.FieldAddress, field.TypeString, value)
+	}
+	if value, ok := vuo.mutation.Notes(); ok {
+		_spec.SetField(volunteer.FieldNotes, field.TypeString, value)
 	}
 	_node = &Volunteer{config: vuo.config}
 	_spec.Assign = _node.assignValues

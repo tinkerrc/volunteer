@@ -4,6 +4,7 @@ package volunteer
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"github.com/google/uuid"
 )
 
 const (
@@ -11,6 +12,20 @@ const (
 	Label = "volunteer"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldEmail holds the string denoting the email field in the database.
+	FieldEmail = "email"
+	// FieldFirstName holds the string denoting the first_name field in the database.
+	FieldFirstName = "first_name"
+	// FieldMiddleName holds the string denoting the middle_name field in the database.
+	FieldMiddleName = "middle_name"
+	// FieldLastName holds the string denoting the last_name field in the database.
+	FieldLastName = "last_name"
+	// FieldPhone holds the string denoting the phone field in the database.
+	FieldPhone = "phone"
+	// FieldAddress holds the string denoting the address field in the database.
+	FieldAddress = "address"
+	// FieldNotes holds the string denoting the notes field in the database.
+	FieldNotes = "notes"
 	// Table holds the table name of the volunteer in the database.
 	Table = "volunteers"
 )
@@ -18,6 +33,13 @@ const (
 // Columns holds all SQL columns for volunteer fields.
 var Columns = []string{
 	FieldID,
+	FieldEmail,
+	FieldFirstName,
+	FieldMiddleName,
+	FieldLastName,
+	FieldPhone,
+	FieldAddress,
+	FieldNotes,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -30,10 +52,50 @@ func ValidColumn(column string) bool {
 	return false
 }
 
+var (
+	// DefaultID holds the default value on creation for the "id" field.
+	DefaultID func() uuid.UUID
+)
+
 // OrderOption defines the ordering options for the Volunteer queries.
 type OrderOption func(*sql.Selector)
 
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByEmail orders the results by the email field.
+func ByEmail(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldEmail, opts...).ToFunc()
+}
+
+// ByFirstName orders the results by the first_name field.
+func ByFirstName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldFirstName, opts...).ToFunc()
+}
+
+// ByMiddleName orders the results by the middle_name field.
+func ByMiddleName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMiddleName, opts...).ToFunc()
+}
+
+// ByLastName orders the results by the last_name field.
+func ByLastName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLastName, opts...).ToFunc()
+}
+
+// ByPhone orders the results by the phone field.
+func ByPhone(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPhone, opts...).ToFunc()
+}
+
+// ByAddress orders the results by the address field.
+func ByAddress(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAddress, opts...).ToFunc()
+}
+
+// ByNotes orders the results by the notes field.
+func ByNotes(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldNotes, opts...).ToFunc()
 }

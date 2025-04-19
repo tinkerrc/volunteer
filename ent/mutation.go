@@ -10,7 +10,10 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/google/uuid"
 	"github.com/tinkerrc/volunteer/ent/predicate"
+	"github.com/tinkerrc/volunteer/ent/user"
+	"github.com/tinkerrc/volunteer/ent/volunteer"
 )
 
 const (
@@ -826,7 +829,8 @@ type UserMutation struct {
 	config
 	op            Op
 	typ           string
-	id            *int
+	id            *uuid.UUID
+	email         *string
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*User, error)
@@ -853,7 +857,7 @@ func newUserMutation(c config, op Op, opts ...userOption) *UserMutation {
 }
 
 // withUserID sets the ID field of the mutation.
-func withUserID(id int) userOption {
+func withUserID(id uuid.UUID) userOption {
 	return func(m *UserMutation) {
 		var (
 			err   error
@@ -903,9 +907,15 @@ func (m UserMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of User entities.
+func (m *UserMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *UserMutation) ID() (id int, exists bool) {
+func (m *UserMutation) ID() (id uuid.UUID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -916,12 +926,12 @@ func (m *UserMutation) ID() (id int, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *UserMutation) IDs(ctx context.Context) ([]int, error) {
+func (m *UserMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []int{id}, nil
+			return []uuid.UUID{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
@@ -929,6 +939,42 @@ func (m *UserMutation) IDs(ctx context.Context) ([]int, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
+}
+
+// SetEmail sets the "email" field.
+func (m *UserMutation) SetEmail(s string) {
+	m.email = &s
+}
+
+// Email returns the value of the "email" field in the mutation.
+func (m *UserMutation) Email() (r string, exists bool) {
+	v := m.email
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEmail returns the old "email" field's value of the User entity.
+// If the User object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserMutation) OldEmail(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEmail is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEmail requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEmail: %w", err)
+	}
+	return oldValue.Email, nil
+}
+
+// ResetEmail resets all changes to the "email" field.
+func (m *UserMutation) ResetEmail() {
+	m.email = nil
 }
 
 // Where appends a list predicates to the UserMutation builder.
@@ -965,7 +1011,10 @@ func (m *UserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserMutation) Fields() []string {
-	fields := make([]string, 0, 0)
+	fields := make([]string, 0, 1)
+	if m.email != nil {
+		fields = append(fields, user.FieldEmail)
+	}
 	return fields
 }
 
@@ -973,6 +1022,10 @@ func (m *UserMutation) Fields() []string {
 // return value indicates that this field was not set, or was not defined in the
 // schema.
 func (m *UserMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case user.FieldEmail:
+		return m.Email()
+	}
 	return nil, false
 }
 
@@ -980,6 +1033,10 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 // returned if the mutation operation is not UpdateOne, or the query to the
 // database failed.
 func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case user.FieldEmail:
+		return m.OldEmail(ctx)
+	}
 	return nil, fmt.Errorf("unknown User field %s", name)
 }
 
@@ -988,6 +1045,13 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 // type.
 func (m *UserMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case user.FieldEmail:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEmail(v)
+		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)
 }
@@ -1009,6 +1073,8 @@ func (m *UserMutation) AddedField(name string) (ent.Value, bool) {
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
 func (m *UserMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
 	return fmt.Errorf("unknown User numeric field %s", name)
 }
 
@@ -1034,6 +1100,11 @@ func (m *UserMutation) ClearField(name string) error {
 // ResetField resets all changes in the mutation for the field with the given name.
 // It returns an error if the field is not defined in the schema.
 func (m *UserMutation) ResetField(name string) error {
+	switch name {
+	case user.FieldEmail:
+		m.ResetEmail()
+		return nil
+	}
 	return fmt.Errorf("unknown User field %s", name)
 }
 
@@ -1090,7 +1161,14 @@ type VolunteerMutation struct {
 	config
 	op            Op
 	typ           string
-	id            *int
+	id            *uuid.UUID
+	email         *string
+	first_name    *string
+	middle_name   *string
+	last_name     *string
+	phone         *string
+	address       *string
+	notes         *string
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*Volunteer, error)
@@ -1117,7 +1195,7 @@ func newVolunteerMutation(c config, op Op, opts ...volunteerOption) *VolunteerMu
 }
 
 // withVolunteerID sets the ID field of the mutation.
-func withVolunteerID(id int) volunteerOption {
+func withVolunteerID(id uuid.UUID) volunteerOption {
 	return func(m *VolunteerMutation) {
 		var (
 			err   error
@@ -1167,9 +1245,15 @@ func (m VolunteerMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Volunteer entities.
+func (m *VolunteerMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *VolunteerMutation) ID() (id int, exists bool) {
+func (m *VolunteerMutation) ID() (id uuid.UUID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -1180,12 +1264,12 @@ func (m *VolunteerMutation) ID() (id int, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *VolunteerMutation) IDs(ctx context.Context) ([]int, error) {
+func (m *VolunteerMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []int{id}, nil
+			return []uuid.UUID{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
@@ -1193,6 +1277,258 @@ func (m *VolunteerMutation) IDs(ctx context.Context) ([]int, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
+}
+
+// SetEmail sets the "email" field.
+func (m *VolunteerMutation) SetEmail(s string) {
+	m.email = &s
+}
+
+// Email returns the value of the "email" field in the mutation.
+func (m *VolunteerMutation) Email() (r string, exists bool) {
+	v := m.email
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEmail returns the old "email" field's value of the Volunteer entity.
+// If the Volunteer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VolunteerMutation) OldEmail(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEmail is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEmail requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEmail: %w", err)
+	}
+	return oldValue.Email, nil
+}
+
+// ResetEmail resets all changes to the "email" field.
+func (m *VolunteerMutation) ResetEmail() {
+	m.email = nil
+}
+
+// SetFirstName sets the "first_name" field.
+func (m *VolunteerMutation) SetFirstName(s string) {
+	m.first_name = &s
+}
+
+// FirstName returns the value of the "first_name" field in the mutation.
+func (m *VolunteerMutation) FirstName() (r string, exists bool) {
+	v := m.first_name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFirstName returns the old "first_name" field's value of the Volunteer entity.
+// If the Volunteer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VolunteerMutation) OldFirstName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFirstName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFirstName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFirstName: %w", err)
+	}
+	return oldValue.FirstName, nil
+}
+
+// ResetFirstName resets all changes to the "first_name" field.
+func (m *VolunteerMutation) ResetFirstName() {
+	m.first_name = nil
+}
+
+// SetMiddleName sets the "middle_name" field.
+func (m *VolunteerMutation) SetMiddleName(s string) {
+	m.middle_name = &s
+}
+
+// MiddleName returns the value of the "middle_name" field in the mutation.
+func (m *VolunteerMutation) MiddleName() (r string, exists bool) {
+	v := m.middle_name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMiddleName returns the old "middle_name" field's value of the Volunteer entity.
+// If the Volunteer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VolunteerMutation) OldMiddleName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMiddleName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMiddleName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMiddleName: %w", err)
+	}
+	return oldValue.MiddleName, nil
+}
+
+// ResetMiddleName resets all changes to the "middle_name" field.
+func (m *VolunteerMutation) ResetMiddleName() {
+	m.middle_name = nil
+}
+
+// SetLastName sets the "last_name" field.
+func (m *VolunteerMutation) SetLastName(s string) {
+	m.last_name = &s
+}
+
+// LastName returns the value of the "last_name" field in the mutation.
+func (m *VolunteerMutation) LastName() (r string, exists bool) {
+	v := m.last_name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLastName returns the old "last_name" field's value of the Volunteer entity.
+// If the Volunteer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VolunteerMutation) OldLastName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLastName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLastName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLastName: %w", err)
+	}
+	return oldValue.LastName, nil
+}
+
+// ResetLastName resets all changes to the "last_name" field.
+func (m *VolunteerMutation) ResetLastName() {
+	m.last_name = nil
+}
+
+// SetPhone sets the "phone" field.
+func (m *VolunteerMutation) SetPhone(s string) {
+	m.phone = &s
+}
+
+// Phone returns the value of the "phone" field in the mutation.
+func (m *VolunteerMutation) Phone() (r string, exists bool) {
+	v := m.phone
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPhone returns the old "phone" field's value of the Volunteer entity.
+// If the Volunteer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VolunteerMutation) OldPhone(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPhone is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPhone requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPhone: %w", err)
+	}
+	return oldValue.Phone, nil
+}
+
+// ResetPhone resets all changes to the "phone" field.
+func (m *VolunteerMutation) ResetPhone() {
+	m.phone = nil
+}
+
+// SetAddress sets the "address" field.
+func (m *VolunteerMutation) SetAddress(s string) {
+	m.address = &s
+}
+
+// Address returns the value of the "address" field in the mutation.
+func (m *VolunteerMutation) Address() (r string, exists bool) {
+	v := m.address
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAddress returns the old "address" field's value of the Volunteer entity.
+// If the Volunteer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VolunteerMutation) OldAddress(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAddress is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAddress requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAddress: %w", err)
+	}
+	return oldValue.Address, nil
+}
+
+// ResetAddress resets all changes to the "address" field.
+func (m *VolunteerMutation) ResetAddress() {
+	m.address = nil
+}
+
+// SetNotes sets the "notes" field.
+func (m *VolunteerMutation) SetNotes(s string) {
+	m.notes = &s
+}
+
+// Notes returns the value of the "notes" field in the mutation.
+func (m *VolunteerMutation) Notes() (r string, exists bool) {
+	v := m.notes
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldNotes returns the old "notes" field's value of the Volunteer entity.
+// If the Volunteer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VolunteerMutation) OldNotes(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldNotes is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldNotes requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldNotes: %w", err)
+	}
+	return oldValue.Notes, nil
+}
+
+// ResetNotes resets all changes to the "notes" field.
+func (m *VolunteerMutation) ResetNotes() {
+	m.notes = nil
 }
 
 // Where appends a list predicates to the VolunteerMutation builder.
@@ -1229,7 +1565,28 @@ func (m *VolunteerMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *VolunteerMutation) Fields() []string {
-	fields := make([]string, 0, 0)
+	fields := make([]string, 0, 7)
+	if m.email != nil {
+		fields = append(fields, volunteer.FieldEmail)
+	}
+	if m.first_name != nil {
+		fields = append(fields, volunteer.FieldFirstName)
+	}
+	if m.middle_name != nil {
+		fields = append(fields, volunteer.FieldMiddleName)
+	}
+	if m.last_name != nil {
+		fields = append(fields, volunteer.FieldLastName)
+	}
+	if m.phone != nil {
+		fields = append(fields, volunteer.FieldPhone)
+	}
+	if m.address != nil {
+		fields = append(fields, volunteer.FieldAddress)
+	}
+	if m.notes != nil {
+		fields = append(fields, volunteer.FieldNotes)
+	}
 	return fields
 }
 
@@ -1237,6 +1594,22 @@ func (m *VolunteerMutation) Fields() []string {
 // return value indicates that this field was not set, or was not defined in the
 // schema.
 func (m *VolunteerMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case volunteer.FieldEmail:
+		return m.Email()
+	case volunteer.FieldFirstName:
+		return m.FirstName()
+	case volunteer.FieldMiddleName:
+		return m.MiddleName()
+	case volunteer.FieldLastName:
+		return m.LastName()
+	case volunteer.FieldPhone:
+		return m.Phone()
+	case volunteer.FieldAddress:
+		return m.Address()
+	case volunteer.FieldNotes:
+		return m.Notes()
+	}
 	return nil, false
 }
 
@@ -1244,6 +1617,22 @@ func (m *VolunteerMutation) Field(name string) (ent.Value, bool) {
 // returned if the mutation operation is not UpdateOne, or the query to the
 // database failed.
 func (m *VolunteerMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case volunteer.FieldEmail:
+		return m.OldEmail(ctx)
+	case volunteer.FieldFirstName:
+		return m.OldFirstName(ctx)
+	case volunteer.FieldMiddleName:
+		return m.OldMiddleName(ctx)
+	case volunteer.FieldLastName:
+		return m.OldLastName(ctx)
+	case volunteer.FieldPhone:
+		return m.OldPhone(ctx)
+	case volunteer.FieldAddress:
+		return m.OldAddress(ctx)
+	case volunteer.FieldNotes:
+		return m.OldNotes(ctx)
+	}
 	return nil, fmt.Errorf("unknown Volunteer field %s", name)
 }
 
@@ -1252,6 +1641,55 @@ func (m *VolunteerMutation) OldField(ctx context.Context, name string) (ent.Valu
 // type.
 func (m *VolunteerMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case volunteer.FieldEmail:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEmail(v)
+		return nil
+	case volunteer.FieldFirstName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFirstName(v)
+		return nil
+	case volunteer.FieldMiddleName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMiddleName(v)
+		return nil
+	case volunteer.FieldLastName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLastName(v)
+		return nil
+	case volunteer.FieldPhone:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPhone(v)
+		return nil
+	case volunteer.FieldAddress:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAddress(v)
+		return nil
+	case volunteer.FieldNotes:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetNotes(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Volunteer field %s", name)
 }
@@ -1273,6 +1711,8 @@ func (m *VolunteerMutation) AddedField(name string) (ent.Value, bool) {
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
 func (m *VolunteerMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
 	return fmt.Errorf("unknown Volunteer numeric field %s", name)
 }
 
@@ -1298,6 +1738,29 @@ func (m *VolunteerMutation) ClearField(name string) error {
 // ResetField resets all changes in the mutation for the field with the given name.
 // It returns an error if the field is not defined in the schema.
 func (m *VolunteerMutation) ResetField(name string) error {
+	switch name {
+	case volunteer.FieldEmail:
+		m.ResetEmail()
+		return nil
+	case volunteer.FieldFirstName:
+		m.ResetFirstName()
+		return nil
+	case volunteer.FieldMiddleName:
+		m.ResetMiddleName()
+		return nil
+	case volunteer.FieldLastName:
+		m.ResetLastName()
+		return nil
+	case volunteer.FieldPhone:
+		m.ResetPhone()
+		return nil
+	case volunteer.FieldAddress:
+		m.ResetAddress()
+		return nil
+	case volunteer.FieldNotes:
+		m.ResetNotes()
+		return nil
+	}
 	return fmt.Errorf("unknown Volunteer field %s", name)
 }
 
