@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/tinkerrc/volunteer/ent/predicate"
 	"github.com/tinkerrc/volunteer/ent/volunteer"
 )
@@ -82,8 +83,8 @@ func (vq *VolunteerQuery) FirstX(ctx context.Context) *Volunteer {
 
 // FirstID returns the first Volunteer ID from the query.
 // Returns a *NotFoundError when no Volunteer ID was found.
-func (vq *VolunteerQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (vq *VolunteerQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = vq.Limit(1).IDs(setContextOp(ctx, vq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
@@ -95,7 +96,7 @@ func (vq *VolunteerQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (vq *VolunteerQuery) FirstIDX(ctx context.Context) int {
+func (vq *VolunteerQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	id, err := vq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -133,8 +134,8 @@ func (vq *VolunteerQuery) OnlyX(ctx context.Context) *Volunteer {
 // OnlyID is like Only, but returns the only Volunteer ID in the query.
 // Returns a *NotSingularError when more than one Volunteer ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (vq *VolunteerQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (vq *VolunteerQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = vq.Limit(2).IDs(setContextOp(ctx, vq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
@@ -150,7 +151,7 @@ func (vq *VolunteerQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (vq *VolunteerQuery) OnlyIDX(ctx context.Context) int {
+func (vq *VolunteerQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	id, err := vq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -178,7 +179,7 @@ func (vq *VolunteerQuery) AllX(ctx context.Context) []*Volunteer {
 }
 
 // IDs executes the query and returns a list of Volunteer IDs.
-func (vq *VolunteerQuery) IDs(ctx context.Context) (ids []int, err error) {
+func (vq *VolunteerQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error) {
 	if vq.ctx.Unique == nil && vq.path != nil {
 		vq.Unique(true)
 	}
@@ -190,7 +191,7 @@ func (vq *VolunteerQuery) IDs(ctx context.Context) (ids []int, err error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (vq *VolunteerQuery) IDsX(ctx context.Context) []int {
+func (vq *VolunteerQuery) IDsX(ctx context.Context) []uuid.UUID {
 	ids, err := vq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -258,6 +259,18 @@ func (vq *VolunteerQuery) Clone() *VolunteerQuery {
 
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
+//
+// Example:
+//
+//	var v []struct {
+//		Email string `json:"email,omitempty"`
+//		Count int `json:"count,omitempty"`
+//	}
+//
+//	client.Volunteer.Query().
+//		GroupBy(volunteer.FieldEmail).
+//		Aggregate(ent.Count()).
+//		Scan(ctx, &v)
 func (vq *VolunteerQuery) GroupBy(field string, fields ...string) *VolunteerGroupBy {
 	vq.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &VolunteerGroupBy{build: vq}
@@ -269,6 +282,16 @@ func (vq *VolunteerQuery) GroupBy(field string, fields ...string) *VolunteerGrou
 
 // Select allows the selection one or more fields/columns for the given query,
 // instead of selecting all fields in the entity.
+//
+// Example:
+//
+//	var v []struct {
+//		Email string `json:"email,omitempty"`
+//	}
+//
+//	client.Volunteer.Query().
+//		Select(volunteer.FieldEmail).
+//		Scan(ctx, &v)
 func (vq *VolunteerQuery) Select(fields ...string) *VolunteerSelect {
 	vq.ctx.Fields = append(vq.ctx.Fields, fields...)
 	sbuild := &VolunteerSelect{VolunteerQuery: vq}
@@ -343,7 +366,7 @@ func (vq *VolunteerQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (vq *VolunteerQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(volunteer.Table, volunteer.Columns, sqlgraph.NewFieldSpec(volunteer.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewQuerySpec(volunteer.Table, volunteer.Columns, sqlgraph.NewFieldSpec(volunteer.FieldID, field.TypeUUID))
 	_spec.From = vq.sql
 	if unique := vq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique

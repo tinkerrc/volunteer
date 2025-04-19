@@ -8,14 +8,29 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/google/uuid"
 	"github.com/tinkerrc/volunteer/ent/volunteer"
 )
 
 // Volunteer is the model entity for the Volunteer schema.
 type Volunteer struct {
-	config
+	config `json:"-"`
 	// ID of the ent.
-	ID           int `json:"id,omitempty"`
+	ID uuid.UUID `json:"id,omitempty"`
+	// Email holds the value of the "email" field.
+	Email string `json:"email,omitempty"`
+	// FirstName holds the value of the "first_name" field.
+	FirstName string `json:"first_name,omitempty"`
+	// MiddleName holds the value of the "middle_name" field.
+	MiddleName string `json:"middle_name,omitempty"`
+	// LastName holds the value of the "last_name" field.
+	LastName string `json:"last_name,omitempty"`
+	// Phone holds the value of the "phone" field.
+	Phone string `json:"phone,omitempty"`
+	// Address holds the value of the "address" field.
+	Address string `json:"address,omitempty"`
+	// Notes holds the value of the "notes" field.
+	Notes        string `json:"notes,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -24,8 +39,10 @@ func (*Volunteer) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case volunteer.FieldEmail, volunteer.FieldFirstName, volunteer.FieldMiddleName, volunteer.FieldLastName, volunteer.FieldPhone, volunteer.FieldAddress, volunteer.FieldNotes:
+			values[i] = new(sql.NullString)
 		case volunteer.FieldID:
-			values[i] = new(sql.NullInt64)
+			values[i] = new(uuid.UUID)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -42,11 +59,53 @@ func (v *Volunteer) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case volunteer.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
-			if !ok {
-				return fmt.Errorf("unexpected type %T for field id", value)
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field id", values[i])
+			} else if value != nil {
+				v.ID = *value
 			}
-			v.ID = int(value.Int64)
+		case volunteer.FieldEmail:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field email", values[i])
+			} else if value.Valid {
+				v.Email = value.String
+			}
+		case volunteer.FieldFirstName:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field first_name", values[i])
+			} else if value.Valid {
+				v.FirstName = value.String
+			}
+		case volunteer.FieldMiddleName:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field middle_name", values[i])
+			} else if value.Valid {
+				v.MiddleName = value.String
+			}
+		case volunteer.FieldLastName:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field last_name", values[i])
+			} else if value.Valid {
+				v.LastName = value.String
+			}
+		case volunteer.FieldPhone:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field phone", values[i])
+			} else if value.Valid {
+				v.Phone = value.String
+			}
+		case volunteer.FieldAddress:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field address", values[i])
+			} else if value.Valid {
+				v.Address = value.String
+			}
+		case volunteer.FieldNotes:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field notes", values[i])
+			} else if value.Valid {
+				v.Notes = value.String
+			}
 		default:
 			v.selectValues.Set(columns[i], values[i])
 		}
@@ -82,7 +141,27 @@ func (v *Volunteer) Unwrap() *Volunteer {
 func (v *Volunteer) String() string {
 	var builder strings.Builder
 	builder.WriteString("Volunteer(")
-	builder.WriteString(fmt.Sprintf("id=%v", v.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", v.ID))
+	builder.WriteString("email=")
+	builder.WriteString(v.Email)
+	builder.WriteString(", ")
+	builder.WriteString("first_name=")
+	builder.WriteString(v.FirstName)
+	builder.WriteString(", ")
+	builder.WriteString("middle_name=")
+	builder.WriteString(v.MiddleName)
+	builder.WriteString(", ")
+	builder.WriteString("last_name=")
+	builder.WriteString(v.LastName)
+	builder.WriteString(", ")
+	builder.WriteString("phone=")
+	builder.WriteString(v.Phone)
+	builder.WriteString(", ")
+	builder.WriteString("address=")
+	builder.WriteString(v.Address)
+	builder.WriteString(", ")
+	builder.WriteString("notes=")
+	builder.WriteString(v.Notes)
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -10,6 +10,7 @@ import (
 
 	"connectrpc.com/authn"
 	"entgo.io/ent/dialect"
+	"github.com/auth0/go-auth0/authentication"
 	"github.com/tinkerrc/volunteer/ent"
 	"github.com/tinkerrc/volunteer/server/api"
 	"golang.org/x/net/http2"
@@ -26,6 +27,19 @@ func main() {
 		log.Fatalf("ADMIN environment variable does not contain valid email")
 	}
 
+	ctx := context.Background()
+	auth0Domain := os.Getenv("AUTH0_DOMAIN")
+	auth0ClientID := os.Getenv("AUTH0_CLIENT_ID")
+	auth0ClientSecret := os.Getenv("AUTH0_CLIENT_SECRET")
+	authAPI, err := authentication.New(ctx,
+		auth0Domain,
+		authentication.WithClientID(auth0ClientID),
+		authentication.WithClientSecret(auth0ClientSecret),
+	)
+	if err != nil {
+		log.Fatalf("failed to initialize auth0 client")
+	}
+
 	host := os.Getenv("PG_HOST")
 	port := os.Getenv("PG_PORT")
 	user := os.Getenv("PG_USER")
@@ -39,13 +53,12 @@ func main() {
 	defer cl.Close()
 	log.Println("connected to database")
 
-	ctx := context.Background()
 	if err := cl.Schema.Create(ctx); err != nil {
 		log.Fatalf("migration failed: %v", err)
 	}
 	log.Println("schema migration done")
 
-	server := &api.APIServer{Db: cl, AdminEmail: adminEmail}
+	server := &api.APIServer{Db: cl, AdminEmail: adminEmail, AuthAPI: authAPI}
 	mux := http.NewServeMux()
 	path, handler := apiv1connect.NewVolunteerServiceHandler(server)
 	mux.Handle(path, handler)

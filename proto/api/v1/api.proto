@@ -3,17 +3,23 @@ syntax = "proto3";
 package api.v1;
 
 import "google/type/date.proto";
-import "google/type/postal_address.proto";
 import "google/type/timeofday.proto";
 
 option go_package = "github.com/tinkerrc/volunteer/proto/api/v1;apiv1";
 
 service VolunteerService {
+  // users
+  // rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+  // rpc GetUser(GetUserRequest) returns (GetUserResponse);
+  // rpc ListUsers(GetUserRequest) returns (GetUserResponse);
+  // rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
   // volunteers
   rpc CreateVolunteer(CreateVolunteerRequest) returns (CreateVolunteerResponse);
   rpc GetVolunteer(GetVolunteerRequest) returns (GetVolunteerResponse);
+  rpc GetVolunteerProfile(GetVolunteerProfileRequest) returns (GetVolunteerProfileResponse);
   rpc ListVolunteers(ListVolunteersRequest) returns (ListVolunteersResponse);
   rpc UpdateVolunteer(UpdateVolunteerRequest) returns (UpdateVolunteerResponse);
+  rpc UpdateVolunteerProfile(UpdateVolunteerProfileRequest) returns (UpdateVolunteerProfileResponse);
   // time logs
   rpc CreateTimeLog(CreateTimeLogRequest) returns (CreateTimeLogResponse);
   rpc ListTimeLogs(ListTimeLogsRequest) returns (ListTimeLogsResponse);
@@ -41,6 +47,45 @@ service VolunteerService {
   rpc RemoveEventVolunteers(RemoveEventVolunteersRequest) returns (RemoveEventVolunteersResponse);
 }
 
+// message User {
+//   string id = 1;
+//   string first_name = 2;
+//   string middle_name = 3;
+//   string last_name = 4;
+//   string email = 5;
+//   bool is_admin = 6;
+// }
+
+// message CreateUserRequest {
+//   string first_name = 2;
+//   string middle_name = 3;
+//   string last_name = 4;
+//   string email = 5;
+// }
+
+// message CreateUserResponse {
+//   string id = 1;
+// }
+
+// message GetUserRequest {
+//   optional string id = 1;
+// }
+
+// message GetUserResponse {
+//   User user = 1;
+// }
+
+// message UpdateUserRequest {
+//   string id = 1;
+//   optional string first_name = 2;
+//   optional string middle_name = 3;
+//   optional string last_name = 4;
+//   optional string email = 5;
+//   optional bool is_admin = 6;
+// }
+
+// message UpdateUserResponse {}
+
 message ListVolunteersRequest {
   int32 page_size = 1;
   int32 page_number = 2;
@@ -54,9 +99,20 @@ message Volunteer {
   string last_name = 4;
   string email = 5;
   string phone = 6;
-  google.type.PostalAddress address = 7;
+  // optional google.type.PostalAddress address = 7;
+  string address = 7;
   string notes = 8;
   Duration total_time = 9;
+}
+
+message VolunteerProfile {
+  string id = 1;
+  string first_name = 2;
+  string middle_name = 3;
+  string last_name = 4;
+  string email = 5;
+  string phone = 6;
+  string address = 7;
 }
 
 message CreateVolunteerRequest {
@@ -65,7 +121,8 @@ message CreateVolunteerRequest {
   string last_name = 4;
   string email = 5;
   string phone = 6;
-  google.type.PostalAddress address = 7;
+  // google.type.PostalAddress address = 7;
+  string address = 7;
   string notes = 8;
 }
 
@@ -75,6 +132,12 @@ message CreateVolunteerResponse {
 
 message GetVolunteerRequest {
   string volunteer_id = 1;
+}
+
+message GetVolunteerProfileRequest {}
+
+message GetVolunteerProfileResponse {
+  VolunteerProfile volunteer = 1;
 }
 
 message GetVolunteerResponse {
@@ -92,11 +155,23 @@ message UpdateVolunteerRequest {
   optional string last_name = 4;
   optional string email = 5;
   optional string phone = 6;
-  optional google.type.PostalAddress address = 7;
+  // optional google.type.PostalAddress address = 7;
+  optional string address = 7;
   optional string notes = 8;
 }
 
 message UpdateVolunteerResponse {}
+
+message UpdateVolunteerProfileRequest {
+  optional string first_name = 2;
+  optional string middle_name = 3;
+  optional string last_name = 4;
+  optional string email = 5;
+  optional string phone = 6;
+  optional string address = 7;
+}
+
+message UpdateVolunteerProfileResponse {}
 
 message Duration {
   int32 hours = 1;

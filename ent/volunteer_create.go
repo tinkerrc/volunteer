@@ -4,10 +4,12 @@ package ent
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/tinkerrc/volunteer/ent/volunteer"
 )
 
@@ -18,6 +20,62 @@ type VolunteerCreate struct {
 	hooks    []Hook
 }
 
+// SetEmail sets the "email" field.
+func (vc *VolunteerCreate) SetEmail(s string) *VolunteerCreate {
+	vc.mutation.SetEmail(s)
+	return vc
+}
+
+// SetFirstName sets the "first_name" field.
+func (vc *VolunteerCreate) SetFirstName(s string) *VolunteerCreate {
+	vc.mutation.SetFirstName(s)
+	return vc
+}
+
+// SetMiddleName sets the "middle_name" field.
+func (vc *VolunteerCreate) SetMiddleName(s string) *VolunteerCreate {
+	vc.mutation.SetMiddleName(s)
+	return vc
+}
+
+// SetLastName sets the "last_name" field.
+func (vc *VolunteerCreate) SetLastName(s string) *VolunteerCreate {
+	vc.mutation.SetLastName(s)
+	return vc
+}
+
+// SetPhone sets the "phone" field.
+func (vc *VolunteerCreate) SetPhone(s string) *VolunteerCreate {
+	vc.mutation.SetPhone(s)
+	return vc
+}
+
+// SetAddress sets the "address" field.
+func (vc *VolunteerCreate) SetAddress(s string) *VolunteerCreate {
+	vc.mutation.SetAddress(s)
+	return vc
+}
+
+// SetNotes sets the "notes" field.
+func (vc *VolunteerCreate) SetNotes(s string) *VolunteerCreate {
+	vc.mutation.SetNotes(s)
+	return vc
+}
+
+// SetID sets the "id" field.
+func (vc *VolunteerCreate) SetID(u uuid.UUID) *VolunteerCreate {
+	vc.mutation.SetID(u)
+	return vc
+}
+
+// SetNillableID sets the "id" field if the given value is not nil.
+func (vc *VolunteerCreate) SetNillableID(u *uuid.UUID) *VolunteerCreate {
+	if u != nil {
+		vc.SetID(*u)
+	}
+	return vc
+}
+
 // Mutation returns the VolunteerMutation object of the builder.
 func (vc *VolunteerCreate) Mutation() *VolunteerMutation {
 	return vc.mutation
@@ -25,6 +83,7 @@ func (vc *VolunteerCreate) Mutation() *VolunteerMutation {
 
 // Save creates the Volunteer in the database.
 func (vc *VolunteerCreate) Save(ctx context.Context) (*Volunteer, error) {
+	vc.defaults()
 	return withHooks(ctx, vc.sqlSave, vc.mutation, vc.hooks)
 }
 
@@ -50,8 +109,37 @@ func (vc *VolunteerCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (vc *VolunteerCreate) defaults() {
+	if _, ok := vc.mutation.ID(); !ok {
+		v := volunteer.DefaultID()
+		vc.mutation.SetID(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (vc *VolunteerCreate) check() error {
+	if _, ok := vc.mutation.Email(); !ok {
+		return &ValidationError{Name: "email", err: errors.New(`ent: missing required field "Volunteer.email"`)}
+	}
+	if _, ok := vc.mutation.FirstName(); !ok {
+		return &ValidationError{Name: "first_name", err: errors.New(`ent: missing required field "Volunteer.first_name"`)}
+	}
+	if _, ok := vc.mutation.MiddleName(); !ok {
+		return &ValidationError{Name: "middle_name", err: errors.New(`ent: missing required field "Volunteer.middle_name"`)}
+	}
+	if _, ok := vc.mutation.LastName(); !ok {
+		return &ValidationError{Name: "last_name", err: errors.New(`ent: missing required field "Volunteer.last_name"`)}
+	}
+	if _, ok := vc.mutation.Phone(); !ok {
+		return &ValidationError{Name: "phone", err: errors.New(`ent: missing required field "Volunteer.phone"`)}
+	}
+	if _, ok := vc.mutation.Address(); !ok {
+		return &ValidationError{Name: "address", err: errors.New(`ent: missing required field "Volunteer.address"`)}
+	}
+	if _, ok := vc.mutation.Notes(); !ok {
+		return &ValidationError{Name: "notes", err: errors.New(`ent: missing required field "Volunteer.notes"`)}
+	}
 	return nil
 }
 
@@ -66,8 +154,13 @@ func (vc *VolunteerCreate) sqlSave(ctx context.Context) (*Volunteer, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != nil {
+		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
+			_node.ID = *id
+		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
+			return nil, err
+		}
+	}
 	vc.mutation.id = &_node.ID
 	vc.mutation.done = true
 	return _node, nil
@@ -76,8 +169,40 @@ func (vc *VolunteerCreate) sqlSave(ctx context.Context) (*Volunteer, error) {
 func (vc *VolunteerCreate) createSpec() (*Volunteer, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Volunteer{config: vc.config}
-		_spec = sqlgraph.NewCreateSpec(volunteer.Table, sqlgraph.NewFieldSpec(volunteer.FieldID, field.TypeInt))
+		_spec = sqlgraph.NewCreateSpec(volunteer.Table, sqlgraph.NewFieldSpec(volunteer.FieldID, field.TypeUUID))
 	)
+	if id, ok := vc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = &id
+	}
+	if value, ok := vc.mutation.Email(); ok {
+		_spec.SetField(volunteer.FieldEmail, field.TypeString, value)
+		_node.Email = value
+	}
+	if value, ok := vc.mutation.FirstName(); ok {
+		_spec.SetField(volunteer.FieldFirstName, field.TypeString, value)
+		_node.FirstName = value
+	}
+	if value, ok := vc.mutation.MiddleName(); ok {
+		_spec.SetField(volunteer.FieldMiddleName, field.TypeString, value)
+		_node.MiddleName = value
+	}
+	if value, ok := vc.mutation.LastName(); ok {
+		_spec.SetField(volunteer.FieldLastName, field.TypeString, value)
+		_node.LastName = value
+	}
+	if value, ok := vc.mutation.Phone(); ok {
+		_spec.SetField(volunteer.FieldPhone, field.TypeString, value)
+		_node.Phone = value
+	}
+	if value, ok := vc.mutation.Address(); ok {
+		_spec.SetField(volunteer.FieldAddress, field.TypeString, value)
+		_node.Address = value
+	}
+	if value, ok := vc.mutation.Notes(); ok {
+		_spec.SetField(volunteer.FieldNotes, field.TypeString, value)
+		_node.Notes = value
+	}
 	return _node, _spec
 }
 
@@ -99,6 +224,7 @@ func (vcb *VolunteerCreateBulk) Save(ctx context.Context) ([]*Volunteer, error) 
 	for i := range vcb.builders {
 		func(i int, root context.Context) {
 			builder := vcb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*VolunteerMutation)
 				if !ok {
@@ -125,10 +251,6 @@ func (vcb *VolunteerCreateBulk) Save(ctx context.Context) ([]*Volunteer, error) 
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
-				if specs[i].ID.Value != nil {
-					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
-				}
 				mutation.done = true
 				return nodes[i], nil
 			})
