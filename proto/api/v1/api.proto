@@ -14,7 +14,11 @@ service VolunteerService {
   rpc GetVolunteer(GetVolunteerRequest) returns (GetVolunteerResponse);
   rpc ListVolunteers(ListVolunteersRequest) returns (ListVolunteersResponse);
   rpc UpdateVolunteer(UpdateVolunteerRequest) returns (UpdateVolunteerResponse);
-  rpc LogVolunteerTime(LogVolunteerTimeRequest) returns (LogVolunteerTimeResponse);
+  // time logs
+  rpc CreateTimeLog(CreateTimeLogRequest) returns (CreateTimeLogResponse);
+  rpc ListTimeLogs(ListTimeLogsRequest) returns (ListTimeLogsResponse);
+  rpc UpdateTimeLog(UpdateTimeLogRequest) returns (UpdateTimeLogResponse);
+  rpc DeleteTimeLog(DeleteTimeLogRequest) returns (DeleteTimeLogResponse);
   // volunteer training
   rpc StartTraining(StartTrainingRequest) returns (StartTrainingResponse);
   rpc FinishTraining(FinishTrainingRequest) returns (FinishTrainingResponse);
@@ -31,6 +35,10 @@ service VolunteerService {
   rpc ListEvents(ListEventsRequest) returns (ListEventsResponse);
   rpc UpdateEvent(UpdateEventRequest) returns (UpdateEventResponse);
   rpc DeleteEvent(DeleteEventRequest) returns (DeleteEventResponse);
+  // event volunteers
+  rpc ListEventVolunteers(ListEventVolunteersRequest) returns (ListEventVolunteersResponse);
+  rpc AddEventVolunteers(AddEventVolunteersRequest) returns (AddEventVolunteersResponse);
+  rpc RemoveEventVolunteers(RemoveEventVolunteersRequest) returns (RemoveEventVolunteersResponse);
 }
 
 message ListVolunteersRequest {
@@ -48,6 +56,7 @@ message Volunteer {
   string phone = 6;
   google.type.PostalAddress address = 7;
   string notes = 8;
+  Duration total_time = 9;
 }
 
 message CreateVolunteerRequest {
@@ -94,13 +103,47 @@ message Duration {
   int32 minutes = 2;
 }
 
-message LogVolunteerTimeRequest {
+message CreateTimeLogRequest {
   string volunteer_id = 1;
   optional string event_id = 2;
   Duration duration = 3;
 }
 
-message LogVolunteerTimeResponse {}
+message CreateTimeLogResponse {
+  string id = 1;
+}
+
+message TimeLog {
+  string id = 1;
+  string volunteer_id = 2;
+  optional string event_id = 3;
+  Duration duration = 4;
+}
+
+message ListTimeLogsRequest {
+  int32 page_size = 1;
+  int32 page_number = 2;
+  string volunteer_id = 3;
+}
+
+message ListTimeLogsResponse {
+  repeated TimeLog logs = 1;
+}
+
+message UpdateTimeLogRequest {
+  string id = 1;
+  optional string volunteer_id = 2;
+  optional string event_id = 3;
+  optional Duration duration = 4;
+}
+
+message UpdateTimeLogResponse {}
+
+message DeleteTimeLogRequest {
+  string log_id = 1;
+}
+
+message DeleteTimeLogResponse {}
 
 message Cert {
   string id = 1;
@@ -211,7 +254,7 @@ message CreateEventRequest {
 }
 
 message CreateEventResponse {
-  string event_id = 1;
+  string id = 1;
 }
 
 message ListEventsRequest {
@@ -244,3 +287,23 @@ message DeleteEventRequest {
 }
 
 message DeleteEventResponse {}
+
+message ListEventVolunteersRequest {
+  string event_id = 1;
+}
+
+message ListEventVolunteersResponse {
+  repeated Volunteer volunteers = 1;
+}
+
+message AddEventVolunteersRequest {
+  repeated string volunteer_ids = 1;
+}
+
+message AddEventVolunteersResponse {}
+
+message RemoveEventVolunteersRequest {
+  repeated string volunteer_ids = 1;
+}
+
+message RemoveEventVolunteersResponse {}
