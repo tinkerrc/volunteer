@@ -1,0 +1,309 @@
+syntax = "proto3";
+
+package api.v1;
+
+import "google/type/date.proto";
+import "google/type/postal_address.proto";
+import "google/type/timeofday.proto";
+
+option go_package = "github.com/tinkerrc/volunteer/proto/api/v1;apiv1";
+
+service VolunteerService {
+  // volunteers
+  rpc CreateVolunteer(CreateVolunteerRequest) returns (CreateVolunteerResponse);
+  rpc GetVolunteer(GetVolunteerRequest) returns (GetVolunteerResponse);
+  rpc ListVolunteers(ListVolunteersRequest) returns (ListVolunteersResponse);
+  rpc UpdateVolunteer(UpdateVolunteerRequest) returns (UpdateVolunteerResponse);
+  // time logs
+  rpc CreateTimeLog(CreateTimeLogRequest) returns (CreateTimeLogResponse);
+  rpc ListTimeLogs(ListTimeLogsRequest) returns (ListTimeLogsResponse);
+  rpc UpdateTimeLog(UpdateTimeLogRequest) returns (UpdateTimeLogResponse);
+  rpc DeleteTimeLog(DeleteTimeLogRequest) returns (DeleteTimeLogResponse);
+  // volunteer training
+  rpc StartTraining(StartTrainingRequest) returns (StartTrainingResponse);
+  rpc FinishTraining(FinishTrainingRequest) returns (FinishTrainingResponse);
+  rpc ListTrainings(ListTrainingsRequest) returns (ListTrainingsResponse);
+  rpc DeleteTraining(DeleteTrainingRequest) returns (DeleteTrainingResponse);
+  // certs
+  rpc CreateCert(CreateCertRequest) returns (CreateCertResponse);
+  rpc ListCerts(ListCertsRequest) returns (ListCertsResponse);
+  rpc GetCert(GetCertRequest) returns (GetCertResponse);
+  rpc UpdateCert(UpdateCertRequest) returns (UpdateCertResponse);
+  rpc DeleteCert(DeleteCertRequest) returns (DeleteCertResponse);
+  // events
+  rpc CreateEvent(CreateEventRequest) returns (CreateEventResponse);
+  rpc ListEvents(ListEventsRequest) returns (ListEventsResponse);
+  rpc UpdateEvent(UpdateEventRequest) returns (UpdateEventResponse);
+  rpc DeleteEvent(DeleteEventRequest) returns (DeleteEventResponse);
+  // event volunteers
+  rpc ListEventVolunteers(ListEventVolunteersRequest) returns (ListEventVolunteersResponse);
+  rpc AddEventVolunteers(AddEventVolunteersRequest) returns (AddEventVolunteersResponse);
+  rpc RemoveEventVolunteers(RemoveEventVolunteersRequest) returns (RemoveEventVolunteersResponse);
+}
+
+message ListVolunteersRequest {
+  int32 page_size = 1;
+  int32 page_number = 2;
+  repeated string cert_ids = 3;
+}
+
+message Volunteer {
+  string id = 1;
+  string first_name = 2;
+  string middle_name = 3;
+  string last_name = 4;
+  string email = 5;
+  string phone = 6;
+  google.type.PostalAddress address = 7;
+  string notes = 8;
+  Duration total_time = 9;
+}
+
+message CreateVolunteerRequest {
+  string first_name = 2;
+  string middle_name = 3;
+  string last_name = 4;
+  string email = 5;
+  string phone = 6;
+  google.type.PostalAddress address = 7;
+  string notes = 8;
+}
+
+message CreateVolunteerResponse {
+  string id = 1;
+}
+
+message GetVolunteerRequest {
+  string volunteer_id = 1;
+}
+
+message GetVolunteerResponse {
+  Volunteer volunteer = 1;
+}
+
+message ListVolunteersResponse {
+  repeated Volunteer volunteers = 1;
+}
+
+message UpdateVolunteerRequest {
+  string id = 1;
+  optional string first_name = 2;
+  optional string middle_name = 3;
+  optional string last_name = 4;
+  optional string email = 5;
+  optional string phone = 6;
+  optional google.type.PostalAddress address = 7;
+  optional string notes = 8;
+}
+
+message UpdateVolunteerResponse {}
+
+message Duration {
+  int32 hours = 1;
+  int32 minutes = 2;
+}
+
+message CreateTimeLogRequest {
+  string volunteer_id = 1;
+  optional string event_id = 2;
+  Duration duration = 3;
+}
+
+message CreateTimeLogResponse {
+  string id = 1;
+}
+
+message TimeLog {
+  string id = 1;
+  string volunteer_id = 2;
+  optional string event_id = 3;
+  Duration duration = 4;
+}
+
+message ListTimeLogsRequest {
+  int32 page_size = 1;
+  int32 page_number = 2;
+  string volunteer_id = 3;
+}
+
+message ListTimeLogsResponse {
+  repeated TimeLog logs = 1;
+}
+
+message UpdateTimeLogRequest {
+  string id = 1;
+  optional string volunteer_id = 2;
+  optional string event_id = 3;
+  optional Duration duration = 4;
+}
+
+message UpdateTimeLogResponse {}
+
+message DeleteTimeLogRequest {
+  string log_id = 1;
+}
+
+message DeleteTimeLogResponse {}
+
+message Cert {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+}
+
+message ListCertsRequest {
+  int32 page_size = 1;
+  int32 page_number = 2;
+}
+
+message ListCertsResponse {
+  repeated Cert certs = 1;
+}
+
+message GetCertRequest {
+  string id = 1;
+}
+
+message GetCertResponse {
+  Cert cert = 1;
+}
+
+message UpdateCertRequest {
+  string id = 1;
+  optional string name = 2;
+  optional string description = 3;
+}
+
+message UpdateCertResponse {}
+
+message DeleteCertRequest {
+  string cert_id = 1;
+}
+
+message DeleteCertResponse {}
+
+message StartTrainingRequest {
+  string volunteer_id = 1;
+  string cert_id = 2;
+}
+
+message StartTrainingResponse {
+  string training_id = 1;
+}
+
+message FinishTrainingRequest {
+  string training_id = 1;
+}
+
+message FinishTrainingResponse {}
+
+message Training {
+  string id = 1;
+  string volunteer_id = 2;
+  string cert_id = 3;
+  optional google.type.Date start_date = 4;
+  optional google.type.Date end_date = 5;
+  bool is_certified = 6;
+}
+
+message ListTrainingsRequest {
+  optional string volunteer_id = 1;
+  optional string cert_id = 2;
+}
+message ListTrainingsResponse {
+  repeated Training trainings = 1;
+}
+
+message DeleteTrainingRequest {
+  string training_id = 1;
+}
+
+message DeleteTrainingResponse {}
+
+message CreateCertRequest {
+  string name = 2;
+  string description = 3;
+}
+
+message CreateCertResponse {
+  string id = 1;
+}
+
+message Event {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  Duration duration = 4;
+  bool is_recurring = 5;
+  google.type.Date date = 6;
+  google.type.TimeOfDay time_of_day = 7;
+  string recur_description = 8;
+  repeated string cert_ids = 10;
+}
+
+message CreateEventRequest {
+  string name = 2;
+  string description = 3;
+  Duration duration = 4;
+  bool is_recurring = 5;
+  google.type.Date date = 6;
+  google.type.TimeOfDay time_of_day = 7;
+  string recur_description = 8; // recurring-only
+  repeated string cert_ids = 10;
+  bool is_active = 11; // recurring-only
+}
+
+message CreateEventResponse {
+  string id = 1;
+}
+
+message ListEventsRequest {
+  int32 page_size = 1;
+  int32 page_number = 2;
+  repeated string cert_ids = 3;
+}
+
+message ListEventsResponse {
+  repeated Event events = 1;
+}
+
+message UpdateEventRequest {
+  string id = 1;
+  optional string name = 2;
+  optional string description = 3;
+  optional Duration duration = 4;
+  optional bool is_recurring = 5;
+  optional google.type.Date date = 6;
+  optional google.type.TimeOfDay time_of_day = 7;
+  optional string recur_description = 8; // recurring-only
+  repeated string cert_ids = 10;
+  optional bool is_active = 11; // recurring-only
+}
+
+message UpdateEventResponse {}
+
+message DeleteEventRequest {
+  string event_id = 1;
+}
+
+message DeleteEventResponse {}
+
+message ListEventVolunteersRequest {
+  string event_id = 1;
+}
+
+message ListEventVolunteersResponse {
+  repeated Volunteer volunteers = 1;
+}
+
+message AddEventVolunteersRequest {
+  repeated string volunteer_ids = 1;
+}
+
+message AddEventVolunteersResponse {}
+
+message RemoveEventVolunteersRequest {
+  repeated string volunteer_ids = 1;
+}
+
+message RemoveEventVolunteersResponse {}
