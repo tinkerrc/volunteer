@@ -18,17 +18,35 @@ func (s *APIServer) ListTimeLogs(
 	ctx context.Context,
 	req *connect.Request[apiv1.ListTimeLogsRequest],
 ) (*connect.Response[apiv1.ListTimeLogsResponse], error) {
-	err := s.ensureAdmin(ctx)
-	if err != nil {
-		return nil, err
-	}
 	m := req.Msg
 	if m.PageSize > 50 {
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("page size too big"))
 	}
-	vid, err := uuid.Parse(m.VolunteerId)
-	if err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("invalid volunteer id"))
+
+	var vid uuid.UUID
+	v, err := s.ensureVolunteer(ctx)
+	if err != nil && m.VolunteerId == nil {
+		return nil, connect.NewError(connect.CodePermissionDenied, errors.New("unauthorized"))
+	}
+	if err == nil && m.VolunteerId != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("expected nil volunteer id"))
+	}
+
+	if v != nil {
+		vid = v.ID
+	} else {
+		err = s.ensureAdmin(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		if m.VolunteerId == nil {
+			return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("expected volunteer id"))
+		}
+		vid, err = uuid.Parse(*m.VolunteerId)
+		if err != nil {
+			return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("invalid volunteer id"))
+		}
 	}
 	tls, err := s.Db.TimeLog.Query().
 		Where(timelog.HasVolunteerWith(volunteer.ID(vid))).
@@ -44,7 +62,7 @@ func (s *APIServer) ListTimeLogs(
 	for idx, tl := range tls {
 		tlProtos[idx] = &apiv1.TimeLog{
 			Id:          tl.ID.String(),
-			VolunteerId: m.VolunteerId,
+			VolunteerId: vid.String(),
 			Duration:    &apiv1.Duration{Hours: int32(tl.Hours), Minutes: int32(tl.Minutes)},
 			Date:        timestamppb.New(tl.Date),
 		}
