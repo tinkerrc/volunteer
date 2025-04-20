@@ -4,33 +4,38 @@ import { intervalToString } from '@/utils/protobuf';
 import { useAuth0 } from '@auth0/auth0-react';
 import { Group, ScrollArea, Table, Text } from '@mantine/core';
 import cx from 'clsx';
-import { useState } from 'react';
-import { useAsync } from 'react-use';
+import { useEffect, useState } from 'react';
 import classes from './EventList.module.css';
 
 export function EventList() {
     const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
+    const [events, setEvents] = useState<Event[]>([])
     let initState: string[] = [];
     const [selection, setSelection] = useState(initState);
-    const state = useAsync(async (): Promise<Event[]> => {
-        try {
-            if (!isAuthenticated) {
-                return []
+    useEffect(() => {
+        const getEvents = async () => {
+            try {
+                if (!isAuthenticated) {
+                    setEvents([])
+                    return
+                }
+                const accessToken = await getAccessTokenSilently({
+                    authorizationParams: {
+                        audience: `https://api.yolovms.org/`,
+                        scope: "read:current_user",
+                    },
+                });
+                const headers = new Headers();
+                headers.set("Authorization", `Bearer ${accessToken}`)
+                const res = await useClient().listEvents({ pageNumber: 1, pageSize: 50 }, { headers })
+                setEvents(res.events)
+            } catch (err) {
+                console.log(err)
             }
-            const accessToken = await getAccessTokenSilently({
-                authorizationParams: {
-                    audience: `https://api.yolovms.org/`,
-                    scope: "read:current_user",
-                },
-            });
-            const headers = new Headers();
-            headers.set("Authorization", `Bearer ${accessToken}`)
-            const res = await useClient().listEvents({ pageNumber: 1, pageSize: 50 }, { headers })
-            return res.events
-        } catch { return [] }
-    }, [isAuthenticated])
-
-    const rows = state?.value?.map((item) => {
+        }
+        getEvents()
+    })
+    const rows = events.map((item) => {
         const selected = selection.includes(item.id);
         return (
             <Table.Tr key={item.id} className={cx({ [classes.rowSelected]: selected })}>
