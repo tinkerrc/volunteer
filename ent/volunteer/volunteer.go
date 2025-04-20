@@ -29,6 +29,8 @@ const (
 	FieldNotes = "notes"
 	// EdgeVolunteerRecords holds the string denoting the volunteer_records edge name in mutations.
 	EdgeVolunteerRecords = "volunteer_records"
+	// EdgeTrainings holds the string denoting the trainings edge name in mutations.
+	EdgeTrainings = "trainings"
 	// Table holds the table name of the volunteer in the database.
 	Table = "volunteers"
 	// VolunteerRecordsTable is the table that holds the volunteer_records relation/edge.
@@ -38,6 +40,13 @@ const (
 	VolunteerRecordsInverseTable = "event_volunteers"
 	// VolunteerRecordsColumn is the table column denoting the volunteer_records relation/edge.
 	VolunteerRecordsColumn = "event_volunteer_volunteer"
+	// TrainingsTable is the table that holds the trainings relation/edge.
+	TrainingsTable = "trainings"
+	// TrainingsInverseTable is the table name for the Training entity.
+	// It exists in this package in order to avoid circular dependency with the "training" package.
+	TrainingsInverseTable = "trainings"
+	// TrainingsColumn is the table column denoting the trainings relation/edge.
+	TrainingsColumn = "training_volunteer"
 )
 
 // Columns holds all SQL columns for volunteer fields.
@@ -123,10 +132,31 @@ func ByVolunteerRecords(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption 
 		sqlgraph.OrderByNeighborTerms(s, newVolunteerRecordsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByTrainingsCount orders the results by trainings count.
+func ByTrainingsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newTrainingsStep(), opts...)
+	}
+}
+
+// ByTrainings orders the results by trainings terms.
+func ByTrainings(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newTrainingsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newVolunteerRecordsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(VolunteerRecordsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, true, VolunteerRecordsTable, VolunteerRecordsColumn),
+	)
+}
+func newTrainingsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(TrainingsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, true, TrainingsTable, TrainingsColumn),
 	)
 }

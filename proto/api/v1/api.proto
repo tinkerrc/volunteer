@@ -69,9 +69,11 @@ service VolunteerService {
   // Requires user
   rpc DeleteEvent(DeleteEventRequest) returns (DeleteEventResponse);
   // === EVENT VOLUNTEERS
+  // Requires user
   rpc ListEventVolunteers(ListEventVolunteersRequest) returns (ListEventVolunteersResponse);
-  rpc AddEventVolunteers(AddEventVolunteersRequest) returns (AddEventVolunteersResponse);
-  rpc RemoveEventVolunteers(RemoveEventVolunteersRequest) returns (RemoveEventVolunteersResponse);
+  // Requires user
+  rpc CreateEventVolunteer(CreateEventVolunteerRequest) returns (CreateEventVolunteerResponse);
+  rpc RemoveEventVolunteer(RemoveEventVolunteerRequest) returns (RemoveEventVolunteerResponse);
 }
 
 // message User {
@@ -398,14 +400,18 @@ message ListEventVolunteersResponse {
   repeated Volunteer volunteers = 1;
 }
 
-message AddEventVolunteersRequest {
-  repeated string volunteer_ids = 1;
+message CreateEventVolunteerRequest {
+  string event_id = 1;
+  string volunteer_id = 2;
 }
 
-message AddEventVolunteersResponse {}
-
-message RemoveEventVolunteersRequest {
-  repeated string volunteer_ids = 1;
+message CreateEventVolunteerResponse {
+  string event_volunteer_id = 1;
 }
 
-message RemoveEventVolunteersResponse {}
+message RemoveEventVolunteerRequest {
+  string event_id = 1;
+  string volunteer_id = 2;
+}
+
+message RemoveEventVolunteerResponse {}

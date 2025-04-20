@@ -111,12 +111,12 @@ const (
 	// VolunteerServiceListEventVolunteersProcedure is the fully-qualified name of the
 	// VolunteerService's ListEventVolunteers RPC.
 	VolunteerServiceListEventVolunteersProcedure = "/api.v1.VolunteerService/ListEventVolunteers"
-	// VolunteerServiceAddEventVolunteersProcedure is the fully-qualified name of the VolunteerService's
-	// AddEventVolunteers RPC.
-	VolunteerServiceAddEventVolunteersProcedure = "/api.v1.VolunteerService/AddEventVolunteers"
-	// VolunteerServiceRemoveEventVolunteersProcedure is the fully-qualified name of the
-	// VolunteerService's RemoveEventVolunteers RPC.
-	VolunteerServiceRemoveEventVolunteersProcedure = "/api.v1.VolunteerService/RemoveEventVolunteers"
+	// VolunteerServiceCreateEventVolunteerProcedure is the fully-qualified name of the
+	// VolunteerService's CreateEventVolunteer RPC.
+	VolunteerServiceCreateEventVolunteerProcedure = "/api.v1.VolunteerService/CreateEventVolunteer"
+	// VolunteerServiceRemoveEventVolunteerProcedure is the fully-qualified name of the
+	// VolunteerService's RemoveEventVolunteer RPC.
+	VolunteerServiceRemoveEventVolunteerProcedure = "/api.v1.VolunteerService/RemoveEventVolunteer"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -148,8 +148,8 @@ var (
 	volunteerServiceRemoveEventCertsMethodDescriptor       = volunteerServiceServiceDescriptor.Methods().ByName("RemoveEventCerts")
 	volunteerServiceDeleteEventMethodDescriptor            = volunteerServiceServiceDescriptor.Methods().ByName("DeleteEvent")
 	volunteerServiceListEventVolunteersMethodDescriptor    = volunteerServiceServiceDescriptor.Methods().ByName("ListEventVolunteers")
-	volunteerServiceAddEventVolunteersMethodDescriptor     = volunteerServiceServiceDescriptor.Methods().ByName("AddEventVolunteers")
-	volunteerServiceRemoveEventVolunteersMethodDescriptor  = volunteerServiceServiceDescriptor.Methods().ByName("RemoveEventVolunteers")
+	volunteerServiceCreateEventVolunteerMethodDescriptor   = volunteerServiceServiceDescriptor.Methods().ByName("CreateEventVolunteer")
+	volunteerServiceRemoveEventVolunteerMethodDescriptor   = volunteerServiceServiceDescriptor.Methods().ByName("RemoveEventVolunteer")
 )
 
 // VolunteerServiceClient is a client for the api.v1.VolunteerService service.
@@ -215,9 +215,11 @@ type VolunteerServiceClient interface {
 	// Requires user
 	DeleteEvent(context.Context, *connect.Request[v1.DeleteEventRequest]) (*connect.Response[v1.DeleteEventResponse], error)
 	// === EVENT VOLUNTEERS
+	// Requires user
 	ListEventVolunteers(context.Context, *connect.Request[v1.ListEventVolunteersRequest]) (*connect.Response[v1.ListEventVolunteersResponse], error)
-	AddEventVolunteers(context.Context, *connect.Request[v1.AddEventVolunteersRequest]) (*connect.Response[v1.AddEventVolunteersResponse], error)
-	RemoveEventVolunteers(context.Context, *connect.Request[v1.RemoveEventVolunteersRequest]) (*connect.Response[v1.RemoveEventVolunteersResponse], error)
+	// Requires user
+	CreateEventVolunteer(context.Context, *connect.Request[v1.CreateEventVolunteerRequest]) (*connect.Response[v1.CreateEventVolunteerResponse], error)
+	RemoveEventVolunteer(context.Context, *connect.Request[v1.RemoveEventVolunteerRequest]) (*connect.Response[v1.RemoveEventVolunteerResponse], error)
 }
 
 // NewVolunteerServiceClient constructs a client for the api.v1.VolunteerService service. By
@@ -386,16 +388,16 @@ func NewVolunteerServiceClient(httpClient connect.HTTPClient, baseURL string, op
 			connect.WithSchema(volunteerServiceListEventVolunteersMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
-		addEventVolunteers: connect.NewClient[v1.AddEventVolunteersRequest, v1.AddEventVolunteersResponse](
+		createEventVolunteer: connect.NewClient[v1.CreateEventVolunteerRequest, v1.CreateEventVolunteerResponse](
 			httpClient,
-			baseURL+VolunteerServiceAddEventVolunteersProcedure,
-			connect.WithSchema(volunteerServiceAddEventVolunteersMethodDescriptor),
+			baseURL+VolunteerServiceCreateEventVolunteerProcedure,
+			connect.WithSchema(volunteerServiceCreateEventVolunteerMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
-		removeEventVolunteers: connect.NewClient[v1.RemoveEventVolunteersRequest, v1.RemoveEventVolunteersResponse](
+		removeEventVolunteer: connect.NewClient[v1.RemoveEventVolunteerRequest, v1.RemoveEventVolunteerResponse](
 			httpClient,
-			baseURL+VolunteerServiceRemoveEventVolunteersProcedure,
-			connect.WithSchema(volunteerServiceRemoveEventVolunteersMethodDescriptor),
+			baseURL+VolunteerServiceRemoveEventVolunteerProcedure,
+			connect.WithSchema(volunteerServiceRemoveEventVolunteerMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -429,8 +431,8 @@ type volunteerServiceClient struct {
 	removeEventCerts       *connect.Client[v1.RemoveEventCertsRequest, v1.RemoveEventCertsResponse]
 	deleteEvent            *connect.Client[v1.DeleteEventRequest, v1.DeleteEventResponse]
 	listEventVolunteers    *connect.Client[v1.ListEventVolunteersRequest, v1.ListEventVolunteersResponse]
-	addEventVolunteers     *connect.Client[v1.AddEventVolunteersRequest, v1.AddEventVolunteersResponse]
-	removeEventVolunteers  *connect.Client[v1.RemoveEventVolunteersRequest, v1.RemoveEventVolunteersResponse]
+	createEventVolunteer   *connect.Client[v1.CreateEventVolunteerRequest, v1.CreateEventVolunteerResponse]
+	removeEventVolunteer   *connect.Client[v1.RemoveEventVolunteerRequest, v1.RemoveEventVolunteerResponse]
 }
 
 // CreateVolunteer calls api.v1.VolunteerService.CreateVolunteer.
@@ -563,14 +565,14 @@ func (c *volunteerServiceClient) ListEventVolunteers(ctx context.Context, req *c
 	return c.listEventVolunteers.CallUnary(ctx, req)
 }
 
-// AddEventVolunteers calls api.v1.VolunteerService.AddEventVolunteers.
-func (c *volunteerServiceClient) AddEventVolunteers(ctx context.Context, req *connect.Request[v1.AddEventVolunteersRequest]) (*connect.Response[v1.AddEventVolunteersResponse], error) {
-	return c.addEventVolunteers.CallUnary(ctx, req)
+// CreateEventVolunteer calls api.v1.VolunteerService.CreateEventVolunteer.
+func (c *volunteerServiceClient) CreateEventVolunteer(ctx context.Context, req *connect.Request[v1.CreateEventVolunteerRequest]) (*connect.Response[v1.CreateEventVolunteerResponse], error) {
+	return c.createEventVolunteer.CallUnary(ctx, req)
 }
 
-// RemoveEventVolunteers calls api.v1.VolunteerService.RemoveEventVolunteers.
-func (c *volunteerServiceClient) RemoveEventVolunteers(ctx context.Context, req *connect.Request[v1.RemoveEventVolunteersRequest]) (*connect.Response[v1.RemoveEventVolunteersResponse], error) {
-	return c.removeEventVolunteers.CallUnary(ctx, req)
+// RemoveEventVolunteer calls api.v1.VolunteerService.RemoveEventVolunteer.
+func (c *volunteerServiceClient) RemoveEventVolunteer(ctx context.Context, req *connect.Request[v1.RemoveEventVolunteerRequest]) (*connect.Response[v1.RemoveEventVolunteerResponse], error) {
+	return c.removeEventVolunteer.CallUnary(ctx, req)
 }
 
 // VolunteerServiceHandler is an implementation of the api.v1.VolunteerService service.
@@ -636,9 +638,11 @@ type VolunteerServiceHandler interface {
 	// Requires user
 	DeleteEvent(context.Context, *connect.Request[v1.DeleteEventRequest]) (*connect.Response[v1.DeleteEventResponse], error)
 	// === EVENT VOLUNTEERS
+	// Requires user
 	ListEventVolunteers(context.Context, *connect.Request[v1.ListEventVolunteersRequest]) (*connect.Response[v1.ListEventVolunteersResponse], error)
-	AddEventVolunteers(context.Context, *connect.Request[v1.AddEventVolunteersRequest]) (*connect.Response[v1.AddEventVolunteersResponse], error)
-	RemoveEventVolunteers(context.Context, *connect.Request[v1.RemoveEventVolunteersRequest]) (*connect.Response[v1.RemoveEventVolunteersResponse], error)
+	// Requires user
+	CreateEventVolunteer(context.Context, *connect.Request[v1.CreateEventVolunteerRequest]) (*connect.Response[v1.CreateEventVolunteerResponse], error)
+	RemoveEventVolunteer(context.Context, *connect.Request[v1.RemoveEventVolunteerRequest]) (*connect.Response[v1.RemoveEventVolunteerResponse], error)
 }
 
 // NewVolunteerServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -803,16 +807,16 @@ func NewVolunteerServiceHandler(svc VolunteerServiceHandler, opts ...connect.Han
 		connect.WithSchema(volunteerServiceListEventVolunteersMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	volunteerServiceAddEventVolunteersHandler := connect.NewUnaryHandler(
-		VolunteerServiceAddEventVolunteersProcedure,
-		svc.AddEventVolunteers,
-		connect.WithSchema(volunteerServiceAddEventVolunteersMethodDescriptor),
+	volunteerServiceCreateEventVolunteerHandler := connect.NewUnaryHandler(
+		VolunteerServiceCreateEventVolunteerProcedure,
+		svc.CreateEventVolunteer,
+		connect.WithSchema(volunteerServiceCreateEventVolunteerMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	volunteerServiceRemoveEventVolunteersHandler := connect.NewUnaryHandler(
-		VolunteerServiceRemoveEventVolunteersProcedure,
-		svc.RemoveEventVolunteers,
-		connect.WithSchema(volunteerServiceRemoveEventVolunteersMethodDescriptor),
+	volunteerServiceRemoveEventVolunteerHandler := connect.NewUnaryHandler(
+		VolunteerServiceRemoveEventVolunteerProcedure,
+		svc.RemoveEventVolunteer,
+		connect.WithSchema(volunteerServiceRemoveEventVolunteerMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/api.v1.VolunteerService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -869,10 +873,10 @@ func NewVolunteerServiceHandler(svc VolunteerServiceHandler, opts ...connect.Han
 			volunteerServiceDeleteEventHandler.ServeHTTP(w, r)
 		case VolunteerServiceListEventVolunteersProcedure:
 			volunteerServiceListEventVolunteersHandler.ServeHTTP(w, r)
-		case VolunteerServiceAddEventVolunteersProcedure:
-			volunteerServiceAddEventVolunteersHandler.ServeHTTP(w, r)
-		case VolunteerServiceRemoveEventVolunteersProcedure:
-			volunteerServiceRemoveEventVolunteersHandler.ServeHTTP(w, r)
+		case VolunteerServiceCreateEventVolunteerProcedure:
+			volunteerServiceCreateEventVolunteerHandler.ServeHTTP(w, r)
+		case VolunteerServiceRemoveEventVolunteerProcedure:
+			volunteerServiceRemoveEventVolunteerHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -986,10 +990,10 @@ func (UnimplementedVolunteerServiceHandler) ListEventVolunteers(context.Context,
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.VolunteerService.ListEventVolunteers is not implemented"))
 }
 
-func (UnimplementedVolunteerServiceHandler) AddEventVolunteers(context.Context, *connect.Request[v1.AddEventVolunteersRequest]) (*connect.Response[v1.AddEventVolunteersResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.VolunteerService.AddEventVolunteers is not implemented"))
+func (UnimplementedVolunteerServiceHandler) CreateEventVolunteer(context.Context, *connect.Request[v1.CreateEventVolunteerRequest]) (*connect.Response[v1.CreateEventVolunteerResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.VolunteerService.CreateEventVolunteer is not implemented"))
 }
 
-func (UnimplementedVolunteerServiceHandler) RemoveEventVolunteers(context.Context, *connect.Request[v1.RemoveEventVolunteersRequest]) (*connect.Response[v1.RemoveEventVolunteersResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.VolunteerService.RemoveEventVolunteers is not implemented"))
+func (UnimplementedVolunteerServiceHandler) RemoveEventVolunteer(context.Context, *connect.Request[v1.RemoveEventVolunteerRequest]) (*connect.Response[v1.RemoveEventVolunteerResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.VolunteerService.RemoveEventVolunteer is not implemented"))
 }

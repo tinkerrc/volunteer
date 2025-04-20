@@ -41,9 +41,11 @@ type Volunteer struct {
 type VolunteerEdges struct {
 	// VolunteerRecords holds the value of the volunteer_records edge.
 	VolunteerRecords []*EventVolunteer `json:"volunteer_records,omitempty"`
+	// Trainings holds the value of the trainings edge.
+	Trainings []*Training `json:"trainings,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // VolunteerRecordsOrErr returns the VolunteerRecords value or an error if the edge
@@ -53,6 +55,15 @@ func (e VolunteerEdges) VolunteerRecordsOrErr() ([]*EventVolunteer, error) {
 		return e.VolunteerRecords, nil
 	}
 	return nil, &NotLoadedError{edge: "volunteer_records"}
+}
+
+// TrainingsOrErr returns the Trainings value or an error if the edge
+// was not loaded in eager-loading.
+func (e VolunteerEdges) TrainingsOrErr() ([]*Training, error) {
+	if e.loadedTypes[1] {
+		return e.Trainings, nil
+	}
+	return nil, &NotLoadedError{edge: "trainings"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -143,6 +154,11 @@ func (v *Volunteer) Value(name string) (ent.Value, error) {
 // QueryVolunteerRecords queries the "volunteer_records" edge of the Volunteer entity.
 func (v *Volunteer) QueryVolunteerRecords() *EventVolunteerQuery {
 	return NewVolunteerClient(v.config).QueryVolunteerRecords(v)
+}
+
+// QueryTrainings queries the "trainings" edge of the Volunteer entity.
+func (v *Volunteer) QueryTrainings() *TrainingQuery {
+	return NewVolunteerClient(v.config).QueryTrainings(v)
 }
 
 // Update returns a builder for updating this Volunteer.

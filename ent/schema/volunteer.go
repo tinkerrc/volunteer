@@ -31,6 +31,7 @@ func (Volunteer) Fields() []ent.Field {
 func (Volunteer) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("volunteer_records", EventVolunteer.Type).Ref("volunteer"),
+		edge.From("trainings", Training.Type).Ref("volunteer"),
 	}
 }
 
