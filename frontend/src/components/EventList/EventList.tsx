@@ -28,7 +28,7 @@ export function EventList() {
             const res = await useClient().listEvents({ pageNumber: 1, pageSize: 50 }, { headers })
             return res.events
         } catch { return [] }
-    }, [])
+    }, [isAuthenticated])
 
     const rows = state?.value?.map((item) => {
         const selected = selection.includes(item.id);
