@@ -1,61 +1,73 @@
-import React, { useCallback } from 'react';
+import React from 'react';
+import { NavLink } from 'react-router-dom'; // using correct router package
 import styles from './VolunteerPage.module.css';
 
-const VolunteerPage = ({ goto }) => {
-  const onGroupContainerClick = useCallback(() => {
-    goto("vol");
-  }, [goto]);
-
+const VolunteerPage = () => {
   return (
-    <div className={styles.finalEditVolPage}>
-      <div className={styles.finalEditVolPageChild} />
-      <div className={styles.finalEditVolPageItem} />
-      <div className={styles.finalEditVolPageInner} />
-      <div className={styles.rectangleDiv} />
-      <div className={styles.finalEditVolPageChild1} />
-      <div className={styles.finalEditVolPageChild2} />
-      <div className={styles.finalEditVolPageChild3} />
-      <b className={styles.christiJohnson}>Christi Johnson</b>
-      <div className={styles.hours}>11.25 hours</div>
-      <div className={styles.cjohnsongmailcom}>cjohnson@gmail.com</div>
-      <div className={styles.thursdays10am5pm}>Thursdays: 10am–5pm</div>
-      <div className={styles.fridays9am6pm}>Fridays: 9am–6pm</div>
-      <div className={styles.div}>(530) 736-1725</div>
-      <div className={styles.mandatedReporterCertificate}>Mandated Reporter Certificate</div>
-      <div className={styles.peerLeaderCertificate}>Peer Leader Certificate</div>
-      <div className={styles.tuesdayMay10}>Tuesday May 10, 2025</div>
-      <div className={styles.peerMentorGroup}>Peer Mentor Group</div>
-      <div className={styles.peerMentorGroup1}>Peer Mentor Group</div>
-      <div className={styles.fridayMay4}>Friday May 4, 2025</div>
-      <div className={styles.hours1}>2 hours</div>
-      <div className={styles.hours2}>2 hours</div>
-      <div className={styles.email}>Email</div>
-      <div className={styles.preferredAvailability}>Preferred Availability</div>
-      <div className={styles.loggedHours}>Logged Hours</div>
-      <div className={styles.certifications}>Certifications</div>
-      <div className={styles.phone}>Phone</div>
+    <div className={styles.volunteerPage}>
+      <div className={styles.volunteerPageChild} />
+      <div className={styles.volunteerPageItem} />
+      <b className={styles.name}>Name</b>
+      <b className={styles.email}>Email</b>
+      <b className={styles.phone}>Phone</b>
+      <b className={styles.hours}>Hours</b>
+      <b className={styles.role}>Role</b>
 
-      <div className={styles.returnToVolunteersParent} onClick={onGroupContainerClick}>
-        <div className={styles.returnToVolunteers}>Return to Volunteers</div>
+      <div className={styles.component1}>
+        <div className={styles.component1Child} />
+        <div className={styles.searchVolunteers}>Search Volunteers</div>
       </div>
 
-      <div className={styles.finalEditVolPageChild4} />
-
-      <div className={styles.peerMentorWrapper}>
-        <div className={styles.peerMentor}>Peer Mentor</div>
-      </div>
-      <div className={styles.availableWrapper}>
-        <div className={styles.available}>Available</div>
+      <div className={styles.statusParent}>
+        <b className={styles.status}>Status</b>
       </div>
 
+      <div className={styles.cardVol}>
+        <div className={styles.cardVolChild} />
+        <div className={styles.frameParent}>
+          <div className={styles.frameGroup}>
+            <div className={styles.gillianBarnesWongParent}>
+              <div className={styles.gillianBarnesWong}>Gillian Barnes-Wong</div>
+              <div className={styles.gbarneswonggmailcom}>gbarneswong@gmail.com</div>
+              <div className={styles.div}>(281) 214-3728</div>
+            </div>
+            <div className={styles.div1}>0</div>
+          </div>
+          <div className={styles.trainingInProgressWrapper}>
+            <div className={styles.trainingInProgress}>Training in Progress</div>
+          </div>
+          <div className={styles.peerMentorWrapper}>
+            <div className={styles.status}>Peer Mentor</div>
+          </div>
+        </div>
+        <div className={styles.cardVolChild} />
+      </div>
+
+      {/* Bottom Nav */}
       <div className={styles.navDash}>
         <div className={styles.navDashChild} />
-        <div className={styles.dashboard} onClick={() => goto("home")}>Dashboard</div>
-        <div className={styles.volunteers} onClick={() => goto("vol")}>Volunteers</div>
-        <div className={styles.coordinatorInfo}>Coordinator Info</div>
+
+        <NavLink
+          to="/"
+          className={({ isActive }) =>
+            isActive ? `${styles.dashboard} ${styles.active}` : styles.dashboard
+          }
+        >
+          Dashboard
+        </NavLink>
+
+        <NavLink
+          to="/volunteer"
+          className={({ isActive }) =>
+            isActive ? `${styles.volunteers} ${styles.active}` : styles.volunteers
+          }
+        >
+          Volunteers
+        </NavLink>
       </div>
     </div>
   );
 };
 
 export default VolunteerPage;
+
