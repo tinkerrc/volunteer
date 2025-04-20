@@ -1,4 +1,4 @@
-import { Event } from '@/proto/api/v1/api_pb';
+import { Event, VolunteerService } from '@/proto/api/v1/api_pb';
 import { useClient } from '@/utils/client';
 import { intervalToString } from '@/utils/protobuf';
 import { useAuth0 } from '@auth0/auth0-react';
@@ -28,7 +28,7 @@ export function EventList() {
                 console.log("got access token")
                 const headers = new Headers();
                 headers.set("Authorization", `Bearer ${accessToken}`)
-                const res = await useClient().listEvents({ pageNumber: 1, pageSize: 50 }, { headers })
+                const res = await useClient(VolunteerService).listEvents({ pageNumber: 1, pageSize: 50 }, { headers })
                 console.log("got events")
                 setEvents(res.events)
             } catch (err) {

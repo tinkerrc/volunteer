@@ -4,12 +4,13 @@ import cx from 'clsx';
 import { useState } from 'react';
 import { useAsync } from 'react-use';
 import classes from './CertList.module.css';
+import { VolunteerService } from '@/proto/api/v1/api_pb';
 
 export function CertList() {
     let initState: string[] = [];
     const [selection, setSelection] = useState(initState);
     const state = useAsync(async () => {
-        const res = await useClient().listCerts({ pageNumber: 1, pageSize: 50 })
+        const res = await useClient(VolunteerService).listCerts({ pageNumber: 1, pageSize: 50 })
         return res.certs
     }, [])
 
