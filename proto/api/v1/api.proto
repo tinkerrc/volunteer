@@ -59,6 +59,7 @@ service VolunteerService {
   // === EVENTS
   // Requires admin
   rpc CreateEvent(CreateEventRequest) returns (CreateEventResponse);
+  // Requires admin
   rpc ListEvents(ListEventsRequest) returns (ListEventsResponse);
   rpc UpdateEvent(UpdateEventRequest) returns (UpdateEventResponse);
   rpc DeleteEvent(DeleteEventRequest) returns (DeleteEventResponse);
@@ -330,20 +331,15 @@ message Event {
   string id = 1;
   string name = 2;
   string description = 3;
-  bool is_recurring = 4;
-  optional bool is_recur_active = 5; // recur only
-  optional string recur_description = 6; // recur only
-  optional google.type.Interval interval = 7; // non-recur only
-  repeated string cert_ids = 8;
+  google.type.Interval interval = 4;
+  repeated string cert_ids = 5;
 }
 
 message CreateEventRequest {
   string name = 2;
   string description = 3;
-  bool is_recurring = 4;
-  optional string recur_description = 6; // recur only
-  optional google.type.Interval interval = 7; // non-recur only
-  repeated string cert_ids = 8;
+  google.type.Interval interval = 4;
+  repeated string cert_ids = 5;
 }
 
 message CreateEventResponse {
@@ -353,7 +349,7 @@ message CreateEventResponse {
 message ListEventsRequest {
   int32 page_size = 1;
   int32 page_number = 2;
-  repeated string cert_ids = 3;
+  // repeated string cert_ids = 3;
 }
 
 message ListEventsResponse {

@@ -34,11 +34,8 @@ var (
 		{Name: "id", Type: field.TypeUUID, Unique: true},
 		{Name: "name", Type: field.TypeString},
 		{Name: "description", Type: field.TypeString},
-		{Name: "is_recurring", Type: field.TypeBool},
-		{Name: "is_recur_active", Type: field.TypeBool, Nullable: true},
-		{Name: "recur_description", Type: field.TypeString, Nullable: true},
-		{Name: "start", Type: field.TypeTime, Nullable: true},
-		{Name: "end", Type: field.TypeTime, Nullable: true},
+		{Name: "start", Type: field.TypeTime},
+		{Name: "end", Type: field.TypeTime},
 	}
 	// EventsTable holds the schema information for the "events" table.
 	EventsTable = &schema.Table{

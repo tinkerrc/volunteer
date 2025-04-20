@@ -66,21 +66,6 @@ func Description(v string) predicate.Event {
 	return predicate.Event(sql.FieldEQ(FieldDescription, v))
 }
 
-// IsRecurring applies equality check predicate on the "is_recurring" field. It's identical to IsRecurringEQ.
-func IsRecurring(v bool) predicate.Event {
-	return predicate.Event(sql.FieldEQ(FieldIsRecurring, v))
-}
-
-// IsRecurActive applies equality check predicate on the "is_recur_active" field. It's identical to IsRecurActiveEQ.
-func IsRecurActive(v bool) predicate.Event {
-	return predicate.Event(sql.FieldEQ(FieldIsRecurActive, v))
-}
-
-// RecurDescription applies equality check predicate on the "recur_description" field. It's identical to RecurDescriptionEQ.
-func RecurDescription(v string) predicate.Event {
-	return predicate.Event(sql.FieldEQ(FieldRecurDescription, v))
-}
-
 // Start applies equality check predicate on the "start" field. It's identical to StartEQ.
 func Start(v time.Time) predicate.Event {
 	return predicate.Event(sql.FieldEQ(FieldStart, v))
@@ -221,111 +206,6 @@ func DescriptionContainsFold(v string) predicate.Event {
 	return predicate.Event(sql.FieldContainsFold(FieldDescription, v))
 }
 
-// IsRecurringEQ applies the EQ predicate on the "is_recurring" field.
-func IsRecurringEQ(v bool) predicate.Event {
-	return predicate.Event(sql.FieldEQ(FieldIsRecurring, v))
-}
-
-// IsRecurringNEQ applies the NEQ predicate on the "is_recurring" field.
-func IsRecurringNEQ(v bool) predicate.Event {
-	return predicate.Event(sql.FieldNEQ(FieldIsRecurring, v))
-}
-
-// IsRecurActiveEQ applies the EQ predicate on the "is_recur_active" field.
-func IsRecurActiveEQ(v bool) predicate.Event {
-	return predicate.Event(sql.FieldEQ(FieldIsRecurActive, v))
-}
-
-// IsRecurActiveNEQ applies the NEQ predicate on the "is_recur_active" field.
-func IsRecurActiveNEQ(v bool) predicate.Event {
-	return predicate.Event(sql.FieldNEQ(FieldIsRecurActive, v))
-}
-
-// IsRecurActiveIsNil applies the IsNil predicate on the "is_recur_active" field.
-func IsRecurActiveIsNil() predicate.Event {
-	return predicate.Event(sql.FieldIsNull(FieldIsRecurActive))
-}
-
-// IsRecurActiveNotNil applies the NotNil predicate on the "is_recur_active" field.
-func IsRecurActiveNotNil() predicate.Event {
-	return predicate.Event(sql.FieldNotNull(FieldIsRecurActive))
-}
-
-// RecurDescriptionEQ applies the EQ predicate on the "recur_description" field.
-func RecurDescriptionEQ(v string) predicate.Event {
-	return predicate.Event(sql.FieldEQ(FieldRecurDescription, v))
-}
-
-// RecurDescriptionNEQ applies the NEQ predicate on the "recur_description" field.
-func RecurDescriptionNEQ(v string) predicate.Event {
-	return predicate.Event(sql.FieldNEQ(FieldRecurDescription, v))
-}
-
-// RecurDescriptionIn applies the In predicate on the "recur_description" field.
-func RecurDescriptionIn(vs ...string) predicate.Event {
-	return predicate.Event(sql.FieldIn(FieldRecurDescription, vs...))
-}
-
-// RecurDescriptionNotIn applies the NotIn predicate on the "recur_description" field.
-func RecurDescriptionNotIn(vs ...string) predicate.Event {
-	return predicate.Event(sql.FieldNotIn(FieldRecurDescription, vs...))
-}
-
-// RecurDescriptionGT applies the GT predicate on the "recur_description" field.
-func RecurDescriptionGT(v string) predicate.Event {
-	return predicate.Event(sql.FieldGT(FieldRecurDescription, v))
-}
-
-// RecurDescriptionGTE applies the GTE predicate on the "recur_description" field.
-func RecurDescriptionGTE(v string) predicate.Event {
-	return predicate.Event(sql.FieldGTE(FieldRecurDescription, v))
-}
-
-// RecurDescriptionLT applies the LT predicate on the "recur_description" field.
-func RecurDescriptionLT(v string) predicate.Event {
-	return predicate.Event(sql.FieldLT(FieldRecurDescription, v))
-}
-
-// RecurDescriptionLTE applies the LTE predicate on the "recur_description" field.
-func RecurDescriptionLTE(v string) predicate.Event {
-	return predicate.Event(sql.FieldLTE(FieldRecurDescription, v))
-}
-
-// RecurDescriptionContains applies the Contains predicate on the "recur_description" field.
-func RecurDescriptionContains(v string) predicate.Event {
-	return predicate.Event(sql.FieldContains(FieldRecurDescription, v))
-}
-
-// RecurDescriptionHasPrefix applies the HasPrefix predicate on the "recur_description" field.
-func RecurDescriptionHasPrefix(v string) predicate.Event {
-	return predicate.Event(sql.FieldHasPrefix(FieldRecurDescription, v))
-}
-
-// RecurDescriptionHasSuffix applies the HasSuffix predicate on the "recur_description" field.
-func RecurDescriptionHasSuffix(v string) predicate.Event {
-	return predicate.Event(sql.FieldHasSuffix(FieldRecurDescription, v))
-}
-
-// RecurDescriptionIsNil applies the IsNil predicate on the "recur_description" field.
-func RecurDescriptionIsNil() predicate.Event {
-	return predicate.Event(sql.FieldIsNull(FieldRecurDescription))
-}
-
-// RecurDescriptionNotNil applies the NotNil predicate on the "recur_description" field.
-func RecurDescriptionNotNil() predicate.Event {
-	return predicate.Event(sql.FieldNotNull(FieldRecurDescription))
-}
-
-// RecurDescriptionEqualFold applies the EqualFold predicate on the "recur_description" field.
-func RecurDescriptionEqualFold(v string) predicate.Event {
-	return predicate.Event(sql.FieldEqualFold(FieldRecurDescription, v))
-}
-
-// RecurDescriptionContainsFold applies the ContainsFold predicate on the "recur_description" field.
-func RecurDescriptionContainsFold(v string) predicate.Event {
-	return predicate.Event(sql.FieldContainsFold(FieldRecurDescription, v))
-}
-
 // StartEQ applies the EQ predicate on the "start" field.
 func StartEQ(v time.Time) predicate.Event {
 	return predicate.Event(sql.FieldEQ(FieldStart, v))
@@ -366,16 +246,6 @@ func StartLTE(v time.Time) predicate.Event {
 	return predicate.Event(sql.FieldLTE(FieldStart, v))
 }
 
-// StartIsNil applies the IsNil predicate on the "start" field.
-func StartIsNil() predicate.Event {
-	return predicate.Event(sql.FieldIsNull(FieldStart))
-}
-
-// StartNotNil applies the NotNil predicate on the "start" field.
-func StartNotNil() predicate.Event {
-	return predicate.Event(sql.FieldNotNull(FieldStart))
-}
-
 // EndEQ applies the EQ predicate on the "end" field.
 func EndEQ(v time.Time) predicate.Event {
 	return predicate.Event(sql.FieldEQ(FieldEnd, v))
@@ -414,16 +284,6 @@ func EndLT(v time.Time) predicate.Event {
 // EndLTE applies the LTE predicate on the "end" field.
 func EndLTE(v time.Time) predicate.Event {
 	return predicate.Event(sql.FieldLTE(FieldEnd, v))
-}
-
-// EndIsNil applies the IsNil predicate on the "end" field.
-func EndIsNil() predicate.Event {
-	return predicate.Event(sql.FieldIsNull(FieldEnd))
-}
-
-// EndNotNil applies the NotNil predicate on the "end" field.
-func EndNotNil() predicate.Event {
-	return predicate.Event(sql.FieldNotNull(FieldEnd))
 }
 
 // HasCerts applies the HasEdge predicate on the "certs" edge.
