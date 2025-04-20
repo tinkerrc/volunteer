@@ -31,6 +31,9 @@ func (s *APIServer) ListEvents(
 		Offset(int(m.PageSize * m.PageNumber)).
 		WithCerts().
 		All(ctx)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, errors.New("could not query field"))
+	}
 	eProtos := make([]*apiv1.Event, len(es))
 	for idx, e := range es {
 		cids := make([]string, len(e.Edges.Certs))

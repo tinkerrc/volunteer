@@ -1,20 +1,42 @@
-import { useClient } from '@/utils/client';
+import { Event, VolunteerService } from '@/proto/api/v1/api_pb';
+import { transport } from '@/utils/client';
 import { intervalToString } from '@/utils/protobuf';
+import { useAuth0 } from '@auth0/auth0-react';
+import { createClient } from '@connectrpc/connect';
 import { Group, ScrollArea, Table, Text } from '@mantine/core';
 import cx from 'clsx';
-import { useState } from 'react';
-import { useAsync } from 'react-use';
+import { useEffect, useMemo, useState } from 'react';
 import classes from './EventList.module.css';
 
 export function EventList() {
+    const [events, setEvents] = useState<Event[]>([])
     let initState: string[] = [];
     const [selection, setSelection] = useState(initState);
-    const state = useAsync(async () => {
-        const res = await useClient().listEvents({ pageNumber: 1, pageSize: 50 })
-        return res.events
-    }, [])
-
-    const rows = state?.value?.map((item) => {
+    const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
+    const client = useMemo(() => createClient(VolunteerService, transport), [VolunteerService]);
+    useEffect(() => {
+        const getEvents = async () => {
+            try {
+                if (!isAuthenticated) {
+                    return
+                }
+                const accessToken = await getAccessTokenSilently({
+                    authorizationParams: {
+                        audience: "https://api.yolovms.org",
+                        scope: "read:current_user",
+                    },
+                });
+                const headers = new Headers();
+                headers.set("Authorization", `Bearer ${accessToken}`)
+                const res = await client.listEvents({ pageNumber: 0, pageSize: 50 }, { headers })
+                setEvents(res.events)
+            } catch (err) {
+                console.log(err)
+            }
+        }
+        getEvents()
+    }, [isAuthenticated])
+    const rows = events.map((item) => {
         const selected = selection.includes(item.id);
         return (
             <Table.Tr key={item.id} className={cx({ [classes.rowSelected]: selected })}>

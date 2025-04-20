@@ -1,19 +1,41 @@
-import { useClient } from '@/utils/client';
+import { Cert, VolunteerService } from '@/proto/api/v1/api_pb';
+import { transport } from '@/utils/client';
+import { useAuth0 } from '@auth0/auth0-react';
+import { createClient } from '@connectrpc/connect';
 import { Group, ScrollArea, Table, Text } from '@mantine/core';
 import cx from 'clsx';
-import { useState } from 'react';
-import { useAsync } from 'react-use';
+import { useEffect, useMemo, useState } from 'react';
 import classes from './CertList.module.css';
 
 export function CertList() {
     let initState: string[] = [];
     const [selection, setSelection] = useState(initState);
-    const state = useAsync(async () => {
-        const res = await useClient().listCerts({ pageNumber: 1, pageSize: 50 })
-        return res.certs
-    }, [])
+    const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
+    const [certs, setCerts] = useState<Cert[]>([])
+    const client = useMemo(() => createClient(VolunteerService, transport), [VolunteerService]);
+    useEffect(() => {
+        const getCerts = async () => {
+            try {
+                if (!isAuthenticated) {
+                    return
+                }
+                const accessToken = await getAccessTokenSilently({
+                    authorizationParams: {
+                        audience: "https://api.yolovms.org",
+                        scope: "read:current_user",
+                    },
+                });
+                const headers = new Headers();
+                headers.set("Authorization", `Bearer ${accessToken}`)
+                const { certs } = await client.listCerts({ pageNumber: 0, pageSize: 50 })
+                setCerts(certs)
+            } catch (err) {
+                console.log(err)
+            }
+        }
+    }, [isAuthenticated])
 
-    const rows = state?.value?.map((item) => {
+    const rows = certs.map((item) => {
         const selected = selection.includes(item.id);
         return (
             <Table.Tr key={item.id} className={cx({ [classes.rowSelected]: selected })}>
