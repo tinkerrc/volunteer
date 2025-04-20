@@ -29,7 +29,7 @@ export const CreateVolunteerForm = () => {
         },
         validate: {
             email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
-            phone: (value) => (/^[\d]{9}$/.test(value) ? null : 'Invalid phone'),
+            phone: (value) => (/^[\d]{10}$/.test(value) ? null : 'Invalid phone'),
         }
     })
 
