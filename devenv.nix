@@ -7,7 +7,9 @@
 }:
 
 {
-  dotenv.enable = true;
+  enterShell = ''
+    [ ! -f .env ] || export $(grep -v '^#' .env | xargs)
+  '';
   env = {
     PG_HOST = "127.0.0.1";
     PG_PORT = "5432";
