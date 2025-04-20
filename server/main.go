@@ -13,8 +13,9 @@ import (
 	"github.com/auth0/go-auth0/authentication"
 	"github.com/tinkerrc/volunteer/ent"
 	"github.com/tinkerrc/volunteer/server/api"
-	"golang.org/x/net/http2"
-	"golang.org/x/net/http2/h2c"
+
+	connectcors "connectrpc.com/cors"
+	"github.com/rs/cors"
 
 	_ "github.com/lib/pq"
 
@@ -65,11 +66,22 @@ func main() {
 
 	middleware := authn.NewMiddleware(api.Authenticate(cl))
 
-	// Use h2c so we can serve HTTP/2 without TLS.
-	handler = h2c.NewHandler(mux, &http2.Server{})
-	handler = middleware.Wrap(handler)
-	http.ListenAndServe(
-		"localhost:8080",
+	handler = middleware.Wrap(mux)
+	handler = withCORS(handler)
+	http.ListenAndServeTLS(
+		"0.0.0.0:443",
+		os.Getenv("TLS_CERT"),
+		os.Getenv("TLS_KEY"),
 		handler,
 	)
+}
+
+func withCORS(h http.Handler) http.Handler {
+	middleware := cors.New(cors.Options{
+		AllowedOrigins: []string{"yolovms.org"},
+		AllowedMethods: connectcors.AllowedMethods(),
+		AllowedHeaders: connectcors.AllowedHeaders(),
+		ExposedHeaders: connectcors.ExposedHeaders(),
+	})
+	return middleware.Handler(h)
 }

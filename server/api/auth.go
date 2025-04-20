@@ -29,7 +29,6 @@ func (c CustomClaims) Validate(ctx context.Context) error {
 }
 
 func Authenticate(db *ent.Client) func(context.Context, *http.Request) (any, error) {
-
 	issuerURL, err := url.Parse("https://" + os.Getenv("AUTH0_DOMAIN") + "/")
 	if err != nil {
 		log.Fatalf("Failed to parse the issuer url: %v", err)
@@ -70,6 +69,16 @@ func Authenticate(db *ent.Client) func(context.Context, *http.Request) (any, err
 		}
 
 		return claims.RegisteredClaims.Subject, nil
+	}
+}
+
+func DebugAuthenticate(db *ent.Client) func(context.Context, *http.Request) (any, error) {
+	return func(ctx context.Context, req *http.Request) (any, error) {
+		token, ok := authn.BearerToken(req)
+		if !ok {
+			return nil, authn.Errorf("unauthenticated")
+		}
+		return token, nil
 	}
 }
 

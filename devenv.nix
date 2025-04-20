@@ -26,7 +26,6 @@
     protoc-gen-go
     protoc-gen-es
     protoc-gen-connect-go
-    protoc-gen-connect-es
 
     nixfmt-rfc-style
   ];
@@ -50,4 +49,11 @@
       }
     ];
   };
+
+  scripts.reset-db.exec = ''
+    psql -U $USER postgres -c "DROP DATABASE IF EXISTS vms;"
+    psql -U $USER postgres -c "CREATE DATABASE vms;"
+    psql -U $USER vms -c "GRANT ALL ON DATABASE vms TO admin;"
+    psql -U $USER vms -c "GRANT ALL ON SCHEMA public TO admin;"
+  '';
 }
