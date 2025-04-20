@@ -49,6 +49,7 @@ service VolunteerService {
   rpc CreateCert(CreateCertRequest) returns (CreateCertResponse);
   // Requires user
   rpc ListCerts(ListCertsRequest) returns (ListCertsResponse);
+  // Requires user
   rpc GetCert(GetCertRequest) returns (GetCertResponse);
   rpc UpdateCert(UpdateCertRequest) returns (UpdateCertResponse);
   rpc DeleteCert(DeleteCertRequest) returns (DeleteCertResponse);
