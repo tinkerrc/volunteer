@@ -14,7 +14,7 @@ func (s *APIServer) CreateVolunteer(
 	req *connect.Request[apiv1.CreateVolunteerRequest],
 ) (*connect.Response[apiv1.CreateVolunteerResponse], error) {
 	err := s.ensureAdmin(ctx)
-	if err == nil {
+	if err != nil {
 		return nil, err
 	}
 

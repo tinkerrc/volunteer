@@ -5,6 +5,7 @@ import { createClient } from '@connectrpc/connect';
 import { Button, Center, Group, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface CreateVolunteerData {
     email: string;
@@ -16,6 +17,7 @@ interface CreateVolunteerData {
 
 export const CreateVolunteerForm = () => {
     const { isAuthenticated, getAccessTokenSilently } = useAuth0();
+    const navigate = useNavigate()
 
     const client = useMemo(() => createClient(VolunteerService, transport), [VolunteerService]);
     const form = useForm({
@@ -46,7 +48,10 @@ export const CreateVolunteerForm = () => {
             });
             const headers = new Headers();
             headers.set("Authorization", `Bearer ${accessToken}`)
-            const res = await client.createVolunteer({ ...values }, { headers });
+            const { id } = await client.createVolunteer({ ...values }, { headers });
+            if (id.length != 0) {
+                navigate("/volunteers")
+            }
         } catch (err) {
             console.log(err)
         }
