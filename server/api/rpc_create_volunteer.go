@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"errors"
 
 	"connectrpc.com/connect"
 
@@ -28,7 +27,8 @@ func (s *APIServer) CreateVolunteer(
 		SetAddress(msg.Address).
 		Save(ctx)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, errors.New("failed to create volunteer"))
+		// return nil, connect.NewError(connect.CodeInternal, errors.New("failed to create volunteer"))
+		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
 	res := connect.NewResponse(&apiv1.CreateVolunteerResponse{
