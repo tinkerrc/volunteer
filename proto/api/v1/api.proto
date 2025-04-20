@@ -31,8 +31,9 @@ service VolunteerService {
   rpc CreateTimeLog(CreateTimeLogRequest) returns (CreateTimeLogResponse);
   // Requires user or volunteer
   rpc ListTimeLogs(ListTimeLogsRequest) returns (ListTimeLogsResponse);
-  // Requires volunteer
+  // Requires user or volunteer
   rpc UpdateTimeLog(UpdateTimeLogRequest) returns (UpdateTimeLogResponse);
+  // Requires user or volunteer
   rpc DeleteTimeLog(DeleteTimeLogRequest) returns (DeleteTimeLogResponse);
   // === VOLUNTEER TRAINING
   rpc StartTraining(StartTrainingRequest) returns (StartTrainingResponse);
@@ -222,7 +223,7 @@ message UpdateTimeLogRequest {
 message UpdateTimeLogResponse {}
 
 message DeleteTimeLogRequest {
-  string log_id = 1;
+  string id = 1;
 }
 
 message DeleteTimeLogResponse {}
