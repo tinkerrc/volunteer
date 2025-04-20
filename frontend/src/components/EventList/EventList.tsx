@@ -32,7 +32,7 @@ export function EventList() {
                 const headers = new Headers();
                 headers.set("Authorization", `Bearer ${accessToken}`)
                 const res = await client.listEvents({ pageNumber: 1, pageSize: 50 }, { headers })
-                console.log("got events")
+                console.log(`got ${res.events.length} events`)
                 setEvents(res.events)
             } catch (err) {
                 console.log(err)
