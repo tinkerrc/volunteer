@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import styles from './userpage.module.css'; // Ensure the file is renamed to userpage.module.css
 
-const Userpage = ({ goto }) => {
+const VolunteerPage = ({ goto }) => {
   const onGroupContainerClick = useCallback(() => {
     goto("vol");
   }, [goto]);
@@ -58,4 +58,4 @@ const Userpage = ({ goto }) => {
   );
 };
 
-export default Userpage;
+export default VolunteerPage;
