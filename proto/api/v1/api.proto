@@ -73,6 +73,7 @@ service VolunteerService {
   rpc ListEventVolunteers(ListEventVolunteersRequest) returns (ListEventVolunteersResponse);
   // Requires user
   rpc CreateEventVolunteer(CreateEventVolunteerRequest) returns (CreateEventVolunteerResponse);
+  // Requires user
   rpc RemoveEventVolunteer(RemoveEventVolunteerRequest) returns (RemoveEventVolunteerResponse);
 }
 
