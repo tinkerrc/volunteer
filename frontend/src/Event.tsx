@@ -4,7 +4,7 @@ import styles from "./EventList.module.css";
 
 export const Event = ({ id }: { id: string}) => {
     const state = useAsync(async () => {
-        return await useClient().getEvent({ id: id })
+        return await useClient().getEvent({ id })
     }, [id])
 
     return (

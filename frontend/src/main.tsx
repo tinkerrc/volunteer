@@ -1,23 +1,24 @@
+import '@mantine/core/styles.css';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { EventList } from './EventList';
-import VolunteerPage from './VolunteerPage.js';
+
+import { MantineProvider } from '@mantine/core';
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <EventList />,
   },
-  {
-    path: '/volunteer',
-    element: <VolunteerPage />,
-  },
-
+  // {
+  //   path: '/volunteer',
+  //   element: <VolunteerPage />,
+  // },
 ]);
 
 function App() {
-  return <RouterProvider router={router} />;
+  return <MantineProvider><RouterProvider router={router} /></MantineProvider>;
 }
 
 createRoot(document.getElementById('root')!).render(

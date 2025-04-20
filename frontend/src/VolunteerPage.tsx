@@ -1,10 +1,16 @@
-import { NavLink } from 'react-router-dom'; // using correct router package
+import { NavLink } from 'react-router-dom';
+import { useAsync } from 'react-use';
+import { useClient } from './client';
 import styles from './VolunteerPage.module.css';
 
-const VolunteerPage = () => {
+const VolunteerPage = ({ pageNumber }: { pageNumber: number }) => {
   // const onGroupContainerClick = useCallback(() => {
   //   goto("vol");
   // }, [goto]);
+  const state = useAsync(async () => {
+    const res = await useClient().listVolunteers({ pageNumber, pageSize: 50 })
+    return res.volunteers
+  }, [pageNumber])
 
   return (
     <div className={styles.volunteerPage}>
