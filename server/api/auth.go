@@ -40,7 +40,8 @@ func Authenticate(db *ent.Client) func(context.Context, *http.Request) (any, err
 		provider.KeyFunc,
 		validator.RS256,
 		issuerURL.String(),
-		[]string{os.Getenv("AUTH0_AUDIENCE")},
+		//[]string{os.Getenv("AUTH0_AUDIENCE")},
+		[]string{"https://dev-v8cbdhmtmu4lj338.us.auth0.com/api/v2/"},
 		validator.WithCustomClaims(
 			func() validator.CustomClaims {
 				return &CustomClaims{}
