@@ -12,10 +12,11 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"github.com/tinkerrc/volunteer/ent/certification"
+	"github.com/tinkerrc/volunteer/ent/cert"
 	"github.com/tinkerrc/volunteer/ent/event"
 	"github.com/tinkerrc/volunteer/ent/eventvolunteer"
 	"github.com/tinkerrc/volunteer/ent/timelog"
+	"github.com/tinkerrc/volunteer/ent/training"
 	"github.com/tinkerrc/volunteer/ent/user"
 	"github.com/tinkerrc/volunteer/ent/volunteer"
 )
@@ -78,10 +79,11 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			certification.Table:  certification.ValidColumn,
+			cert.Table:           cert.ValidColumn,
 			event.Table:          event.ValidColumn,
 			eventvolunteer.Table: eventvolunteer.ValidColumn,
 			timelog.Table:        timelog.ValidColumn,
+			training.Table:       training.ValidColumn,
 			user.Table:           user.ValidColumn,
 			volunteer.Table:      volunteer.ValidColumn,
 		})

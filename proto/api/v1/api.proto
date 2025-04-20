@@ -36,6 +36,7 @@ service VolunteerService {
   // Requires user or volunteer
   rpc DeleteTimeLog(DeleteTimeLogRequest) returns (DeleteTimeLogResponse);
   // === VOLUNTEER TRAINING
+  // Requires admin
   rpc StartTraining(StartTrainingRequest) returns (StartTrainingResponse);
   rpc FinishTraining(FinishTrainingRequest) returns (FinishTrainingResponse);
   rpc ListTrainings(ListTrainingsRequest) returns (ListTrainingsResponse);
@@ -271,11 +272,11 @@ message StartTrainingRequest {
 }
 
 message StartTrainingResponse {
-  string training_id = 1;
+  string id = 1;
 }
 
 message FinishTrainingRequest {
-  string training_id = 1;
+  string id = 1;
 }
 
 message FinishTrainingResponse {}
@@ -284,7 +285,7 @@ message Training {
   string id = 1;
   string volunteer_id = 2;
   string cert_id = 3;
-  optional google.protobuf.Timestamp start_date = 4;
+  google.protobuf.Timestamp start_date = 4;
   optional google.protobuf.Timestamp end_date = 5;
   bool is_certified = 6;
 }

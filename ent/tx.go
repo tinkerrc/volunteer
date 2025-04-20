@@ -12,14 +12,16 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
-	// Certification is the client for interacting with the Certification builders.
-	Certification *CertificationClient
+	// Cert is the client for interacting with the Cert builders.
+	Cert *CertClient
 	// Event is the client for interacting with the Event builders.
 	Event *EventClient
 	// EventVolunteer is the client for interacting with the EventVolunteer builders.
 	EventVolunteer *EventVolunteerClient
 	// TimeLog is the client for interacting with the TimeLog builders.
 	TimeLog *TimeLogClient
+	// Training is the client for interacting with the Training builders.
+	Training *TrainingClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 	// Volunteer is the client for interacting with the Volunteer builders.
@@ -155,10 +157,11 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
-	tx.Certification = NewCertificationClient(tx.config)
+	tx.Cert = NewCertClient(tx.config)
 	tx.Event = NewEventClient(tx.config)
 	tx.EventVolunteer = NewEventVolunteerClient(tx.config)
 	tx.TimeLog = NewTimeLogClient(tx.config)
+	tx.Training = NewTrainingClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 	tx.Volunteer = NewVolunteerClient(tx.config)
 }
@@ -170,7 +173,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: Certification.QueryXXX(), the query will be executed
+// applies a query, for example: Cert.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

@@ -9,16 +9,16 @@ import (
 	"github.com/tinkerrc/volunteer/ent"
 )
 
-// The CertificationFunc type is an adapter to allow the use of ordinary
-// function as Certification mutator.
-type CertificationFunc func(context.Context, *ent.CertificationMutation) (ent.Value, error)
+// The CertFunc type is an adapter to allow the use of ordinary
+// function as Cert mutator.
+type CertFunc func(context.Context, *ent.CertMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f CertificationFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.CertificationMutation); ok {
+func (f CertFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.CertMutation); ok {
 		return f(ctx, mv)
 	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CertificationMutation", m)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CertMutation", m)
 }
 
 // The EventFunc type is an adapter to allow the use of ordinary
@@ -55,6 +55,18 @@ func (f TimeLogFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, err
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TimeLogMutation", m)
+}
+
+// The TrainingFunc type is an adapter to allow the use of ordinary
+// function as Training mutator.
+type TrainingFunc func(context.Context, *ent.TrainingMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f TrainingFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.TrainingMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TrainingMutation", m)
 }
 
 // The UserFunc type is an adapter to allow the use of ordinary

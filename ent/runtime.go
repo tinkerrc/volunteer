@@ -3,11 +3,15 @@
 package ent
 
 import (
+	"time"
+
 	"github.com/google/uuid"
+	"github.com/tinkerrc/volunteer/ent/cert"
 	"github.com/tinkerrc/volunteer/ent/event"
 	"github.com/tinkerrc/volunteer/ent/eventvolunteer"
 	"github.com/tinkerrc/volunteer/ent/schema"
 	"github.com/tinkerrc/volunteer/ent/timelog"
+	"github.com/tinkerrc/volunteer/ent/training"
 	"github.com/tinkerrc/volunteer/ent/user"
 	"github.com/tinkerrc/volunteer/ent/volunteer"
 )
@@ -16,6 +20,12 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	certFields := schema.Cert{}.Fields()
+	_ = certFields
+	// certDescID is the schema descriptor for id field.
+	certDescID := certFields[0].Descriptor()
+	// cert.DefaultID holds the default value on creation for the id field.
+	cert.DefaultID = certDescID.Default.(func() uuid.UUID)
 	eventFields := schema.Event{}.Fields()
 	_ = eventFields
 	// eventDescID is the schema descriptor for id field.
@@ -34,6 +44,20 @@ func init() {
 	timelogDescID := timelogFields[0].Descriptor()
 	// timelog.DefaultID holds the default value on creation for the id field.
 	timelog.DefaultID = timelogDescID.Default.(func() uuid.UUID)
+	trainingFields := schema.Training{}.Fields()
+	_ = trainingFields
+	// trainingDescStartDate is the schema descriptor for start_date field.
+	trainingDescStartDate := trainingFields[1].Descriptor()
+	// training.DefaultStartDate holds the default value on creation for the start_date field.
+	training.DefaultStartDate = trainingDescStartDate.Default.(func() time.Time)
+	// trainingDescIsCertified is the schema descriptor for is_certified field.
+	trainingDescIsCertified := trainingFields[3].Descriptor()
+	// training.DefaultIsCertified holds the default value on creation for the is_certified field.
+	training.DefaultIsCertified = trainingDescIsCertified.Default.(bool)
+	// trainingDescID is the schema descriptor for id field.
+	trainingDescID := trainingFields[0].Descriptor()
+	// training.DefaultID holds the default value on creation for the id field.
+	training.DefaultID = trainingDescID.Default.(func() uuid.UUID)
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescID is the schema descriptor for id field.

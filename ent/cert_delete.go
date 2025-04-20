@@ -8,30 +8,30 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/tinkerrc/volunteer/ent/certification"
+	"github.com/tinkerrc/volunteer/ent/cert"
 	"github.com/tinkerrc/volunteer/ent/predicate"
 )
 
-// CertificationDelete is the builder for deleting a Certification entity.
-type CertificationDelete struct {
+// CertDelete is the builder for deleting a Cert entity.
+type CertDelete struct {
 	config
 	hooks    []Hook
-	mutation *CertificationMutation
+	mutation *CertMutation
 }
 
-// Where appends a list predicates to the CertificationDelete builder.
-func (cd *CertificationDelete) Where(ps ...predicate.Certification) *CertificationDelete {
+// Where appends a list predicates to the CertDelete builder.
+func (cd *CertDelete) Where(ps ...predicate.Cert) *CertDelete {
 	cd.mutation.Where(ps...)
 	return cd
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (cd *CertificationDelete) Exec(ctx context.Context) (int, error) {
+func (cd *CertDelete) Exec(ctx context.Context) (int, error) {
 	return withHooks(ctx, cd.sqlExec, cd.mutation, cd.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (cd *CertificationDelete) ExecX(ctx context.Context) int {
+func (cd *CertDelete) ExecX(ctx context.Context) int {
 	n, err := cd.Exec(ctx)
 	if err != nil {
 		panic(err)
@@ -39,8 +39,8 @@ func (cd *CertificationDelete) ExecX(ctx context.Context) int {
 	return n
 }
 
-func (cd *CertificationDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := sqlgraph.NewDeleteSpec(certification.Table, sqlgraph.NewFieldSpec(certification.FieldID, field.TypeInt))
+func (cd *CertDelete) sqlExec(ctx context.Context) (int, error) {
+	_spec := sqlgraph.NewDeleteSpec(cert.Table, sqlgraph.NewFieldSpec(cert.FieldID, field.TypeUUID))
 	if ps := cd.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -56,32 +56,32 @@ func (cd *CertificationDelete) sqlExec(ctx context.Context) (int, error) {
 	return affected, err
 }
 
-// CertificationDeleteOne is the builder for deleting a single Certification entity.
-type CertificationDeleteOne struct {
-	cd *CertificationDelete
+// CertDeleteOne is the builder for deleting a single Cert entity.
+type CertDeleteOne struct {
+	cd *CertDelete
 }
 
-// Where appends a list predicates to the CertificationDelete builder.
-func (cdo *CertificationDeleteOne) Where(ps ...predicate.Certification) *CertificationDeleteOne {
+// Where appends a list predicates to the CertDelete builder.
+func (cdo *CertDeleteOne) Where(ps ...predicate.Cert) *CertDeleteOne {
 	cdo.cd.mutation.Where(ps...)
 	return cdo
 }
 
 // Exec executes the deletion query.
-func (cdo *CertificationDeleteOne) Exec(ctx context.Context) error {
+func (cdo *CertDeleteOne) Exec(ctx context.Context) error {
 	n, err := cdo.cd.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
 	case n == 0:
-		return &NotFoundError{certification.Label}
+		return &NotFoundError{cert.Label}
 	default:
 		return nil
 	}
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (cdo *CertificationDeleteOne) ExecX(ctx context.Context) {
+func (cdo *CertDeleteOne) ExecX(ctx context.Context) {
 	if err := cdo.Exec(ctx); err != nil {
 		panic(err)
 	}
