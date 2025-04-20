@@ -10,6 +10,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
+	"github.com/tinkerrc/volunteer/ent/eventvolunteer"
 	"github.com/tinkerrc/volunteer/ent/predicate"
 	"github.com/tinkerrc/volunteer/ent/volunteer"
 )
@@ -125,9 +127,45 @@ func (vu *VolunteerUpdate) SetNillableNotes(s *string) *VolunteerUpdate {
 	return vu
 }
 
+// AddVolunteerRecordIDs adds the "volunteer_records" edge to the EventVolunteer entity by IDs.
+func (vu *VolunteerUpdate) AddVolunteerRecordIDs(ids ...uuid.UUID) *VolunteerUpdate {
+	vu.mutation.AddVolunteerRecordIDs(ids...)
+	return vu
+}
+
+// AddVolunteerRecords adds the "volunteer_records" edges to the EventVolunteer entity.
+func (vu *VolunteerUpdate) AddVolunteerRecords(e ...*EventVolunteer) *VolunteerUpdate {
+	ids := make([]uuid.UUID, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return vu.AddVolunteerRecordIDs(ids...)
+}
+
 // Mutation returns the VolunteerMutation object of the builder.
 func (vu *VolunteerUpdate) Mutation() *VolunteerMutation {
 	return vu.mutation
+}
+
+// ClearVolunteerRecords clears all "volunteer_records" edges to the EventVolunteer entity.
+func (vu *VolunteerUpdate) ClearVolunteerRecords() *VolunteerUpdate {
+	vu.mutation.ClearVolunteerRecords()
+	return vu
+}
+
+// RemoveVolunteerRecordIDs removes the "volunteer_records" edge to EventVolunteer entities by IDs.
+func (vu *VolunteerUpdate) RemoveVolunteerRecordIDs(ids ...uuid.UUID) *VolunteerUpdate {
+	vu.mutation.RemoveVolunteerRecordIDs(ids...)
+	return vu
+}
+
+// RemoveVolunteerRecords removes "volunteer_records" edges to EventVolunteer entities.
+func (vu *VolunteerUpdate) RemoveVolunteerRecords(e ...*EventVolunteer) *VolunteerUpdate {
+	ids := make([]uuid.UUID, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return vu.RemoveVolunteerRecordIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -186,6 +224,51 @@ func (vu *VolunteerUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := vu.mutation.Notes(); ok {
 		_spec.SetField(volunteer.FieldNotes, field.TypeString, value)
+	}
+	if vu.mutation.VolunteerRecordsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   volunteer.VolunteerRecordsTable,
+			Columns: []string{volunteer.VolunteerRecordsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventvolunteer.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := vu.mutation.RemovedVolunteerRecordsIDs(); len(nodes) > 0 && !vu.mutation.VolunteerRecordsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   volunteer.VolunteerRecordsTable,
+			Columns: []string{volunteer.VolunteerRecordsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventvolunteer.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := vu.mutation.VolunteerRecordsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   volunteer.VolunteerRecordsTable,
+			Columns: []string{volunteer.VolunteerRecordsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventvolunteer.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, vu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -305,9 +388,45 @@ func (vuo *VolunteerUpdateOne) SetNillableNotes(s *string) *VolunteerUpdateOne {
 	return vuo
 }
 
+// AddVolunteerRecordIDs adds the "volunteer_records" edge to the EventVolunteer entity by IDs.
+func (vuo *VolunteerUpdateOne) AddVolunteerRecordIDs(ids ...uuid.UUID) *VolunteerUpdateOne {
+	vuo.mutation.AddVolunteerRecordIDs(ids...)
+	return vuo
+}
+
+// AddVolunteerRecords adds the "volunteer_records" edges to the EventVolunteer entity.
+func (vuo *VolunteerUpdateOne) AddVolunteerRecords(e ...*EventVolunteer) *VolunteerUpdateOne {
+	ids := make([]uuid.UUID, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return vuo.AddVolunteerRecordIDs(ids...)
+}
+
 // Mutation returns the VolunteerMutation object of the builder.
 func (vuo *VolunteerUpdateOne) Mutation() *VolunteerMutation {
 	return vuo.mutation
+}
+
+// ClearVolunteerRecords clears all "volunteer_records" edges to the EventVolunteer entity.
+func (vuo *VolunteerUpdateOne) ClearVolunteerRecords() *VolunteerUpdateOne {
+	vuo.mutation.ClearVolunteerRecords()
+	return vuo
+}
+
+// RemoveVolunteerRecordIDs removes the "volunteer_records" edge to EventVolunteer entities by IDs.
+func (vuo *VolunteerUpdateOne) RemoveVolunteerRecordIDs(ids ...uuid.UUID) *VolunteerUpdateOne {
+	vuo.mutation.RemoveVolunteerRecordIDs(ids...)
+	return vuo
+}
+
+// RemoveVolunteerRecords removes "volunteer_records" edges to EventVolunteer entities.
+func (vuo *VolunteerUpdateOne) RemoveVolunteerRecords(e ...*EventVolunteer) *VolunteerUpdateOne {
+	ids := make([]uuid.UUID, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return vuo.RemoveVolunteerRecordIDs(ids...)
 }
 
 // Where appends a list predicates to the VolunteerUpdate builder.
@@ -396,6 +515,51 @@ func (vuo *VolunteerUpdateOne) sqlSave(ctx context.Context) (_node *Volunteer, e
 	}
 	if value, ok := vuo.mutation.Notes(); ok {
 		_spec.SetField(volunteer.FieldNotes, field.TypeString, value)
+	}
+	if vuo.mutation.VolunteerRecordsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   volunteer.VolunteerRecordsTable,
+			Columns: []string{volunteer.VolunteerRecordsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventvolunteer.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := vuo.mutation.RemovedVolunteerRecordsIDs(); len(nodes) > 0 && !vuo.mutation.VolunteerRecordsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   volunteer.VolunteerRecordsTable,
+			Columns: []string{volunteer.VolunteerRecordsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventvolunteer.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := vuo.mutation.VolunteerRecordsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   volunteer.VolunteerRecordsTable,
+			Columns: []string{volunteer.VolunteerRecordsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventvolunteer.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Volunteer{config: vuo.config}
 	_spec.Assign = _node.assignValues

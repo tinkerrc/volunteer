@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
 	"github.com/google/uuid"
@@ -28,7 +29,9 @@ func (Volunteer) Fields() []ent.Field {
 
 // Edges of the Volunteer.
 func (Volunteer) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.From("volunteer_records", EventVolunteer.Type).Ref("volunteer"),
+	}
 }
 
 func (Volunteer) Indexes() []ent.Index {

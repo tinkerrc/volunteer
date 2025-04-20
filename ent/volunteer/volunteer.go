@@ -4,6 +4,7 @@ package volunteer
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/google/uuid"
 )
 
@@ -26,8 +27,17 @@ const (
 	FieldAddress = "address"
 	// FieldNotes holds the string denoting the notes field in the database.
 	FieldNotes = "notes"
+	// EdgeVolunteerRecords holds the string denoting the volunteer_records edge name in mutations.
+	EdgeVolunteerRecords = "volunteer_records"
 	// Table holds the table name of the volunteer in the database.
 	Table = "volunteers"
+	// VolunteerRecordsTable is the table that holds the volunteer_records relation/edge.
+	VolunteerRecordsTable = "event_volunteers"
+	// VolunteerRecordsInverseTable is the table name for the EventVolunteer entity.
+	// It exists in this package in order to avoid circular dependency with the "eventvolunteer" package.
+	VolunteerRecordsInverseTable = "event_volunteers"
+	// VolunteerRecordsColumn is the table column denoting the volunteer_records relation/edge.
+	VolunteerRecordsColumn = "event_volunteer_volunteer"
 )
 
 // Columns holds all SQL columns for volunteer fields.
@@ -98,4 +108,25 @@ func ByAddress(opts ...sql.OrderTermOption) OrderOption {
 // ByNotes orders the results by the notes field.
 func ByNotes(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldNotes, opts...).ToFunc()
+}
+
+// ByVolunteerRecordsCount orders the results by volunteer_records count.
+func ByVolunteerRecordsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newVolunteerRecordsStep(), opts...)
+	}
+}
+
+// ByVolunteerRecords orders the results by volunteer_records terms.
+func ByVolunteerRecords(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newVolunteerRecordsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newVolunteerRecordsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(VolunteerRecordsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, true, VolunteerRecordsTable, VolunteerRecordsColumn),
+	)
 }

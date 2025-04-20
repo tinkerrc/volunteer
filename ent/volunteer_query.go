@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -12,6 +13,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
+	"github.com/tinkerrc/volunteer/ent/eventvolunteer"
 	"github.com/tinkerrc/volunteer/ent/predicate"
 	"github.com/tinkerrc/volunteer/ent/volunteer"
 )
@@ -19,10 +21,11 @@ import (
 // VolunteerQuery is the builder for querying Volunteer entities.
 type VolunteerQuery struct {
 	config
-	ctx        *QueryContext
-	order      []volunteer.OrderOption
-	inters     []Interceptor
-	predicates []predicate.Volunteer
+	ctx                  *QueryContext
+	order                []volunteer.OrderOption
+	inters               []Interceptor
+	predicates           []predicate.Volunteer
+	withVolunteerRecords *EventVolunteerQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -57,6 +60,28 @@ func (vq *VolunteerQuery) Unique(unique bool) *VolunteerQuery {
 func (vq *VolunteerQuery) Order(o ...volunteer.OrderOption) *VolunteerQuery {
 	vq.order = append(vq.order, o...)
 	return vq
+}
+
+// QueryVolunteerRecords chains the current query on the "volunteer_records" edge.
+func (vq *VolunteerQuery) QueryVolunteerRecords() *EventVolunteerQuery {
+	query := (&EventVolunteerClient{config: vq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := vq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := vq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(volunteer.Table, volunteer.FieldID, selector),
+			sqlgraph.To(eventvolunteer.Table, eventvolunteer.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, volunteer.VolunteerRecordsTable, volunteer.VolunteerRecordsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(vq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first Volunteer entity from the query.
@@ -246,15 +271,27 @@ func (vq *VolunteerQuery) Clone() *VolunteerQuery {
 		return nil
 	}
 	return &VolunteerQuery{
-		config:     vq.config,
-		ctx:        vq.ctx.Clone(),
-		order:      append([]volunteer.OrderOption{}, vq.order...),
-		inters:     append([]Interceptor{}, vq.inters...),
-		predicates: append([]predicate.Volunteer{}, vq.predicates...),
+		config:               vq.config,
+		ctx:                  vq.ctx.Clone(),
+		order:                append([]volunteer.OrderOption{}, vq.order...),
+		inters:               append([]Interceptor{}, vq.inters...),
+		predicates:           append([]predicate.Volunteer{}, vq.predicates...),
+		withVolunteerRecords: vq.withVolunteerRecords.Clone(),
 		// clone intermediate query.
 		sql:  vq.sql.Clone(),
 		path: vq.path,
 	}
+}
+
+// WithVolunteerRecords tells the query-builder to eager-load the nodes that are connected to
+// the "volunteer_records" edge. The optional arguments are used to configure the query builder of the edge.
+func (vq *VolunteerQuery) WithVolunteerRecords(opts ...func(*EventVolunteerQuery)) *VolunteerQuery {
+	query := (&EventVolunteerClient{config: vq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	vq.withVolunteerRecords = query
+	return vq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -333,8 +370,11 @@ func (vq *VolunteerQuery) prepareQuery(ctx context.Context) error {
 
 func (vq *VolunteerQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Volunteer, error) {
 	var (
-		nodes = []*Volunteer{}
-		_spec = vq.querySpec()
+		nodes       = []*Volunteer{}
+		_spec       = vq.querySpec()
+		loadedTypes = [1]bool{
+			vq.withVolunteerRecords != nil,
+		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Volunteer).scanValues(nil, columns)
@@ -342,6 +382,7 @@ func (vq *VolunteerQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Vo
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &Volunteer{config: vq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -353,7 +394,46 @@ func (vq *VolunteerQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Vo
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := vq.withVolunteerRecords; query != nil {
+		if err := vq.loadVolunteerRecords(ctx, query, nodes,
+			func(n *Volunteer) { n.Edges.VolunteerRecords = []*EventVolunteer{} },
+			func(n *Volunteer, e *EventVolunteer) { n.Edges.VolunteerRecords = append(n.Edges.VolunteerRecords, e) }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
+}
+
+func (vq *VolunteerQuery) loadVolunteerRecords(ctx context.Context, query *EventVolunteerQuery, nodes []*Volunteer, init func(*Volunteer), assign func(*Volunteer, *EventVolunteer)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*Volunteer)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.EventVolunteer(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(volunteer.VolunteerRecordsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.event_volunteer_volunteer
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "event_volunteer_volunteer" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "event_volunteer_volunteer" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
 }
 
 func (vq *VolunteerQuery) sqlCount(ctx context.Context) (int, error) {
