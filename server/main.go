@@ -13,6 +13,8 @@ import (
 	"github.com/auth0/go-auth0/authentication"
 	"github.com/tinkerrc/volunteer/ent"
 	"github.com/tinkerrc/volunteer/server/api"
+	"golang.org/x/net/http2"
+	"golang.org/x/net/http2/h2c"
 
 	connectcors "connectrpc.com/cors"
 	"github.com/rs/cors"
@@ -66,12 +68,11 @@ func main() {
 
 	middleware := authn.NewMiddleware(api.Authenticate(cl))
 
-	handler = middleware.Wrap(mux)
+	handler = h2c.NewHandler(mux, &http2.Server{})
+	handler = middleware.Wrap(handler)
 	handler = withCORS(handler)
-	http.ListenAndServeTLS(
+	http.ListenAndServe(
 		os.Getenv("ADDR"),
-		os.Getenv("TLS_CERT"),
-		os.Getenv("TLS_KEY"),
 		handler,
 	)
 }
