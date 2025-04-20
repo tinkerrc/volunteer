@@ -38,6 +38,7 @@ service VolunteerService {
   // === VOLUNTEER TRAINING
   // Requires admin
   rpc StartTraining(StartTrainingRequest) returns (StartTrainingResponse);
+  // Requires admin
   rpc FinishTraining(FinishTrainingRequest) returns (FinishTrainingResponse);
   rpc ListTrainings(ListTrainingsRequest) returns (ListTrainingsResponse);
   rpc DeleteTraining(DeleteTrainingRequest) returns (DeleteTrainingResponse);
