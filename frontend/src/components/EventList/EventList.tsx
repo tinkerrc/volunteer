@@ -16,7 +16,6 @@ export function EventList() {
         const getEvents = async () => {
             try {
                 if (!isAuthenticated) {
-                    setEvents([])
                     return
                 }
                 const accessToken = await getAccessTokenSilently({
