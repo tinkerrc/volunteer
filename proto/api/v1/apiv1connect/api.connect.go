@@ -174,10 +174,11 @@ type VolunteerServiceClient interface {
 	// Requires user or volunteer
 	DeleteTimeLog(context.Context, *connect.Request[v1.DeleteTimeLogRequest]) (*connect.Response[v1.DeleteTimeLogResponse], error)
 	// === VOLUNTEER TRAINING
-	// Requires admin
+	// Requires user
 	StartTraining(context.Context, *connect.Request[v1.StartTrainingRequest]) (*connect.Response[v1.StartTrainingResponse], error)
-	// Requires admin
+	// Requires user
 	FinishTraining(context.Context, *connect.Request[v1.FinishTrainingRequest]) (*connect.Response[v1.FinishTrainingResponse], error)
+	// Requires user
 	ListTrainings(context.Context, *connect.Request[v1.ListTrainingsRequest]) (*connect.Response[v1.ListTrainingsResponse], error)
 	DeleteTraining(context.Context, *connect.Request[v1.DeleteTrainingRequest]) (*connect.Response[v1.DeleteTrainingResponse], error)
 	// === CERTS
@@ -556,10 +557,11 @@ type VolunteerServiceHandler interface {
 	// Requires user or volunteer
 	DeleteTimeLog(context.Context, *connect.Request[v1.DeleteTimeLogRequest]) (*connect.Response[v1.DeleteTimeLogResponse], error)
 	// === VOLUNTEER TRAINING
-	// Requires admin
+	// Requires user
 	StartTraining(context.Context, *connect.Request[v1.StartTrainingRequest]) (*connect.Response[v1.StartTrainingResponse], error)
-	// Requires admin
+	// Requires user
 	FinishTraining(context.Context, *connect.Request[v1.FinishTrainingRequest]) (*connect.Response[v1.FinishTrainingResponse], error)
+	// Requires user
 	ListTrainings(context.Context, *connect.Request[v1.ListTrainingsRequest]) (*connect.Response[v1.ListTrainingsResponse], error)
 	DeleteTraining(context.Context, *connect.Request[v1.DeleteTrainingRequest]) (*connect.Response[v1.DeleteTrainingResponse], error)
 	// === CERTS

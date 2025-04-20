@@ -215,7 +215,7 @@ func (tc *TrainingCreate) createSpec() (*Training, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := tc.mutation.EndDate(); ok {
 		_spec.SetField(training.FieldEndDate, field.TypeTime, value)
-		_node.EndDate = value
+		_node.EndDate = &value
 	}
 	if value, ok := tc.mutation.IsCertified(); ok {
 		_spec.SetField(training.FieldIsCertified, field.TypeBool, value)

@@ -23,7 +23,7 @@ type Training struct {
 	// StartDate holds the value of the "start_date" field.
 	StartDate time.Time `json:"start_date,omitempty"`
 	// EndDate holds the value of the "end_date" field.
-	EndDate time.Time `json:"end_date,omitempty"`
+	EndDate *time.Time `json:"end_date,omitempty"`
 	// IsCertified holds the value of the "is_certified" field.
 	IsCertified bool `json:"is_certified,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -113,7 +113,8 @@ func (t *Training) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field end_date", values[i])
 			} else if value.Valid {
-				t.EndDate = value.Time
+				t.EndDate = new(time.Time)
+				*t.EndDate = value.Time
 			}
 		case training.FieldIsCertified:
 			if value, ok := values[i].(*sql.NullBool); !ok {
@@ -184,8 +185,10 @@ func (t *Training) String() string {
 	builder.WriteString("start_date=")
 	builder.WriteString(t.StartDate.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("end_date=")
-	builder.WriteString(t.EndDate.Format(time.ANSIC))
+	if v := t.EndDate; v != nil {
+		builder.WriteString("end_date=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("is_certified=")
 	builder.WriteString(fmt.Sprintf("%v", t.IsCertified))

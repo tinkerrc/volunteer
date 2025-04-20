@@ -36,10 +36,11 @@ service VolunteerService {
   // Requires user or volunteer
   rpc DeleteTimeLog(DeleteTimeLogRequest) returns (DeleteTimeLogResponse);
   // === VOLUNTEER TRAINING
-  // Requires admin
+  // Requires user
   rpc StartTraining(StartTrainingRequest) returns (StartTrainingResponse);
-  // Requires admin
+  // Requires user
   rpc FinishTraining(FinishTrainingRequest) returns (FinishTrainingResponse);
+  // Requires user
   rpc ListTrainings(ListTrainingsRequest) returns (ListTrainingsResponse);
   rpc DeleteTraining(DeleteTrainingRequest) returns (DeleteTrainingResponse);
   // === CERTS
@@ -292,8 +293,11 @@ message Training {
 }
 
 message ListTrainingsRequest {
-  optional string volunteer_id = 1;
-  optional string cert_id = 2;
+  int32 page_size = 1;
+  int32 page_number = 2;
+  optional string volunteer_id = 3;
+  optional string cert_id = 4;
+  optional bool is_certified = 5;
 }
 message ListTrainingsResponse {
   repeated Training trainings = 1;

@@ -20,7 +20,7 @@ func (Training) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.UUID{}).Default(uuid.New).Unique(),
 		field.Time("start_date").Default(time.Now),
-		field.Time("end_date").Optional(),
+		field.Time("end_date").Optional().Nillable(),
 		field.Bool("is_certified").Default(false),
 	}
 }
@@ -36,5 +36,6 @@ func (Training) Edges() []ent.Edge {
 func (Training) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Edges("volunteer", "cert").Unique(),
+		index.Fields("start_date"),
 	}
 }
