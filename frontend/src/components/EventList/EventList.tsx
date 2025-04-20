@@ -1,5 +1,7 @@
+import { Event } from '@/proto/api/v1/api_pb';
 import { useClient } from '@/utils/client';
 import { intervalToString } from '@/utils/protobuf';
+import { useAuth0 } from '@auth0/auth0-react';
 import { Group, ScrollArea, Table, Text } from '@mantine/core';
 import cx from 'clsx';
 import { useState } from 'react';
@@ -7,11 +9,25 @@ import { useAsync } from 'react-use';
 import classes from './EventList.module.css';
 
 export function EventList() {
+    const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
     let initState: string[] = [];
     const [selection, setSelection] = useState(initState);
-    const state = useAsync(async () => {
-        const res = await useClient().listEvents({ pageNumber: 1, pageSize: 50 })
-        return res.events
+    const state = useAsync(async (): Promise<Event[]> => {
+        try {
+            if (!isAuthenticated) {
+                return []
+            }
+            const accessToken = await getAccessTokenSilently({
+                authorizationParams: {
+                    audience: `https://api.yolovms.org/`,
+                    scope: "read:current_user",
+                },
+            });
+            const headers = new Headers();
+            headers.set("Authorization", `Bearer ${accessToken}`)
+            const res = await useClient().listEvents({ pageNumber: 1, pageSize: 50 }, { headers })
+            return res.events
+        } catch { return [] }
     }, [])
 
     const rows = state?.value?.map((item) => {
