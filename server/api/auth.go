@@ -69,7 +69,7 @@ func Authenticate(db *ent.Client) func(context.Context, *http.Request) (any, err
 		if !ok {
 			return nil, authn.Errorf("invalid token")
 		}
-		customClaims, ok := claims.CustomClaims.(CustomClaims)
+		customClaims, ok := claims.CustomClaims.(*CustomClaims)
 		if !ok {
 			return nil, authn.Errorf("missing email claim")
 		}
