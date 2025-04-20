@@ -33,7 +33,7 @@ export function EventList() {
             }
         }
         getEvents()
-    })
+    }, [isAuthenticated])
     const rows = events.map((item) => {
         const selected = selection.includes(item.id);
         return (
