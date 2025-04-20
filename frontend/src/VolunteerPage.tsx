@@ -1,8 +1,11 @@
-import React from 'react';
 import { NavLink } from 'react-router-dom'; // using correct router package
 import styles from './VolunteerPage.module.css';
 
 const VolunteerPage = () => {
+  // const onGroupContainerClick = useCallback(() => {
+  //   goto("vol");
+  // }, [goto]);
+
   return (
     <div className={styles.volunteerPage}>
       <div className={styles.volunteerPageChild} />
@@ -46,7 +49,6 @@ const VolunteerPage = () => {
       {/* Bottom Nav */}
       <div className={styles.navDash}>
         <div className={styles.navDashChild} />
-
         <NavLink
           to="/"
           className={({ isActive }) =>
