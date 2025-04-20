@@ -1,13 +1,16 @@
+import { AppShell, AppShellNavbar } from '@mantine/core';
 import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom';
-import { Navbar } from './components/Navbar/Navbar';
+import { Nav } from './components/Nav/Nav';
 import { CertsPage } from './pages/Certs.page';
 import { EventsPage } from './pages/Events.page';
 import { HomePage } from './pages/Home.page';
 
 const AppLayout = () => (
   <>
-    <Navbar />
-    <Outlet />
+    <AppShell>
+      <AppShellNavbar><Nav></Nav></AppShellNavbar>
+      <Outlet />
+    </AppShell>
   </>
 )
 const router = createBrowserRouter([

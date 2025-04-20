@@ -11,7 +11,7 @@ import {
 } from '@tabler/icons-react';
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import classes from './Navbar.module.css';
+import classes from './Nav.module.css';
 
 interface NavbarLinkProps {
     icon: typeof IconHome2;
@@ -40,7 +40,7 @@ const navData = [
     { icon: IconCertificate, label: 'Certifications', to: '/certs' },
 ];
 
-export function Navbar() {
+export function Nav() {
     const [active, setActive] = useState(0);
 
     const links = navData.map((link, index) => (
