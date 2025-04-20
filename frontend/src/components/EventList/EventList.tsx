@@ -6,13 +6,6 @@ import { useState } from 'react';
 import { useAsync } from 'react-use';
 import classes from './EventList.module.css';
 
-// interface EventData {
-//     id: string;
-//     name: string;
-//     description: string;
-//     start: Date;
-// }
-
 export function EventList() {
     let initState: string[] = [];
     const [selection, setSelection] = useState(initState);

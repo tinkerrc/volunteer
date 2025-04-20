@@ -3,7 +3,7 @@ import { Group, ScrollArea, Table, Text } from '@mantine/core';
 import cx from 'clsx';
 import { useState } from 'react';
 import { useAsync } from 'react-use';
-import classes from './EventList.module.css';
+import classes from './CertList.module.css';
 
 export function CertList() {
     let initState: string[] = [];
