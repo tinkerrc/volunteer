@@ -18,21 +18,17 @@ export function EventList() {
         const getEvents = async () => {
             try {
                 if (!isAuthenticated) {
-                    console.log("not authenticated")
                     return
                 }
                 const accessToken = await getAccessTokenSilently({
                     authorizationParams: {
-                        // audience: `https://dev-v8cbdhmtmu4lj338.us.auth0.com/api/v2/`,
                         audience: "https://api.yolovms.org",
                         scope: "read:current_user",
                     },
                 });
-                console.log(`got access token ${accessToken}`)
                 const headers = new Headers();
                 headers.set("Authorization", `Bearer ${accessToken}`)
-                const res = await client.listEvents({ pageNumber: 1, pageSize: 50 }, { headers })
-                console.log(`got ${res.events.length} events`)
+                const res = await client.listEvents({ pageNumber: 0, pageSize: 50 }, { headers })
                 setEvents(res.events)
             } catch (err) {
                 console.log(err)
