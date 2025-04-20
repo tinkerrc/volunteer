@@ -27,7 +27,7 @@ export function EventList() {
                         scope: "read:current_user",
                     },
                 });
-                console.log("got access token")
+                console.log(`got access token ${accessToken}`)
                 const headers = new Headers();
                 headers.set("Authorization", `Bearer ${accessToken}`)
                 const res = await client.listEvents({ pageNumber: 1, pageSize: 50 }, { headers })

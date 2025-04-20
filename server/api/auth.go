@@ -20,7 +20,7 @@ import (
 // CustomClaims contains custom data we want from the token.
 type CustomClaims struct {
 	Scope string `json:"scope"`
-	Email string `json:"email"`
+	Email string `json:"user_email"`
 }
 
 // Validate does nothing for this example, but we need
