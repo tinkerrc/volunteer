@@ -1,0 +1,320 @@
+.finalEditVolPageChild {
+    position: absolute;
+    top: 1099px;
+    left: 369px;
+    background-color: #d9d9d9;
+    width: 999px;
+    height: 55px;
+}
+.finalEditVolPageItem {
+    position: absolute;
+    top: 1172px;
+    left: 369px;
+    background-color: #d9d9d9;
+    width: 999px;
+    height: 54px;
+}
+.finalEditVolPageInner {
+    position: absolute;
+    top: 530px;
+    left: 369px;
+    border-radius: 20px;
+    border: 2px solid #d9d9d9;
+    box-sizing: border-box;
+    width: 504px;
+    height: 56px;
+}
+.rectangleDiv {
+    position: absolute;
+    top: 530px;
+    left: 925px;
+    border-radius: 20px;
+    border: 2px solid #d9d9d9;
+    box-sizing: border-box;
+    width: 504px;
+    height: 56px;
+}
+.finalEditVolPageChild1 {
+    position: absolute;
+    top: 219px;
+    left: 378px;
+    border-radius: 107.5px;
+    background-color: #d9d9d9;
+    width: 220px;
+    height: 215px;
+}
+.finalEditVolPageChild2 {
+    position: absolute;
+    top: 650px;
+    left: 369px;
+    border-radius: 20px;
+    border: 2px solid #d9d9d9;
+    box-sizing: border-box;
+    width: 504px;
+    height: 105px;
+}
+.finalEditVolPageChild3 {
+    position: absolute;
+    top: 646px;
+    left: 925px;
+    border-radius: 20px;
+    border: 2px solid #d9d9d9;
+    box-sizing: border-box;
+    width: 504px;
+    height: 115px;
+}
+.christiJohnson {
+    position: absolute;
+    top: 245px;
+    left: 639px;
+    font-size: 40px;
+    display: inline-block;
+    width: 321px;
+    height: 39px;
+}
+.hours {
+    position: absolute;
+    top: 390px;
+    left: 642px;
+    display: inline-block;
+    width: 178px;
+    height: 39px;
+}
+.cjohnsongmailcom {
+    position: absolute;
+    top: 544px;
+    left: 404px;
+    font-weight: 500;
+}
+.thursdays10am5pm {
+    position: absolute;
+    top: 668px;
+    left: 404px;
+    font-weight: 500;
+}
+.fridays9am6pm {
+    position: absolute;
+    top: 710px;
+    left: 404px;
+    font-weight: 500;
+}
+.div {
+    position: absolute;
+    top: 544px;
+    left: 960px;
+    font-weight: 500;
+}
+.mandatedReporterCertificate {
+    position: absolute;
+    top: 668px;
+    left: 960px;
+    font-weight: 500;
+}
+.peerLeaderCertificate {
+    position: absolute;
+    top: 710px;
+    left: 960px;
+    font-weight: 500;
+}
+.tuesdayMay10 {
+    position: absolute;
+    top: 891px;
+    left: 404px;
+    font-weight: 500;
+}
+.peerMentorGroup {
+    position: absolute;
+    top: 925px;
+    left: 406px;
+    font-size: 16px;
+    color: #5b5a5a;
+}
+.peerMentorGroup1 {
+    position: absolute;
+    top: 1004px;
+    left: 404px;
+    font-size: 16px;
+    color: #5b5a5a;
+}
+.fridayMay4 {
+    position: absolute;
+    top: 970px;
+    left: 404px;
+    font-weight: 500;
+}
+.hours1 {
+    position: absolute;
+    top: 891px;
+    left: 1282px;
+    font-weight: 500;
+}
+.hours2 {
+    position: absolute;
+    top: 970px;
+    left: 1283px;
+    font-weight: 500;
+}
+.email {
+    position: absolute;
+    top: 499px;
+    left: 403px;
+    font-size: 20px;
+    color: #6b6767;
+}
+.preferredAvailability {
+    position: absolute;
+    top: 615px;
+    left: 403px;
+    font-size: 20px;
+    color: #6b6767;
+}
+.loggedHours {
+    position: absolute;
+    top: 837px;
+    left: 404px;
+    font-size: 20px;
+    color: #6b6767;
+}
+.certifications {
+    position: absolute;
+    top: 612px;
+    left: 960px;
+    font-size: 20px;
+    color: #6b6767;
+}
+.phone {
+    position: absolute;
+    top: 499px;
+    left: 960px;
+    font-size: 20px;
+    color: #6b6767;
+}
+.returnToVolunteers {
+    position: absolute;
+    top: 2px;
+    left: 66px;
+}
+.weuibackFilledIcon {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 17px;
+    height: 34px;
+    overflow: hidden;
+}
+.returnToVolunteersParent {
+    position: absolute;
+    top: 143px;
+    left: 378px;
+    width: 299px;
+    height: 34px;
+    cursor: pointer;
+}
+.materialSymbolseditOutlineIcon {
+    position: absolute;
+    top: 280px;
+    left: 1292px;
+    width: 62px;
+    height: 62px;
+    overflow: hidden;
+    cursor: pointer;
+}
+.finalEditVolPageChild4 {
+    position: absolute;
+    top: 0px;
+    left: 305px;
+    background-color: #d9d9d9;
+    width: 1px;
+    height: 1024px;
+}
+.peerMentor {
+    position: relative;
+}
+.peerMentorWrapper {
+    position: absolute;
+    top: 327px;
+    left: 767px;
+    border-radius: 7.5px;
+    background-color: #f5f5f5;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 7.5px;
+    font-size: 12px;
+}
+.available {
+    position: relative;
+    font-weight: 500;
+}
+.availableWrapper {
+    position: absolute;
+    top: 322px;
+    left: 642px;
+    border-radius: 10px;
+    background-color: rgba(137, 166, 32, 0.17);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    font-size: 16px;
+    color: #546b00;
+}
+.image7Icon {
+    position: absolute;
+    top: 55px;
+    left: 41px;
+    width: 232.9px;
+    height: 36px;
+    object-fit: cover;
+}
+.navDashChild {
+    position: absolute;
+    height: 17.2%;
+    width: 101.48%;
+    top: 39.78%;
+    right: -1.48%;
+    bottom: 43.01%;
+    left: 0%;
+    border-radius: 10px;
+    background-color: #0053a0;
+}
+.dashboard {
+    position: absolute;
+    top: 17.2%;
+    left: 9.63%;
+    line-height: 121.47%;
+}
+.volunteers {
+    position: absolute;
+    top: 43.55%;
+    left: 9.63%;
+    color: #fff;
+}
+.coordinatorInfo {
+    position: absolute;
+    top: 70.43%;
+    left: 9.63%;
+}
+.navDash {
+    position: absolute;
+    top: 142px;
+    left: 22px;
+    width: 270px;
+    height: 186px;
+    font-size: 14px;
+    color: #535353;
+}
+.finalEditVolPage {
+    width: 100%;
+    position: relative;
+    background-color: #fff;
+    height: 1024px;
+    overflow: hidden;
+    text-align: left;
+    font-size: 24px;
+    color: #222;
+    font-family: Inter;
+}
+

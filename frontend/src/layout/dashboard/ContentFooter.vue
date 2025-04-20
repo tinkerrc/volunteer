@@ -1,6 +1,6 @@
 <template>
   <footer class="footer">
-    <div class="container-fluid">
+    <!-- <div class="container-fluid">
       <ul class="nav">
         <li class="nav-item">
           <a class="nav-link" href="http://www.creative-tim.com">
@@ -25,7 +25,7 @@
           >Creative Tim</a
         >
         for a better web.
-      </div>
+      </div> -->
     </div>
   </footer>
 </template>

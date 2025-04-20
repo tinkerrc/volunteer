@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <div
     @click="tryClose"
     data-notify="container"
@@ -184,4 +184,4 @@ export default {
     right: 20px;
   }
 }
-</style>
+</style> -->

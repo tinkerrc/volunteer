@@ -19,17 +19,25 @@
  import BlackDashboard from "./plugins/blackDashboard";
  import i18n from "./i18n";
  import "./registerServiceWorker";
- 
- import { Auth0Plugin } from "./auth";
- 
+ import { Auth0Plugin } from './auth';
+
+ import { domain, clientId } from '../auth_config.json';
+
  Vue.use(Auth0Plugin, {
-   domain: "dev-v8cbdhmtmu4lj338.us.auth0.com",
-   client_id: "xtR3z01pmtfqLnsC2Y2Vjl25pLTPDkQC",
-   authorizationParams: {
-     redirect_uri: window.location.origin
-   }
- });
- 
+  domain,
+  clientId,
+  onRedirectCallback: appState => {
+    const target = appState && appState.targetUrl
+      ? appState.targetUrl
+      : window.location.pathname;
+
+    if (router.currentRoute.path !== target) {
+      router.push(target);
+    }
+  }
+});
+ Vue.config.productionTip = false;
+
  Vue.use(BlackDashboard);
  Vue.use(VueRouter);
  Vue.use(RouterPrefetch);

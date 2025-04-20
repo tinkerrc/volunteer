@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <base-table :data="tableData" thead-classes="text-primary">
     <template slot-scope="{ row }">
       <td>
@@ -29,4 +29,4 @@ export default {
   },
 };
 </script>
-<style></style>
+<style></style> -->

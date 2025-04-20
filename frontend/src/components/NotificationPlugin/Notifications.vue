@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <div class="notifications">
     <transition-group :name="transitionName" :mode="transitionMode">
       <notification
@@ -78,4 +78,4 @@ export default {
     transform: scale(1.2, 0.7);
   }
 }
-</style>
+</style> -->

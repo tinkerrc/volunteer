@@ -1,6 +1,6 @@
 <template>
     <div class="home">
-      <img alt="Vue logo" src="../assets/logo.png" />
+      <img alt="Vue logo" src="@/assets/logo/logo.png" />
       <h2>Welcome to Your Vue App</h2>
   
       <div v-if="!$auth.loading">
