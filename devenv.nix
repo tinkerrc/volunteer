@@ -23,7 +23,7 @@
 
     buf
     grpcurl
-    protoc-gen-go    
+    protoc-gen-go
     protoc-gen-es
     protoc-gen-connect-go
     protoc-gen-connect-es

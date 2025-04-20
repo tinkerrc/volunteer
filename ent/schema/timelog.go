@@ -20,7 +20,6 @@ func (TimeLog) Fields() []ent.Field {
 		field.Int("hours"),
 		field.Int("minutes"),
 		field.Time("date"),
-		field.UUID("volunteer_id", uuid.UUID{}),
 	}
 }
 

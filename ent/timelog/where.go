@@ -71,11 +71,6 @@ func Date(v time.Time) predicate.TimeLog {
 	return predicate.TimeLog(sql.FieldEQ(FieldDate, v))
 }
 
-// VolunteerID applies equality check predicate on the "volunteer_id" field. It's identical to VolunteerIDEQ.
-func VolunteerID(v uuid.UUID) predicate.TimeLog {
-	return predicate.TimeLog(sql.FieldEQ(FieldVolunteerID, v))
-}
-
 // HoursEQ applies the EQ predicate on the "hours" field.
 func HoursEQ(v int) predicate.TimeLog {
 	return predicate.TimeLog(sql.FieldEQ(FieldHours, v))
@@ -194,46 +189,6 @@ func DateLT(v time.Time) predicate.TimeLog {
 // DateLTE applies the LTE predicate on the "date" field.
 func DateLTE(v time.Time) predicate.TimeLog {
 	return predicate.TimeLog(sql.FieldLTE(FieldDate, v))
-}
-
-// VolunteerIDEQ applies the EQ predicate on the "volunteer_id" field.
-func VolunteerIDEQ(v uuid.UUID) predicate.TimeLog {
-	return predicate.TimeLog(sql.FieldEQ(FieldVolunteerID, v))
-}
-
-// VolunteerIDNEQ applies the NEQ predicate on the "volunteer_id" field.
-func VolunteerIDNEQ(v uuid.UUID) predicate.TimeLog {
-	return predicate.TimeLog(sql.FieldNEQ(FieldVolunteerID, v))
-}
-
-// VolunteerIDIn applies the In predicate on the "volunteer_id" field.
-func VolunteerIDIn(vs ...uuid.UUID) predicate.TimeLog {
-	return predicate.TimeLog(sql.FieldIn(FieldVolunteerID, vs...))
-}
-
-// VolunteerIDNotIn applies the NotIn predicate on the "volunteer_id" field.
-func VolunteerIDNotIn(vs ...uuid.UUID) predicate.TimeLog {
-	return predicate.TimeLog(sql.FieldNotIn(FieldVolunteerID, vs...))
-}
-
-// VolunteerIDGT applies the GT predicate on the "volunteer_id" field.
-func VolunteerIDGT(v uuid.UUID) predicate.TimeLog {
-	return predicate.TimeLog(sql.FieldGT(FieldVolunteerID, v))
-}
-
-// VolunteerIDGTE applies the GTE predicate on the "volunteer_id" field.
-func VolunteerIDGTE(v uuid.UUID) predicate.TimeLog {
-	return predicate.TimeLog(sql.FieldGTE(FieldVolunteerID, v))
-}
-
-// VolunteerIDLT applies the LT predicate on the "volunteer_id" field.
-func VolunteerIDLT(v uuid.UUID) predicate.TimeLog {
-	return predicate.TimeLog(sql.FieldLT(FieldVolunteerID, v))
-}
-
-// VolunteerIDLTE applies the LTE predicate on the "volunteer_id" field.
-func VolunteerIDLTE(v uuid.UUID) predicate.TimeLog {
-	return predicate.TimeLog(sql.FieldLTE(FieldVolunteerID, v))
 }
 
 // HasVolunteer applies the HasEdge predicate on the "volunteer" edge.
