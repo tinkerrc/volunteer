@@ -15,7 +15,7 @@ func (s *APIServer) CreateCert(
 ) (*connect.Response[apiv1.CreateCertResponse], error) {
 	err := s.ensureAdmin(ctx)
 	if err != nil {
-		return nil, connect.NewError(connect.CodePermissionDenied, errors.New("unauthorized"))
+		return nil, err
 	}
 	m := req.Msg
 	c, err := s.Db.Cert.Create().SetName(m.Name).SetDescription(m.Description).Save(ctx)

@@ -21,6 +21,7 @@ type Cert struct {
 	Name string `json:"name,omitempty"`
 	// Description holds the value of the "description" field.
 	Description  string `json:"description,omitempty"`
+	event_certs  *uuid.UUID
 	selectValues sql.SelectValues
 }
 
@@ -33,6 +34,8 @@ func (*Cert) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case cert.FieldID:
 			values[i] = new(uuid.UUID)
+		case cert.ForeignKeys[0]: // event_certs
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -65,6 +68,13 @@ func (c *Cert) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field description", values[i])
 			} else if value.Valid {
 				c.Description = value.String
+			}
+		case cert.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field event_certs", values[i])
+			} else if value.Valid {
+				c.event_certs = new(uuid.UUID)
+				*c.event_certs = *value.S.(*uuid.UUID)
 			}
 		default:
 			c.selectValues.Set(columns[i], values[i])

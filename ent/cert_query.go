@@ -23,6 +23,7 @@ type CertQuery struct {
 	order      []cert.OrderOption
 	inters     []Interceptor
 	predicates []predicate.Cert
+	withFKs    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -333,9 +334,13 @@ func (cq *CertQuery) prepareQuery(ctx context.Context) error {
 
 func (cq *CertQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cert, error) {
 	var (
-		nodes = []*Cert{}
-		_spec = cq.querySpec()
+		nodes   = []*Cert{}
+		withFKs = cq.withFKs
+		_spec   = cq.querySpec()
 	)
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, cert.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Cert).scanValues(nil, columns)
 	}

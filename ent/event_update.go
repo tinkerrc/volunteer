@@ -6,10 +6,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
+	"github.com/tinkerrc/volunteer/ent/cert"
 	"github.com/tinkerrc/volunteer/ent/event"
 	"github.com/tinkerrc/volunteer/ent/predicate"
 )
@@ -27,9 +30,167 @@ func (eu *EventUpdate) Where(ps ...predicate.Event) *EventUpdate {
 	return eu
 }
 
+// SetName sets the "name" field.
+func (eu *EventUpdate) SetName(s string) *EventUpdate {
+	eu.mutation.SetName(s)
+	return eu
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (eu *EventUpdate) SetNillableName(s *string) *EventUpdate {
+	if s != nil {
+		eu.SetName(*s)
+	}
+	return eu
+}
+
+// SetDescription sets the "description" field.
+func (eu *EventUpdate) SetDescription(s string) *EventUpdate {
+	eu.mutation.SetDescription(s)
+	return eu
+}
+
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (eu *EventUpdate) SetNillableDescription(s *string) *EventUpdate {
+	if s != nil {
+		eu.SetDescription(*s)
+	}
+	return eu
+}
+
+// SetIsRecurring sets the "is_recurring" field.
+func (eu *EventUpdate) SetIsRecurring(b bool) *EventUpdate {
+	eu.mutation.SetIsRecurring(b)
+	return eu
+}
+
+// SetNillableIsRecurring sets the "is_recurring" field if the given value is not nil.
+func (eu *EventUpdate) SetNillableIsRecurring(b *bool) *EventUpdate {
+	if b != nil {
+		eu.SetIsRecurring(*b)
+	}
+	return eu
+}
+
+// SetIsRecurActive sets the "is_recur_active" field.
+func (eu *EventUpdate) SetIsRecurActive(b bool) *EventUpdate {
+	eu.mutation.SetIsRecurActive(b)
+	return eu
+}
+
+// SetNillableIsRecurActive sets the "is_recur_active" field if the given value is not nil.
+func (eu *EventUpdate) SetNillableIsRecurActive(b *bool) *EventUpdate {
+	if b != nil {
+		eu.SetIsRecurActive(*b)
+	}
+	return eu
+}
+
+// ClearIsRecurActive clears the value of the "is_recur_active" field.
+func (eu *EventUpdate) ClearIsRecurActive() *EventUpdate {
+	eu.mutation.ClearIsRecurActive()
+	return eu
+}
+
+// SetRecurDescription sets the "recur_description" field.
+func (eu *EventUpdate) SetRecurDescription(s string) *EventUpdate {
+	eu.mutation.SetRecurDescription(s)
+	return eu
+}
+
+// SetNillableRecurDescription sets the "recur_description" field if the given value is not nil.
+func (eu *EventUpdate) SetNillableRecurDescription(s *string) *EventUpdate {
+	if s != nil {
+		eu.SetRecurDescription(*s)
+	}
+	return eu
+}
+
+// ClearRecurDescription clears the value of the "recur_description" field.
+func (eu *EventUpdate) ClearRecurDescription() *EventUpdate {
+	eu.mutation.ClearRecurDescription()
+	return eu
+}
+
+// SetStart sets the "start" field.
+func (eu *EventUpdate) SetStart(t time.Time) *EventUpdate {
+	eu.mutation.SetStart(t)
+	return eu
+}
+
+// SetNillableStart sets the "start" field if the given value is not nil.
+func (eu *EventUpdate) SetNillableStart(t *time.Time) *EventUpdate {
+	if t != nil {
+		eu.SetStart(*t)
+	}
+	return eu
+}
+
+// ClearStart clears the value of the "start" field.
+func (eu *EventUpdate) ClearStart() *EventUpdate {
+	eu.mutation.ClearStart()
+	return eu
+}
+
+// SetEnd sets the "end" field.
+func (eu *EventUpdate) SetEnd(t time.Time) *EventUpdate {
+	eu.mutation.SetEnd(t)
+	return eu
+}
+
+// SetNillableEnd sets the "end" field if the given value is not nil.
+func (eu *EventUpdate) SetNillableEnd(t *time.Time) *EventUpdate {
+	if t != nil {
+		eu.SetEnd(*t)
+	}
+	return eu
+}
+
+// ClearEnd clears the value of the "end" field.
+func (eu *EventUpdate) ClearEnd() *EventUpdate {
+	eu.mutation.ClearEnd()
+	return eu
+}
+
+// AddCertIDs adds the "certs" edge to the Cert entity by IDs.
+func (eu *EventUpdate) AddCertIDs(ids ...uuid.UUID) *EventUpdate {
+	eu.mutation.AddCertIDs(ids...)
+	return eu
+}
+
+// AddCerts adds the "certs" edges to the Cert entity.
+func (eu *EventUpdate) AddCerts(c ...*Cert) *EventUpdate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return eu.AddCertIDs(ids...)
+}
+
 // Mutation returns the EventMutation object of the builder.
 func (eu *EventUpdate) Mutation() *EventMutation {
 	return eu.mutation
+}
+
+// ClearCerts clears all "certs" edges to the Cert entity.
+func (eu *EventUpdate) ClearCerts() *EventUpdate {
+	eu.mutation.ClearCerts()
+	return eu
+}
+
+// RemoveCertIDs removes the "certs" edge to Cert entities by IDs.
+func (eu *EventUpdate) RemoveCertIDs(ids ...uuid.UUID) *EventUpdate {
+	eu.mutation.RemoveCertIDs(ids...)
+	return eu
+}
+
+// RemoveCerts removes "certs" edges to Cert entities.
+func (eu *EventUpdate) RemoveCerts(c ...*Cert) *EventUpdate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return eu.RemoveCertIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -68,6 +229,84 @@ func (eu *EventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
+	if value, ok := eu.mutation.Name(); ok {
+		_spec.SetField(event.FieldName, field.TypeString, value)
+	}
+	if value, ok := eu.mutation.Description(); ok {
+		_spec.SetField(event.FieldDescription, field.TypeString, value)
+	}
+	if value, ok := eu.mutation.IsRecurring(); ok {
+		_spec.SetField(event.FieldIsRecurring, field.TypeBool, value)
+	}
+	if value, ok := eu.mutation.IsRecurActive(); ok {
+		_spec.SetField(event.FieldIsRecurActive, field.TypeBool, value)
+	}
+	if eu.mutation.IsRecurActiveCleared() {
+		_spec.ClearField(event.FieldIsRecurActive, field.TypeBool)
+	}
+	if value, ok := eu.mutation.RecurDescription(); ok {
+		_spec.SetField(event.FieldRecurDescription, field.TypeString, value)
+	}
+	if eu.mutation.RecurDescriptionCleared() {
+		_spec.ClearField(event.FieldRecurDescription, field.TypeString)
+	}
+	if value, ok := eu.mutation.Start(); ok {
+		_spec.SetField(event.FieldStart, field.TypeTime, value)
+	}
+	if eu.mutation.StartCleared() {
+		_spec.ClearField(event.FieldStart, field.TypeTime)
+	}
+	if value, ok := eu.mutation.End(); ok {
+		_spec.SetField(event.FieldEnd, field.TypeTime, value)
+	}
+	if eu.mutation.EndCleared() {
+		_spec.ClearField(event.FieldEnd, field.TypeTime)
+	}
+	if eu.mutation.CertsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.CertsTable,
+			Columns: []string{event.CertsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(cert.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.RemovedCertsIDs(); len(nodes) > 0 && !eu.mutation.CertsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.CertsTable,
+			Columns: []string{event.CertsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(cert.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.CertsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.CertsTable,
+			Columns: []string{event.CertsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(cert.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, eu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{event.Label}
@@ -88,9 +327,167 @@ type EventUpdateOne struct {
 	mutation *EventMutation
 }
 
+// SetName sets the "name" field.
+func (euo *EventUpdateOne) SetName(s string) *EventUpdateOne {
+	euo.mutation.SetName(s)
+	return euo
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (euo *EventUpdateOne) SetNillableName(s *string) *EventUpdateOne {
+	if s != nil {
+		euo.SetName(*s)
+	}
+	return euo
+}
+
+// SetDescription sets the "description" field.
+func (euo *EventUpdateOne) SetDescription(s string) *EventUpdateOne {
+	euo.mutation.SetDescription(s)
+	return euo
+}
+
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (euo *EventUpdateOne) SetNillableDescription(s *string) *EventUpdateOne {
+	if s != nil {
+		euo.SetDescription(*s)
+	}
+	return euo
+}
+
+// SetIsRecurring sets the "is_recurring" field.
+func (euo *EventUpdateOne) SetIsRecurring(b bool) *EventUpdateOne {
+	euo.mutation.SetIsRecurring(b)
+	return euo
+}
+
+// SetNillableIsRecurring sets the "is_recurring" field if the given value is not nil.
+func (euo *EventUpdateOne) SetNillableIsRecurring(b *bool) *EventUpdateOne {
+	if b != nil {
+		euo.SetIsRecurring(*b)
+	}
+	return euo
+}
+
+// SetIsRecurActive sets the "is_recur_active" field.
+func (euo *EventUpdateOne) SetIsRecurActive(b bool) *EventUpdateOne {
+	euo.mutation.SetIsRecurActive(b)
+	return euo
+}
+
+// SetNillableIsRecurActive sets the "is_recur_active" field if the given value is not nil.
+func (euo *EventUpdateOne) SetNillableIsRecurActive(b *bool) *EventUpdateOne {
+	if b != nil {
+		euo.SetIsRecurActive(*b)
+	}
+	return euo
+}
+
+// ClearIsRecurActive clears the value of the "is_recur_active" field.
+func (euo *EventUpdateOne) ClearIsRecurActive() *EventUpdateOne {
+	euo.mutation.ClearIsRecurActive()
+	return euo
+}
+
+// SetRecurDescription sets the "recur_description" field.
+func (euo *EventUpdateOne) SetRecurDescription(s string) *EventUpdateOne {
+	euo.mutation.SetRecurDescription(s)
+	return euo
+}
+
+// SetNillableRecurDescription sets the "recur_description" field if the given value is not nil.
+func (euo *EventUpdateOne) SetNillableRecurDescription(s *string) *EventUpdateOne {
+	if s != nil {
+		euo.SetRecurDescription(*s)
+	}
+	return euo
+}
+
+// ClearRecurDescription clears the value of the "recur_description" field.
+func (euo *EventUpdateOne) ClearRecurDescription() *EventUpdateOne {
+	euo.mutation.ClearRecurDescription()
+	return euo
+}
+
+// SetStart sets the "start" field.
+func (euo *EventUpdateOne) SetStart(t time.Time) *EventUpdateOne {
+	euo.mutation.SetStart(t)
+	return euo
+}
+
+// SetNillableStart sets the "start" field if the given value is not nil.
+func (euo *EventUpdateOne) SetNillableStart(t *time.Time) *EventUpdateOne {
+	if t != nil {
+		euo.SetStart(*t)
+	}
+	return euo
+}
+
+// ClearStart clears the value of the "start" field.
+func (euo *EventUpdateOne) ClearStart() *EventUpdateOne {
+	euo.mutation.ClearStart()
+	return euo
+}
+
+// SetEnd sets the "end" field.
+func (euo *EventUpdateOne) SetEnd(t time.Time) *EventUpdateOne {
+	euo.mutation.SetEnd(t)
+	return euo
+}
+
+// SetNillableEnd sets the "end" field if the given value is not nil.
+func (euo *EventUpdateOne) SetNillableEnd(t *time.Time) *EventUpdateOne {
+	if t != nil {
+		euo.SetEnd(*t)
+	}
+	return euo
+}
+
+// ClearEnd clears the value of the "end" field.
+func (euo *EventUpdateOne) ClearEnd() *EventUpdateOne {
+	euo.mutation.ClearEnd()
+	return euo
+}
+
+// AddCertIDs adds the "certs" edge to the Cert entity by IDs.
+func (euo *EventUpdateOne) AddCertIDs(ids ...uuid.UUID) *EventUpdateOne {
+	euo.mutation.AddCertIDs(ids...)
+	return euo
+}
+
+// AddCerts adds the "certs" edges to the Cert entity.
+func (euo *EventUpdateOne) AddCerts(c ...*Cert) *EventUpdateOne {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return euo.AddCertIDs(ids...)
+}
+
 // Mutation returns the EventMutation object of the builder.
 func (euo *EventUpdateOne) Mutation() *EventMutation {
 	return euo.mutation
+}
+
+// ClearCerts clears all "certs" edges to the Cert entity.
+func (euo *EventUpdateOne) ClearCerts() *EventUpdateOne {
+	euo.mutation.ClearCerts()
+	return euo
+}
+
+// RemoveCertIDs removes the "certs" edge to Cert entities by IDs.
+func (euo *EventUpdateOne) RemoveCertIDs(ids ...uuid.UUID) *EventUpdateOne {
+	euo.mutation.RemoveCertIDs(ids...)
+	return euo
+}
+
+// RemoveCerts removes "certs" edges to Cert entities.
+func (euo *EventUpdateOne) RemoveCerts(c ...*Cert) *EventUpdateOne {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return euo.RemoveCertIDs(ids...)
 }
 
 // Where appends a list predicates to the EventUpdate builder.
@@ -158,6 +555,84 @@ func (euo *EventUpdateOne) sqlSave(ctx context.Context) (_node *Event, err error
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := euo.mutation.Name(); ok {
+		_spec.SetField(event.FieldName, field.TypeString, value)
+	}
+	if value, ok := euo.mutation.Description(); ok {
+		_spec.SetField(event.FieldDescription, field.TypeString, value)
+	}
+	if value, ok := euo.mutation.IsRecurring(); ok {
+		_spec.SetField(event.FieldIsRecurring, field.TypeBool, value)
+	}
+	if value, ok := euo.mutation.IsRecurActive(); ok {
+		_spec.SetField(event.FieldIsRecurActive, field.TypeBool, value)
+	}
+	if euo.mutation.IsRecurActiveCleared() {
+		_spec.ClearField(event.FieldIsRecurActive, field.TypeBool)
+	}
+	if value, ok := euo.mutation.RecurDescription(); ok {
+		_spec.SetField(event.FieldRecurDescription, field.TypeString, value)
+	}
+	if euo.mutation.RecurDescriptionCleared() {
+		_spec.ClearField(event.FieldRecurDescription, field.TypeString)
+	}
+	if value, ok := euo.mutation.Start(); ok {
+		_spec.SetField(event.FieldStart, field.TypeTime, value)
+	}
+	if euo.mutation.StartCleared() {
+		_spec.ClearField(event.FieldStart, field.TypeTime)
+	}
+	if value, ok := euo.mutation.End(); ok {
+		_spec.SetField(event.FieldEnd, field.TypeTime, value)
+	}
+	if euo.mutation.EndCleared() {
+		_spec.ClearField(event.FieldEnd, field.TypeTime)
+	}
+	if euo.mutation.CertsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.CertsTable,
+			Columns: []string{event.CertsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(cert.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.RemovedCertsIDs(); len(nodes) > 0 && !euo.mutation.CertsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.CertsTable,
+			Columns: []string{event.CertsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(cert.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.CertsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.CertsTable,
+			Columns: []string{event.CertsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(cert.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Event{config: euo.config}
 	_spec.Assign = _node.assignValues

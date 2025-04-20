@@ -16,7 +16,7 @@ func (s *APIServer) DeleteTraining(
 ) (*connect.Response[apiv1.DeleteTrainingResponse], error) {
 	err := s.ensureAdmin(ctx)
 	if err != nil {
-		return nil, connect.NewError(connect.CodePermissionDenied, errors.New("unauthorized"))
+		return nil, err
 	}
 	m := req.Msg
 	tid, err := uuid.Parse(m.Id)

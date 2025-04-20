@@ -16,7 +16,7 @@ func (s *APIServer) DeleteCert(
 ) (*connect.Response[apiv1.DeleteCertResponse], error) {
 	err := s.ensureAdmin(ctx)
 	if err != nil {
-		return nil, connect.NewError(connect.CodePermissionDenied, errors.New("unauthorized"))
+		return nil, err
 	}
 	cid, err := uuid.Parse(req.Msg.Id)
 	if err != nil {
