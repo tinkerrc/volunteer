@@ -1,4 +1,4 @@
-.finalVolPageChild {
+.volunteerPageChild {
     position: absolute;
     top: -97px;
     left: 306px;
@@ -6,7 +6,7 @@
     width: 1px;
     height: 1216px;
 }
-.finalVolPageItem {
+.volunteerPageItem {
     position: absolute;
     top: 1172px;
     left: 369px;
@@ -274,6 +274,12 @@
     font-size: 16px;
     color: #222;
 }
+.div9 {
+    position: absolute;
+    top: 10px;
+    left: 638px;
+    white-space: pre-wrap;
+}
 .awaitingTrainingWrapper {
     border-radius: 10px;
     background-color: rgba(224, 0, 0, 0.13);
@@ -343,7 +349,7 @@
     height: 186px;
     font-size: 14px;
 }
-.finalVolPage {
+.volunteerPage {
     width: 100%;
     position: relative;
     background-color: #fff;
@@ -355,3 +361,37 @@
     font-family: Inter;
 }
 
+/* Remove default link styles for all sidebar links */
+a {
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  /* Optional: scoped to just your navDash to avoid global override */
+  .navDash a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+  
+  /* Active link styling */
+  .active {
+    background-color: #0053a0;
+    color: white;
+    font-weight: bold;
+    border-radius: 10px;
+    padding: 10px 20px;
+  }
+  /* Style active NavLink link */
+.active {
+    color: white !important;
+    font-weight: bold;
+    text-decoration: none;
+  }
+  
+  /* Optional: Remove underline from all links */
+  a {
+    text-decoration: none;
+  }
+  
+  

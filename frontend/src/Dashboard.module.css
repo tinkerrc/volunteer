@@ -432,4 +432,17 @@
     color: #222;
     font-family: Inter;
 }
-
+/* Prevent underline globally or in module */
+a {
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  /* Optional: highlight active */
+  .active {
+    background-color: #0053a0;
+    color: white;
+    padding: 10px;
+    border-radius: 10px;
+  }
+  

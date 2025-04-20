@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from './Dashboard.module.css';
+import { NavLink } from 'react-router-dom';
 
 const Event = ({ date, day, title, time, slots, onClick }) => {
   return (
@@ -32,7 +33,7 @@ const Event = ({ date, day, title, time, slots, onClick }) => {
   );
 };
 
-const Dashboard = ({ goto }) => {
+const Dashboard = () => {
   return (
     <div className={styles.finalDash}>
       <div className={styles.finalDashChild} />
@@ -94,7 +95,7 @@ const Dashboard = ({ goto }) => {
           <div className={styles.next6Months}>Next 6 Months</div>
         </div>
         <div className={styles.cardParent}>
-          <Event day="TUES" date="May 13" title="Peer Support Group" time="2pm – 3pm" slots="1/2 Filled Slots" onClick={() => goto("vol")} />
+          <Event day="TUES" date="May 13" title="Peer Support Group" time="2pm – 3pm" slots="1/2 Filled Slots" onClick={() => {}} />
           <Event day="MON" date="May 19" title="Peer Support Group" time="12pm – 2pm" slots="0/2 Filled Slots" />
         </div>
       </div>
@@ -104,11 +105,27 @@ const Dashboard = ({ goto }) => {
       <div className={styles.view5More}>View 5 More</div>
       <img className={styles.materialSymbolssearchRoundeIcon} alt="" src="material-symbols:search-rounded.svg" />
       <img className={styles.image7Icon} alt="" src="image 7.png" />
+
+      {/* Navigation */}
       <div className={styles.navDash}>
         <div className={styles.navDashChild} />
-        <div className={styles.dashboard} onClick={() => goto("home")}>Dashboard</div>
-        <div className={styles.volunteers} onClick={() => goto("vol")}>Volunteers</div>
-        <div className={styles.coordinatorInfo} onClick={() => goto("login")}>Coordinator Info</div>
+        <NavLink
+          to="/"
+          className={({ isActive }) =>
+            isActive ? `${styles.dashboard} ${styles.active}` : styles.dashboard
+          }
+        >
+          Dashboard
+        </NavLink>
+
+        <NavLink
+          to="/volunteer"
+          className={({ isActive }) =>
+            isActive ? `${styles.volunteers} ${styles.active}` : styles.volunteers
+          }
+        >
+          Volunteers
+        </NavLink>
       </div>
     </div>
   );
