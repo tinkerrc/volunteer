@@ -26,6 +26,8 @@ type TimeLog struct {
 	Minutes int `json:"minutes,omitempty"`
 	// Date holds the value of the "date" field.
 	Date time.Time `json:"date,omitempty"`
+	// VolunteerID holds the value of the "volunteer_id" field.
+	VolunteerID uuid.UUID `json:"volunteer_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the TimeLogQuery when eager-loading is set.
 	Edges              TimeLogEdges `json:"edges"`
@@ -76,7 +78,7 @@ func (*TimeLog) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case timelog.FieldDate:
 			values[i] = new(sql.NullTime)
-		case timelog.FieldID:
+		case timelog.FieldID, timelog.FieldVolunteerID:
 			values[i] = new(uuid.UUID)
 		case timelog.ForeignKeys[0]: // time_log_volunteer
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
@@ -120,6 +122,12 @@ func (tl *TimeLog) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field date", values[i])
 			} else if value.Valid {
 				tl.Date = value.Time
+			}
+		case timelog.FieldVolunteerID:
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field volunteer_id", values[i])
+			} else if value != nil {
+				tl.VolunteerID = *value
 			}
 		case timelog.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
@@ -189,6 +197,9 @@ func (tl *TimeLog) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("date=")
 	builder.WriteString(tl.Date.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("volunteer_id=")
+	builder.WriteString(fmt.Sprintf("%v", tl.VolunteerID))
 	builder.WriteByte(')')
 	return builder.String()
 }

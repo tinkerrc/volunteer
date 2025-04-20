@@ -977,6 +977,7 @@ type TimeLogMutation struct {
 	minutes          *int
 	addminutes       *int
 	date             *time.Time
+	volunteer_id     *uuid.UUID
 	clearedFields    map[string]struct{}
 	volunteer        *uuid.UUID
 	clearedvolunteer bool
@@ -1239,6 +1240,42 @@ func (m *TimeLogMutation) ResetDate() {
 	m.date = nil
 }
 
+// SetVolunteerID sets the "volunteer_id" field.
+func (m *TimeLogMutation) SetVolunteerID(u uuid.UUID) {
+	m.volunteer_id = &u
+}
+
+// VolunteerID returns the value of the "volunteer_id" field in the mutation.
+func (m *TimeLogMutation) VolunteerID() (r uuid.UUID, exists bool) {
+	v := m.volunteer_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldVolunteerID returns the old "volunteer_id" field's value of the TimeLog entity.
+// If the TimeLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TimeLogMutation) OldVolunteerID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldVolunteerID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldVolunteerID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldVolunteerID: %w", err)
+	}
+	return oldValue.VolunteerID, nil
+}
+
+// ResetVolunteerID resets all changes to the "volunteer_id" field.
+func (m *TimeLogMutation) ResetVolunteerID() {
+	m.volunteer_id = nil
+}
+
 // SetVolunteerID sets the "volunteer" edge to the Volunteer entity by id.
 func (m *TimeLogMutation) SetVolunteerID(id uuid.UUID) {
 	m.volunteer = &id
@@ -1351,7 +1388,7 @@ func (m *TimeLogMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *TimeLogMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 4)
 	if m.hours != nil {
 		fields = append(fields, timelog.FieldHours)
 	}
@@ -1360,6 +1397,9 @@ func (m *TimeLogMutation) Fields() []string {
 	}
 	if m.date != nil {
 		fields = append(fields, timelog.FieldDate)
+	}
+	if m.volunteer_id != nil {
+		fields = append(fields, timelog.FieldVolunteerID)
 	}
 	return fields
 }
@@ -1375,6 +1415,8 @@ func (m *TimeLogMutation) Field(name string) (ent.Value, bool) {
 		return m.Minutes()
 	case timelog.FieldDate:
 		return m.Date()
+	case timelog.FieldVolunteerID:
+		return m.VolunteerID()
 	}
 	return nil, false
 }
@@ -1390,6 +1432,8 @@ func (m *TimeLogMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldMinutes(ctx)
 	case timelog.FieldDate:
 		return m.OldDate(ctx)
+	case timelog.FieldVolunteerID:
+		return m.OldVolunteerID(ctx)
 	}
 	return nil, fmt.Errorf("unknown TimeLog field %s", name)
 }
@@ -1419,6 +1463,13 @@ func (m *TimeLogMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetDate(v)
+		return nil
+	case timelog.FieldVolunteerID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetVolunteerID(v)
 		return nil
 	}
 	return fmt.Errorf("unknown TimeLog field %s", name)
@@ -1504,6 +1555,9 @@ func (m *TimeLogMutation) ResetField(name string) error {
 		return nil
 	case timelog.FieldDate:
 		m.ResetDate()
+		return nil
+	case timelog.FieldVolunteerID:
+		m.ResetVolunteerID()
 		return nil
 	}
 	return fmt.Errorf("unknown TimeLog field %s", name)

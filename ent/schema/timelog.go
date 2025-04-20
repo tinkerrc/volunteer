@@ -4,6 +4,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 	"github.com/google/uuid"
 )
 
@@ -19,6 +20,7 @@ func (TimeLog) Fields() []ent.Field {
 		field.Int("hours"),
 		field.Int("minutes"),
 		field.Time("date"),
+		field.UUID("volunteer_id", uuid.UUID{}),
 	}
 }
 
@@ -27,5 +29,12 @@ func (TimeLog) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("volunteer", Volunteer.Type).Unique().Required(),
 		edge.To("event", Event.Type).Unique(),
+	}
+}
+
+func (TimeLog) Indexes() []ent.Index {
+	return []ent.Index{
+		index.Edges("volunteer"),
+		index.Fields("date"),
 	}
 }
