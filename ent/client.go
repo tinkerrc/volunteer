@@ -16,10 +16,11 @@ import (
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"github.com/tinkerrc/volunteer/ent/certification"
+	"github.com/tinkerrc/volunteer/ent/cert"
 	"github.com/tinkerrc/volunteer/ent/event"
 	"github.com/tinkerrc/volunteer/ent/eventvolunteer"
 	"github.com/tinkerrc/volunteer/ent/timelog"
+	"github.com/tinkerrc/volunteer/ent/training"
 	"github.com/tinkerrc/volunteer/ent/user"
 	"github.com/tinkerrc/volunteer/ent/volunteer"
 )
@@ -29,14 +30,16 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
-	// Certification is the client for interacting with the Certification builders.
-	Certification *CertificationClient
+	// Cert is the client for interacting with the Cert builders.
+	Cert *CertClient
 	// Event is the client for interacting with the Event builders.
 	Event *EventClient
 	// EventVolunteer is the client for interacting with the EventVolunteer builders.
 	EventVolunteer *EventVolunteerClient
 	// TimeLog is the client for interacting with the TimeLog builders.
 	TimeLog *TimeLogClient
+	// Training is the client for interacting with the Training builders.
+	Training *TrainingClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 	// Volunteer is the client for interacting with the Volunteer builders.
@@ -52,10 +55,11 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
-	c.Certification = NewCertificationClient(c.config)
+	c.Cert = NewCertClient(c.config)
 	c.Event = NewEventClient(c.config)
 	c.EventVolunteer = NewEventVolunteerClient(c.config)
 	c.TimeLog = NewTimeLogClient(c.config)
+	c.Training = NewTrainingClient(c.config)
 	c.User = NewUserClient(c.config)
 	c.Volunteer = NewVolunteerClient(c.config)
 }
@@ -150,10 +154,11 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	return &Tx{
 		ctx:            ctx,
 		config:         cfg,
-		Certification:  NewCertificationClient(cfg),
+		Cert:           NewCertClient(cfg),
 		Event:          NewEventClient(cfg),
 		EventVolunteer: NewEventVolunteerClient(cfg),
 		TimeLog:        NewTimeLogClient(cfg),
+		Training:       NewTrainingClient(cfg),
 		User:           NewUserClient(cfg),
 		Volunteer:      NewVolunteerClient(cfg),
 	}, nil
@@ -175,10 +180,11 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	return &Tx{
 		ctx:            ctx,
 		config:         cfg,
-		Certification:  NewCertificationClient(cfg),
+		Cert:           NewCertClient(cfg),
 		Event:          NewEventClient(cfg),
 		EventVolunteer: NewEventVolunteerClient(cfg),
 		TimeLog:        NewTimeLogClient(cfg),
+		Training:       NewTrainingClient(cfg),
 		User:           NewUserClient(cfg),
 		Volunteer:      NewVolunteerClient(cfg),
 	}, nil
@@ -187,7 +193,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		Certification.
+//		Cert.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -210,7 +216,7 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.Certification, c.Event, c.EventVolunteer, c.TimeLog, c.User, c.Volunteer,
+		c.Cert, c.Event, c.EventVolunteer, c.TimeLog, c.Training, c.User, c.Volunteer,
 	} {
 		n.Use(hooks...)
 	}
@@ -220,7 +226,7 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.Certification, c.Event, c.EventVolunteer, c.TimeLog, c.User, c.Volunteer,
+		c.Cert, c.Event, c.EventVolunteer, c.TimeLog, c.Training, c.User, c.Volunteer,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -229,14 +235,16 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 // Mutate implements the ent.Mutator interface.
 func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
-	case *CertificationMutation:
-		return c.Certification.mutate(ctx, m)
+	case *CertMutation:
+		return c.Cert.mutate(ctx, m)
 	case *EventMutation:
 		return c.Event.mutate(ctx, m)
 	case *EventVolunteerMutation:
 		return c.EventVolunteer.mutate(ctx, m)
 	case *TimeLogMutation:
 		return c.TimeLog.mutate(ctx, m)
+	case *TrainingMutation:
+		return c.Training.mutate(ctx, m)
 	case *UserMutation:
 		return c.User.mutate(ctx, m)
 	case *VolunteerMutation:
@@ -246,107 +254,107 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	}
 }
 
-// CertificationClient is a client for the Certification schema.
-type CertificationClient struct {
+// CertClient is a client for the Cert schema.
+type CertClient struct {
 	config
 }
 
-// NewCertificationClient returns a client for the Certification from the given config.
-func NewCertificationClient(c config) *CertificationClient {
-	return &CertificationClient{config: c}
+// NewCertClient returns a client for the Cert from the given config.
+func NewCertClient(c config) *CertClient {
+	return &CertClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `certification.Hooks(f(g(h())))`.
-func (c *CertificationClient) Use(hooks ...Hook) {
-	c.hooks.Certification = append(c.hooks.Certification, hooks...)
+// A call to `Use(f, g, h)` equals to `cert.Hooks(f(g(h())))`.
+func (c *CertClient) Use(hooks ...Hook) {
+	c.hooks.Cert = append(c.hooks.Cert, hooks...)
 }
 
 // Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `certification.Intercept(f(g(h())))`.
-func (c *CertificationClient) Intercept(interceptors ...Interceptor) {
-	c.inters.Certification = append(c.inters.Certification, interceptors...)
+// A call to `Intercept(f, g, h)` equals to `cert.Intercept(f(g(h())))`.
+func (c *CertClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Cert = append(c.inters.Cert, interceptors...)
 }
 
-// Create returns a builder for creating a Certification entity.
-func (c *CertificationClient) Create() *CertificationCreate {
-	mutation := newCertificationMutation(c.config, OpCreate)
-	return &CertificationCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a Cert entity.
+func (c *CertClient) Create() *CertCreate {
+	mutation := newCertMutation(c.config, OpCreate)
+	return &CertCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of Certification entities.
-func (c *CertificationClient) CreateBulk(builders ...*CertificationCreate) *CertificationCreateBulk {
-	return &CertificationCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of Cert entities.
+func (c *CertClient) CreateBulk(builders ...*CertCreate) *CertCreateBulk {
+	return &CertCreateBulk{config: c.config, builders: builders}
 }
 
 // MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
 // a builder and applies setFunc on it.
-func (c *CertificationClient) MapCreateBulk(slice any, setFunc func(*CertificationCreate, int)) *CertificationCreateBulk {
+func (c *CertClient) MapCreateBulk(slice any, setFunc func(*CertCreate, int)) *CertCreateBulk {
 	rv := reflect.ValueOf(slice)
 	if rv.Kind() != reflect.Slice {
-		return &CertificationCreateBulk{err: fmt.Errorf("calling to CertificationClient.MapCreateBulk with wrong type %T, need slice", slice)}
+		return &CertCreateBulk{err: fmt.Errorf("calling to CertClient.MapCreateBulk with wrong type %T, need slice", slice)}
 	}
-	builders := make([]*CertificationCreate, rv.Len())
+	builders := make([]*CertCreate, rv.Len())
 	for i := 0; i < rv.Len(); i++ {
 		builders[i] = c.Create()
 		setFunc(builders[i], i)
 	}
-	return &CertificationCreateBulk{config: c.config, builders: builders}
+	return &CertCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for Certification.
-func (c *CertificationClient) Update() *CertificationUpdate {
-	mutation := newCertificationMutation(c.config, OpUpdate)
-	return &CertificationUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for Cert.
+func (c *CertClient) Update() *CertUpdate {
+	mutation := newCertMutation(c.config, OpUpdate)
+	return &CertUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *CertificationClient) UpdateOne(ce *Certification) *CertificationUpdateOne {
-	mutation := newCertificationMutation(c.config, OpUpdateOne, withCertification(ce))
-	return &CertificationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *CertClient) UpdateOne(ce *Cert) *CertUpdateOne {
+	mutation := newCertMutation(c.config, OpUpdateOne, withCert(ce))
+	return &CertUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *CertificationClient) UpdateOneID(id int) *CertificationUpdateOne {
-	mutation := newCertificationMutation(c.config, OpUpdateOne, withCertificationID(id))
-	return &CertificationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *CertClient) UpdateOneID(id uuid.UUID) *CertUpdateOne {
+	mutation := newCertMutation(c.config, OpUpdateOne, withCertID(id))
+	return &CertUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for Certification.
-func (c *CertificationClient) Delete() *CertificationDelete {
-	mutation := newCertificationMutation(c.config, OpDelete)
-	return &CertificationDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for Cert.
+func (c *CertClient) Delete() *CertDelete {
+	mutation := newCertMutation(c.config, OpDelete)
+	return &CertDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *CertificationClient) DeleteOne(ce *Certification) *CertificationDeleteOne {
+func (c *CertClient) DeleteOne(ce *Cert) *CertDeleteOne {
 	return c.DeleteOneID(ce.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *CertificationClient) DeleteOneID(id int) *CertificationDeleteOne {
-	builder := c.Delete().Where(certification.ID(id))
+func (c *CertClient) DeleteOneID(id uuid.UUID) *CertDeleteOne {
+	builder := c.Delete().Where(cert.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &CertificationDeleteOne{builder}
+	return &CertDeleteOne{builder}
 }
 
-// Query returns a query builder for Certification.
-func (c *CertificationClient) Query() *CertificationQuery {
-	return &CertificationQuery{
+// Query returns a query builder for Cert.
+func (c *CertClient) Query() *CertQuery {
+	return &CertQuery{
 		config: c.config,
-		ctx:    &QueryContext{Type: TypeCertification},
+		ctx:    &QueryContext{Type: TypeCert},
 		inters: c.Interceptors(),
 	}
 }
 
-// Get returns a Certification entity by its id.
-func (c *CertificationClient) Get(ctx context.Context, id int) (*Certification, error) {
-	return c.Query().Where(certification.ID(id)).Only(ctx)
+// Get returns a Cert entity by its id.
+func (c *CertClient) Get(ctx context.Context, id uuid.UUID) (*Cert, error) {
+	return c.Query().Where(cert.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *CertificationClient) GetX(ctx context.Context, id int) *Certification {
+func (c *CertClient) GetX(ctx context.Context, id uuid.UUID) *Cert {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -355,27 +363,27 @@ func (c *CertificationClient) GetX(ctx context.Context, id int) *Certification {
 }
 
 // Hooks returns the client hooks.
-func (c *CertificationClient) Hooks() []Hook {
-	return c.hooks.Certification
+func (c *CertClient) Hooks() []Hook {
+	return c.hooks.Cert
 }
 
 // Interceptors returns the client interceptors.
-func (c *CertificationClient) Interceptors() []Interceptor {
-	return c.inters.Certification
+func (c *CertClient) Interceptors() []Interceptor {
+	return c.inters.Cert
 }
 
-func (c *CertificationClient) mutate(ctx context.Context, m *CertificationMutation) (Value, error) {
+func (c *CertClient) mutate(ctx context.Context, m *CertMutation) (Value, error) {
 	switch m.Op() {
 	case OpCreate:
-		return (&CertificationCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&CertCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdate:
-		return (&CertificationUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&CertUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdateOne:
-		return (&CertificationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&CertUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpDelete, OpDeleteOne:
-		return (&CertificationDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+		return (&CertDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
-		return nil, fmt.Errorf("ent: unknown Certification mutation op: %q", m.Op())
+		return nil, fmt.Errorf("ent: unknown Cert mutation op: %q", m.Op())
 	}
 }
 
@@ -842,6 +850,171 @@ func (c *TimeLogClient) mutate(ctx context.Context, m *TimeLogMutation) (Value, 
 	}
 }
 
+// TrainingClient is a client for the Training schema.
+type TrainingClient struct {
+	config
+}
+
+// NewTrainingClient returns a client for the Training from the given config.
+func NewTrainingClient(c config) *TrainingClient {
+	return &TrainingClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `training.Hooks(f(g(h())))`.
+func (c *TrainingClient) Use(hooks ...Hook) {
+	c.hooks.Training = append(c.hooks.Training, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `training.Intercept(f(g(h())))`.
+func (c *TrainingClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Training = append(c.inters.Training, interceptors...)
+}
+
+// Create returns a builder for creating a Training entity.
+func (c *TrainingClient) Create() *TrainingCreate {
+	mutation := newTrainingMutation(c.config, OpCreate)
+	return &TrainingCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Training entities.
+func (c *TrainingClient) CreateBulk(builders ...*TrainingCreate) *TrainingCreateBulk {
+	return &TrainingCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *TrainingClient) MapCreateBulk(slice any, setFunc func(*TrainingCreate, int)) *TrainingCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &TrainingCreateBulk{err: fmt.Errorf("calling to TrainingClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*TrainingCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &TrainingCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Training.
+func (c *TrainingClient) Update() *TrainingUpdate {
+	mutation := newTrainingMutation(c.config, OpUpdate)
+	return &TrainingUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *TrainingClient) UpdateOne(t *Training) *TrainingUpdateOne {
+	mutation := newTrainingMutation(c.config, OpUpdateOne, withTraining(t))
+	return &TrainingUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *TrainingClient) UpdateOneID(id uuid.UUID) *TrainingUpdateOne {
+	mutation := newTrainingMutation(c.config, OpUpdateOne, withTrainingID(id))
+	return &TrainingUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Training.
+func (c *TrainingClient) Delete() *TrainingDelete {
+	mutation := newTrainingMutation(c.config, OpDelete)
+	return &TrainingDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *TrainingClient) DeleteOne(t *Training) *TrainingDeleteOne {
+	return c.DeleteOneID(t.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *TrainingClient) DeleteOneID(id uuid.UUID) *TrainingDeleteOne {
+	builder := c.Delete().Where(training.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &TrainingDeleteOne{builder}
+}
+
+// Query returns a query builder for Training.
+func (c *TrainingClient) Query() *TrainingQuery {
+	return &TrainingQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeTraining},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Training entity by its id.
+func (c *TrainingClient) Get(ctx context.Context, id uuid.UUID) (*Training, error) {
+	return c.Query().Where(training.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *TrainingClient) GetX(ctx context.Context, id uuid.UUID) *Training {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryVolunteer queries the volunteer edge of a Training.
+func (c *TrainingClient) QueryVolunteer(t *Training) *VolunteerQuery {
+	query := (&VolunteerClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := t.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(training.Table, training.FieldID, id),
+			sqlgraph.To(volunteer.Table, volunteer.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, training.VolunteerTable, training.VolunteerColumn),
+		)
+		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCert queries the cert edge of a Training.
+func (c *TrainingClient) QueryCert(t *Training) *CertQuery {
+	query := (&CertClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := t.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(training.Table, training.FieldID, id),
+			sqlgraph.To(cert.Table, cert.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, training.CertTable, training.CertColumn),
+		)
+		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *TrainingClient) Hooks() []Hook {
+	return c.hooks.Training
+}
+
+// Interceptors returns the client interceptors.
+func (c *TrainingClient) Interceptors() []Interceptor {
+	return c.inters.Training
+}
+
+func (c *TrainingClient) mutate(ctx context.Context, m *TrainingMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&TrainingCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&TrainingUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&TrainingUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&TrainingDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Training mutation op: %q", m.Op())
+	}
+}
+
 // UserClient is a client for the User schema.
 type UserClient struct {
 	config
@@ -1111,9 +1284,10 @@ func (c *VolunteerClient) mutate(ctx context.Context, m *VolunteerMutation) (Val
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Certification, Event, EventVolunteer, TimeLog, User, Volunteer []ent.Hook
+		Cert, Event, EventVolunteer, TimeLog, Training, User, Volunteer []ent.Hook
 	}
 	inters struct {
-		Certification, Event, EventVolunteer, TimeLog, User, Volunteer []ent.Interceptor
+		Cert, Event, EventVolunteer, TimeLog, Training, User,
+		Volunteer []ent.Interceptor
 	}
 )

@@ -12,9 +12,11 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/google/uuid"
+	"github.com/tinkerrc/volunteer/ent/cert"
 	"github.com/tinkerrc/volunteer/ent/eventvolunteer"
 	"github.com/tinkerrc/volunteer/ent/predicate"
 	"github.com/tinkerrc/volunteer/ent/timelog"
+	"github.com/tinkerrc/volunteer/ent/training"
 	"github.com/tinkerrc/volunteer/ent/user"
 	"github.com/tinkerrc/volunteer/ent/volunteer"
 )
@@ -28,37 +30,40 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeCertification  = "Certification"
+	TypeCert           = "Cert"
 	TypeEvent          = "Event"
 	TypeEventVolunteer = "EventVolunteer"
 	TypeTimeLog        = "TimeLog"
+	TypeTraining       = "Training"
 	TypeUser           = "User"
 	TypeVolunteer      = "Volunteer"
 )
 
-// CertificationMutation represents an operation that mutates the Certification nodes in the graph.
-type CertificationMutation struct {
+// CertMutation represents an operation that mutates the Cert nodes in the graph.
+type CertMutation struct {
 	config
 	op            Op
 	typ           string
-	id            *int
+	id            *uuid.UUID
+	name          *string
+	description   *string
 	clearedFields map[string]struct{}
 	done          bool
-	oldValue      func(context.Context) (*Certification, error)
-	predicates    []predicate.Certification
+	oldValue      func(context.Context) (*Cert, error)
+	predicates    []predicate.Cert
 }
 
-var _ ent.Mutation = (*CertificationMutation)(nil)
+var _ ent.Mutation = (*CertMutation)(nil)
 
-// certificationOption allows management of the mutation configuration using functional options.
-type certificationOption func(*CertificationMutation)
+// certOption allows management of the mutation configuration using functional options.
+type certOption func(*CertMutation)
 
-// newCertificationMutation creates new mutation for the Certification entity.
-func newCertificationMutation(c config, op Op, opts ...certificationOption) *CertificationMutation {
-	m := &CertificationMutation{
+// newCertMutation creates new mutation for the Cert entity.
+func newCertMutation(c config, op Op, opts ...certOption) *CertMutation {
+	m := &CertMutation{
 		config:        c,
 		op:            op,
-		typ:           TypeCertification,
+		typ:           TypeCert,
 		clearedFields: make(map[string]struct{}),
 	}
 	for _, opt := range opts {
@@ -67,20 +72,20 @@ func newCertificationMutation(c config, op Op, opts ...certificationOption) *Cer
 	return m
 }
 
-// withCertificationID sets the ID field of the mutation.
-func withCertificationID(id int) certificationOption {
-	return func(m *CertificationMutation) {
+// withCertID sets the ID field of the mutation.
+func withCertID(id uuid.UUID) certOption {
+	return func(m *CertMutation) {
 		var (
 			err   error
 			once  sync.Once
-			value *Certification
+			value *Cert
 		)
-		m.oldValue = func(ctx context.Context) (*Certification, error) {
+		m.oldValue = func(ctx context.Context) (*Cert, error) {
 			once.Do(func() {
 				if m.done {
 					err = errors.New("querying old values post mutation is not allowed")
 				} else {
-					value, err = m.Client().Certification.Get(ctx, id)
+					value, err = m.Client().Cert.Get(ctx, id)
 				}
 			})
 			return value, err
@@ -89,10 +94,10 @@ func withCertificationID(id int) certificationOption {
 	}
 }
 
-// withCertification sets the old Certification of the mutation.
-func withCertification(node *Certification) certificationOption {
-	return func(m *CertificationMutation) {
-		m.oldValue = func(context.Context) (*Certification, error) {
+// withCert sets the old Cert of the mutation.
+func withCert(node *Cert) certOption {
+	return func(m *CertMutation) {
+		m.oldValue = func(context.Context) (*Cert, error) {
 			return node, nil
 		}
 		m.id = &node.ID
@@ -101,7 +106,7 @@ func withCertification(node *Certification) certificationOption {
 
 // Client returns a new `ent.Client` from the mutation. If the mutation was
 // executed in a transaction (ent.Tx), a transactional client is returned.
-func (m CertificationMutation) Client() *Client {
+func (m CertMutation) Client() *Client {
 	client := &Client{config: m.config}
 	client.init()
 	return client
@@ -109,7 +114,7 @@ func (m CertificationMutation) Client() *Client {
 
 // Tx returns an `ent.Tx` for mutations that were executed in transactions;
 // it returns an error otherwise.
-func (m CertificationMutation) Tx() (*Tx, error) {
+func (m CertMutation) Tx() (*Tx, error) {
 	if _, ok := m.driver.(*txDriver); !ok {
 		return nil, errors.New("ent: mutation is not running in a transaction")
 	}
@@ -118,9 +123,15 @@ func (m CertificationMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Cert entities.
+func (m *CertMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *CertificationMutation) ID() (id int, exists bool) {
+func (m *CertMutation) ID() (id uuid.UUID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -131,30 +142,102 @@ func (m *CertificationMutation) ID() (id int, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *CertificationMutation) IDs(ctx context.Context) ([]int, error) {
+func (m *CertMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []int{id}, nil
+			return []uuid.UUID{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
-		return m.Client().Certification.Query().Where(m.predicates...).IDs(ctx)
+		return m.Client().Cert.Query().Where(m.predicates...).IDs(ctx)
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
 }
 
-// Where appends a list predicates to the CertificationMutation builder.
-func (m *CertificationMutation) Where(ps ...predicate.Certification) {
+// SetName sets the "name" field.
+func (m *CertMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *CertMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the Cert entity.
+// If the Cert object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CertMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *CertMutation) ResetName() {
+	m.name = nil
+}
+
+// SetDescription sets the "description" field.
+func (m *CertMutation) SetDescription(s string) {
+	m.description = &s
+}
+
+// Description returns the value of the "description" field in the mutation.
+func (m *CertMutation) Description() (r string, exists bool) {
+	v := m.description
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDescription returns the old "description" field's value of the Cert entity.
+// If the Cert object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CertMutation) OldDescription(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDescription requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
+	}
+	return oldValue.Description, nil
+}
+
+// ResetDescription resets all changes to the "description" field.
+func (m *CertMutation) ResetDescription() {
+	m.description = nil
+}
+
+// Where appends a list predicates to the CertMutation builder.
+func (m *CertMutation) Where(ps ...predicate.Cert) {
 	m.predicates = append(m.predicates, ps...)
 }
 
-// WhereP appends storage-level predicates to the CertificationMutation builder. Using this method,
+// WhereP appends storage-level predicates to the CertMutation builder. Using this method,
 // users can use type-assertion to append predicates that do not depend on any generated package.
-func (m *CertificationMutation) WhereP(ps ...func(*sql.Selector)) {
-	p := make([]predicate.Certification, len(ps))
+func (m *CertMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Cert, len(ps))
 	for i := range ps {
 		p[i] = ps[i]
 	}
@@ -162,142 +245,184 @@ func (m *CertificationMutation) WhereP(ps ...func(*sql.Selector)) {
 }
 
 // Op returns the operation name.
-func (m *CertificationMutation) Op() Op {
+func (m *CertMutation) Op() Op {
 	return m.op
 }
 
 // SetOp allows setting the mutation operation.
-func (m *CertificationMutation) SetOp(op Op) {
+func (m *CertMutation) SetOp(op Op) {
 	m.op = op
 }
 
-// Type returns the node type of this mutation (Certification).
-func (m *CertificationMutation) Type() string {
+// Type returns the node type of this mutation (Cert).
+func (m *CertMutation) Type() string {
 	return m.typ
 }
 
 // Fields returns all fields that were changed during this mutation. Note that in
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
-func (m *CertificationMutation) Fields() []string {
-	fields := make([]string, 0, 0)
+func (m *CertMutation) Fields() []string {
+	fields := make([]string, 0, 2)
+	if m.name != nil {
+		fields = append(fields, cert.FieldName)
+	}
+	if m.description != nil {
+		fields = append(fields, cert.FieldDescription)
+	}
 	return fields
 }
 
 // Field returns the value of a field with the given name. The second boolean
 // return value indicates that this field was not set, or was not defined in the
 // schema.
-func (m *CertificationMutation) Field(name string) (ent.Value, bool) {
+func (m *CertMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case cert.FieldName:
+		return m.Name()
+	case cert.FieldDescription:
+		return m.Description()
+	}
 	return nil, false
 }
 
 // OldField returns the old value of the field from the database. An error is
 // returned if the mutation operation is not UpdateOne, or the query to the
 // database failed.
-func (m *CertificationMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
-	return nil, fmt.Errorf("unknown Certification field %s", name)
+func (m *CertMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case cert.FieldName:
+		return m.OldName(ctx)
+	case cert.FieldDescription:
+		return m.OldDescription(ctx)
+	}
+	return nil, fmt.Errorf("unknown Cert field %s", name)
 }
 
 // SetField sets the value of a field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *CertificationMutation) SetField(name string, value ent.Value) error {
+func (m *CertMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case cert.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case cert.FieldDescription:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDescription(v)
+		return nil
 	}
-	return fmt.Errorf("unknown Certification field %s", name)
+	return fmt.Errorf("unknown Cert field %s", name)
 }
 
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
-func (m *CertificationMutation) AddedFields() []string {
+func (m *CertMutation) AddedFields() []string {
 	return nil
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
-func (m *CertificationMutation) AddedField(name string) (ent.Value, bool) {
+func (m *CertMutation) AddedField(name string) (ent.Value, bool) {
 	return nil, false
 }
 
 // AddField adds the value to the field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *CertificationMutation) AddField(name string, value ent.Value) error {
-	return fmt.Errorf("unknown Certification numeric field %s", name)
+func (m *CertMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Cert numeric field %s", name)
 }
 
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
-func (m *CertificationMutation) ClearedFields() []string {
+func (m *CertMutation) ClearedFields() []string {
 	return nil
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
 // cleared in this mutation.
-func (m *CertificationMutation) FieldCleared(name string) bool {
+func (m *CertMutation) FieldCleared(name string) bool {
 	_, ok := m.clearedFields[name]
 	return ok
 }
 
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
-func (m *CertificationMutation) ClearField(name string) error {
-	return fmt.Errorf("unknown Certification nullable field %s", name)
+func (m *CertMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown Cert nullable field %s", name)
 }
 
 // ResetField resets all changes in the mutation for the field with the given name.
 // It returns an error if the field is not defined in the schema.
-func (m *CertificationMutation) ResetField(name string) error {
-	return fmt.Errorf("unknown Certification field %s", name)
+func (m *CertMutation) ResetField(name string) error {
+	switch name {
+	case cert.FieldName:
+		m.ResetName()
+		return nil
+	case cert.FieldDescription:
+		m.ResetDescription()
+		return nil
+	}
+	return fmt.Errorf("unknown Cert field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
-func (m *CertificationMutation) AddedEdges() []string {
+func (m *CertMutation) AddedEdges() []string {
 	edges := make([]string, 0, 0)
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
-func (m *CertificationMutation) AddedIDs(name string) []ent.Value {
+func (m *CertMutation) AddedIDs(name string) []ent.Value {
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
-func (m *CertificationMutation) RemovedEdges() []string {
+func (m *CertMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 0)
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
-func (m *CertificationMutation) RemovedIDs(name string) []ent.Value {
+func (m *CertMutation) RemovedIDs(name string) []ent.Value {
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *CertificationMutation) ClearedEdges() []string {
+func (m *CertMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 0)
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
-func (m *CertificationMutation) EdgeCleared(name string) bool {
+func (m *CertMutation) EdgeCleared(name string) bool {
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
-func (m *CertificationMutation) ClearEdge(name string) error {
-	return fmt.Errorf("unknown Certification unique edge %s", name)
+func (m *CertMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown Cert unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
-func (m *CertificationMutation) ResetEdge(name string) error {
-	return fmt.Errorf("unknown Certification edge %s", name)
+func (m *CertMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown Cert edge %s", name)
 }
 
 // EventMutation represents an operation that mutates the Event nodes in the graph.
@@ -1653,6 +1778,594 @@ func (m *TimeLogMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown TimeLog edge %s", name)
+}
+
+// TrainingMutation represents an operation that mutates the Training nodes in the graph.
+type TrainingMutation struct {
+	config
+	op               Op
+	typ              string
+	id               *uuid.UUID
+	start_date       *time.Time
+	end_date         *time.Time
+	is_certified     *bool
+	clearedFields    map[string]struct{}
+	volunteer        *uuid.UUID
+	clearedvolunteer bool
+	cert             *uuid.UUID
+	clearedcert      bool
+	done             bool
+	oldValue         func(context.Context) (*Training, error)
+	predicates       []predicate.Training
+}
+
+var _ ent.Mutation = (*TrainingMutation)(nil)
+
+// trainingOption allows management of the mutation configuration using functional options.
+type trainingOption func(*TrainingMutation)
+
+// newTrainingMutation creates new mutation for the Training entity.
+func newTrainingMutation(c config, op Op, opts ...trainingOption) *TrainingMutation {
+	m := &TrainingMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeTraining,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withTrainingID sets the ID field of the mutation.
+func withTrainingID(id uuid.UUID) trainingOption {
+	return func(m *TrainingMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Training
+		)
+		m.oldValue = func(ctx context.Context) (*Training, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Training.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withTraining sets the old Training of the mutation.
+func withTraining(node *Training) trainingOption {
+	return func(m *TrainingMutation) {
+		m.oldValue = func(context.Context) (*Training, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m TrainingMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m TrainingMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Training entities.
+func (m *TrainingMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *TrainingMutation) ID() (id uuid.UUID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *TrainingMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []uuid.UUID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Training.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetStartDate sets the "start_date" field.
+func (m *TrainingMutation) SetStartDate(t time.Time) {
+	m.start_date = &t
+}
+
+// StartDate returns the value of the "start_date" field in the mutation.
+func (m *TrainingMutation) StartDate() (r time.Time, exists bool) {
+	v := m.start_date
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStartDate returns the old "start_date" field's value of the Training entity.
+// If the Training object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrainingMutation) OldStartDate(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStartDate is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStartDate requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStartDate: %w", err)
+	}
+	return oldValue.StartDate, nil
+}
+
+// ResetStartDate resets all changes to the "start_date" field.
+func (m *TrainingMutation) ResetStartDate() {
+	m.start_date = nil
+}
+
+// SetEndDate sets the "end_date" field.
+func (m *TrainingMutation) SetEndDate(t time.Time) {
+	m.end_date = &t
+}
+
+// EndDate returns the value of the "end_date" field in the mutation.
+func (m *TrainingMutation) EndDate() (r time.Time, exists bool) {
+	v := m.end_date
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEndDate returns the old "end_date" field's value of the Training entity.
+// If the Training object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrainingMutation) OldEndDate(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEndDate is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEndDate requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEndDate: %w", err)
+	}
+	return oldValue.EndDate, nil
+}
+
+// ClearEndDate clears the value of the "end_date" field.
+func (m *TrainingMutation) ClearEndDate() {
+	m.end_date = nil
+	m.clearedFields[training.FieldEndDate] = struct{}{}
+}
+
+// EndDateCleared returns if the "end_date" field was cleared in this mutation.
+func (m *TrainingMutation) EndDateCleared() bool {
+	_, ok := m.clearedFields[training.FieldEndDate]
+	return ok
+}
+
+// ResetEndDate resets all changes to the "end_date" field.
+func (m *TrainingMutation) ResetEndDate() {
+	m.end_date = nil
+	delete(m.clearedFields, training.FieldEndDate)
+}
+
+// SetIsCertified sets the "is_certified" field.
+func (m *TrainingMutation) SetIsCertified(b bool) {
+	m.is_certified = &b
+}
+
+// IsCertified returns the value of the "is_certified" field in the mutation.
+func (m *TrainingMutation) IsCertified() (r bool, exists bool) {
+	v := m.is_certified
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsCertified returns the old "is_certified" field's value of the Training entity.
+// If the Training object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TrainingMutation) OldIsCertified(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIsCertified is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIsCertified requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsCertified: %w", err)
+	}
+	return oldValue.IsCertified, nil
+}
+
+// ResetIsCertified resets all changes to the "is_certified" field.
+func (m *TrainingMutation) ResetIsCertified() {
+	m.is_certified = nil
+}
+
+// SetVolunteerID sets the "volunteer" edge to the Volunteer entity by id.
+func (m *TrainingMutation) SetVolunteerID(id uuid.UUID) {
+	m.volunteer = &id
+}
+
+// ClearVolunteer clears the "volunteer" edge to the Volunteer entity.
+func (m *TrainingMutation) ClearVolunteer() {
+	m.clearedvolunteer = true
+}
+
+// VolunteerCleared reports if the "volunteer" edge to the Volunteer entity was cleared.
+func (m *TrainingMutation) VolunteerCleared() bool {
+	return m.clearedvolunteer
+}
+
+// VolunteerID returns the "volunteer" edge ID in the mutation.
+func (m *TrainingMutation) VolunteerID() (id uuid.UUID, exists bool) {
+	if m.volunteer != nil {
+		return *m.volunteer, true
+	}
+	return
+}
+
+// VolunteerIDs returns the "volunteer" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// VolunteerID instead. It exists only for internal usage by the builders.
+func (m *TrainingMutation) VolunteerIDs() (ids []uuid.UUID) {
+	if id := m.volunteer; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetVolunteer resets all changes to the "volunteer" edge.
+func (m *TrainingMutation) ResetVolunteer() {
+	m.volunteer = nil
+	m.clearedvolunteer = false
+}
+
+// SetCertID sets the "cert" edge to the Cert entity by id.
+func (m *TrainingMutation) SetCertID(id uuid.UUID) {
+	m.cert = &id
+}
+
+// ClearCert clears the "cert" edge to the Cert entity.
+func (m *TrainingMutation) ClearCert() {
+	m.clearedcert = true
+}
+
+// CertCleared reports if the "cert" edge to the Cert entity was cleared.
+func (m *TrainingMutation) CertCleared() bool {
+	return m.clearedcert
+}
+
+// CertID returns the "cert" edge ID in the mutation.
+func (m *TrainingMutation) CertID() (id uuid.UUID, exists bool) {
+	if m.cert != nil {
+		return *m.cert, true
+	}
+	return
+}
+
+// CertIDs returns the "cert" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// CertID instead. It exists only for internal usage by the builders.
+func (m *TrainingMutation) CertIDs() (ids []uuid.UUID) {
+	if id := m.cert; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetCert resets all changes to the "cert" edge.
+func (m *TrainingMutation) ResetCert() {
+	m.cert = nil
+	m.clearedcert = false
+}
+
+// Where appends a list predicates to the TrainingMutation builder.
+func (m *TrainingMutation) Where(ps ...predicate.Training) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the TrainingMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *TrainingMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Training, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *TrainingMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *TrainingMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Training).
+func (m *TrainingMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *TrainingMutation) Fields() []string {
+	fields := make([]string, 0, 3)
+	if m.start_date != nil {
+		fields = append(fields, training.FieldStartDate)
+	}
+	if m.end_date != nil {
+		fields = append(fields, training.FieldEndDate)
+	}
+	if m.is_certified != nil {
+		fields = append(fields, training.FieldIsCertified)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *TrainingMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case training.FieldStartDate:
+		return m.StartDate()
+	case training.FieldEndDate:
+		return m.EndDate()
+	case training.FieldIsCertified:
+		return m.IsCertified()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *TrainingMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case training.FieldStartDate:
+		return m.OldStartDate(ctx)
+	case training.FieldEndDate:
+		return m.OldEndDate(ctx)
+	case training.FieldIsCertified:
+		return m.OldIsCertified(ctx)
+	}
+	return nil, fmt.Errorf("unknown Training field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *TrainingMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case training.FieldStartDate:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStartDate(v)
+		return nil
+	case training.FieldEndDate:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEndDate(v)
+		return nil
+	case training.FieldIsCertified:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsCertified(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Training field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *TrainingMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *TrainingMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *TrainingMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Training numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *TrainingMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(training.FieldEndDate) {
+		fields = append(fields, training.FieldEndDate)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *TrainingMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *TrainingMutation) ClearField(name string) error {
+	switch name {
+	case training.FieldEndDate:
+		m.ClearEndDate()
+		return nil
+	}
+	return fmt.Errorf("unknown Training nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *TrainingMutation) ResetField(name string) error {
+	switch name {
+	case training.FieldStartDate:
+		m.ResetStartDate()
+		return nil
+	case training.FieldEndDate:
+		m.ResetEndDate()
+		return nil
+	case training.FieldIsCertified:
+		m.ResetIsCertified()
+		return nil
+	}
+	return fmt.Errorf("unknown Training field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *TrainingMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.volunteer != nil {
+		edges = append(edges, training.EdgeVolunteer)
+	}
+	if m.cert != nil {
+		edges = append(edges, training.EdgeCert)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *TrainingMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case training.EdgeVolunteer:
+		if id := m.volunteer; id != nil {
+			return []ent.Value{*id}
+		}
+	case training.EdgeCert:
+		if id := m.cert; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *TrainingMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *TrainingMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *TrainingMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearedvolunteer {
+		edges = append(edges, training.EdgeVolunteer)
+	}
+	if m.clearedcert {
+		edges = append(edges, training.EdgeCert)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *TrainingMutation) EdgeCleared(name string) bool {
+	switch name {
+	case training.EdgeVolunteer:
+		return m.clearedvolunteer
+	case training.EdgeCert:
+		return m.clearedcert
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *TrainingMutation) ClearEdge(name string) error {
+	switch name {
+	case training.EdgeVolunteer:
+		m.ClearVolunteer()
+		return nil
+	case training.EdgeCert:
+		m.ClearCert()
+		return nil
+	}
+	return fmt.Errorf("unknown Training unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *TrainingMutation) ResetEdge(name string) error {
+	switch name {
+	case training.EdgeVolunteer:
+		m.ResetVolunteer()
+		return nil
+	case training.EdgeCert:
+		m.ResetCert()
+		return nil
+	}
+	return fmt.Errorf("unknown Training edge %s", name)
 }
 
 // UserMutation represents an operation that mutates the User nodes in the graph.

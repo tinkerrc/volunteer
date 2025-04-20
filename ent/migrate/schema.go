@@ -8,15 +8,17 @@ import (
 )
 
 var (
-	// CertificationsColumns holds the columns for the "certifications" table.
-	CertificationsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
+	// CertsColumns holds the columns for the "certs" table.
+	CertsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "description", Type: field.TypeString},
 	}
-	// CertificationsTable holds the schema information for the "certifications" table.
-	CertificationsTable = &schema.Table{
-		Name:       "certifications",
-		Columns:    CertificationsColumns,
-		PrimaryKey: []*schema.Column{CertificationsColumns[0]},
+	// CertsTable holds the schema information for the "certs" table.
+	CertsTable = &schema.Table{
+		Name:       "certs",
+		Columns:    CertsColumns,
+		PrimaryKey: []*schema.Column{CertsColumns[0]},
 	}
 	// EventsColumns holds the columns for the "events" table.
 	EventsColumns = []*schema.Column{
@@ -96,6 +98,42 @@ var (
 			},
 		},
 	}
+	// TrainingsColumns holds the columns for the "trainings" table.
+	TrainingsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "start_date", Type: field.TypeTime},
+		{Name: "end_date", Type: field.TypeTime, Nullable: true},
+		{Name: "is_certified", Type: field.TypeBool, Default: false},
+		{Name: "training_volunteer", Type: field.TypeUUID, Nullable: true},
+		{Name: "training_cert", Type: field.TypeUUID, Nullable: true},
+	}
+	// TrainingsTable holds the schema information for the "trainings" table.
+	TrainingsTable = &schema.Table{
+		Name:       "trainings",
+		Columns:    TrainingsColumns,
+		PrimaryKey: []*schema.Column{TrainingsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "trainings_volunteers_volunteer",
+				Columns:    []*schema.Column{TrainingsColumns[4]},
+				RefColumns: []*schema.Column{VolunteersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "trainings_certs_cert",
+				Columns:    []*schema.Column{TrainingsColumns[5]},
+				RefColumns: []*schema.Column{CertsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "training_training_volunteer_training_cert",
+				Unique:  true,
+				Columns: []*schema.Column{TrainingsColumns[4], TrainingsColumns[5]},
+			},
+		},
+	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
@@ -133,10 +171,11 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
-		CertificationsTable,
+		CertsTable,
 		EventsTable,
 		EventVolunteersTable,
 		TimeLogsTable,
+		TrainingsTable,
 		UsersTable,
 		VolunteersTable,
 	}
@@ -147,4 +186,6 @@ func init() {
 	EventVolunteersTable.ForeignKeys[1].RefTable = VolunteersTable
 	TimeLogsTable.ForeignKeys[0].RefTable = VolunteersTable
 	TimeLogsTable.ForeignKeys[1].RefTable = EventsTable
+	TrainingsTable.ForeignKeys[0].RefTable = VolunteersTable
+	TrainingsTable.ForeignKeys[1].RefTable = CertsTable
 }

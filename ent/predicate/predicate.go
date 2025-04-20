@@ -6,8 +6,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
-// Certification is the predicate function for certification builders.
-type Certification func(*sql.Selector)
+// Cert is the predicate function for cert builders.
+type Cert func(*sql.Selector)
 
 // Event is the predicate function for event builders.
 type Event func(*sql.Selector)
@@ -17,6 +17,9 @@ type EventVolunteer func(*sql.Selector)
 
 // TimeLog is the predicate function for timelog builders.
 type TimeLog func(*sql.Selector)
+
+// Training is the predicate function for training builders.
+type Training func(*sql.Selector)
 
 // User is the predicate function for user builders.
 type User func(*sql.Selector)
