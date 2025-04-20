@@ -22,16 +22,10 @@ type Event struct {
 	Name string `json:"name,omitempty"`
 	// Description holds the value of the "description" field.
 	Description string `json:"description,omitempty"`
-	// IsRecurring holds the value of the "is_recurring" field.
-	IsRecurring bool `json:"is_recurring,omitempty"`
-	// IsRecurActive holds the value of the "is_recur_active" field.
-	IsRecurActive *bool `json:"is_recur_active,omitempty"`
-	// RecurDescription holds the value of the "recur_description" field.
-	RecurDescription *string `json:"recur_description,omitempty"`
 	// Start holds the value of the "start" field.
-	Start *time.Time `json:"start,omitempty"`
+	Start time.Time `json:"start,omitempty"`
 	// End holds the value of the "end" field.
-	End *time.Time `json:"end,omitempty"`
+	End time.Time `json:"end,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the EventQuery when eager-loading is set.
 	Edges        EventEdges `json:"edges"`
@@ -61,9 +55,7 @@ func (*Event) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case event.FieldIsRecurring, event.FieldIsRecurActive:
-			values[i] = new(sql.NullBool)
-		case event.FieldName, event.FieldDescription, event.FieldRecurDescription:
+		case event.FieldName, event.FieldDescription:
 			values[i] = new(sql.NullString)
 		case event.FieldStart, event.FieldEnd:
 			values[i] = new(sql.NullTime)
@@ -102,39 +94,17 @@ func (e *Event) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				e.Description = value.String
 			}
-		case event.FieldIsRecurring:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field is_recurring", values[i])
-			} else if value.Valid {
-				e.IsRecurring = value.Bool
-			}
-		case event.FieldIsRecurActive:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field is_recur_active", values[i])
-			} else if value.Valid {
-				e.IsRecurActive = new(bool)
-				*e.IsRecurActive = value.Bool
-			}
-		case event.FieldRecurDescription:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field recur_description", values[i])
-			} else if value.Valid {
-				e.RecurDescription = new(string)
-				*e.RecurDescription = value.String
-			}
 		case event.FieldStart:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field start", values[i])
 			} else if value.Valid {
-				e.Start = new(time.Time)
-				*e.Start = value.Time
+				e.Start = value.Time
 			}
 		case event.FieldEnd:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field end", values[i])
 			} else if value.Valid {
-				e.End = new(time.Time)
-				*e.End = value.Time
+				e.End = value.Time
 			}
 		default:
 			e.selectValues.Set(columns[i], values[i])
@@ -183,28 +153,11 @@ func (e *Event) String() string {
 	builder.WriteString("description=")
 	builder.WriteString(e.Description)
 	builder.WriteString(", ")
-	builder.WriteString("is_recurring=")
-	builder.WriteString(fmt.Sprintf("%v", e.IsRecurring))
+	builder.WriteString("start=")
+	builder.WriteString(e.Start.Format(time.ANSIC))
 	builder.WriteString(", ")
-	if v := e.IsRecurActive; v != nil {
-		builder.WriteString("is_recur_active=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
-	}
-	builder.WriteString(", ")
-	if v := e.RecurDescription; v != nil {
-		builder.WriteString("recur_description=")
-		builder.WriteString(*v)
-	}
-	builder.WriteString(", ")
-	if v := e.Start; v != nil {
-		builder.WriteString("start=")
-		builder.WriteString(v.Format(time.ANSIC))
-	}
-	builder.WriteString(", ")
-	if v := e.End; v != nil {
-		builder.WriteString("end=")
-		builder.WriteString(v.Format(time.ANSIC))
-	}
+	builder.WriteString("end=")
+	builder.WriteString(e.End.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

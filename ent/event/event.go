@@ -17,12 +17,6 @@ const (
 	FieldName = "name"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
-	// FieldIsRecurring holds the string denoting the is_recurring field in the database.
-	FieldIsRecurring = "is_recurring"
-	// FieldIsRecurActive holds the string denoting the is_recur_active field in the database.
-	FieldIsRecurActive = "is_recur_active"
-	// FieldRecurDescription holds the string denoting the recur_description field in the database.
-	FieldRecurDescription = "recur_description"
 	// FieldStart holds the string denoting the start field in the database.
 	FieldStart = "start"
 	// FieldEnd holds the string denoting the end field in the database.
@@ -45,9 +39,6 @@ var Columns = []string{
 	FieldID,
 	FieldName,
 	FieldDescription,
-	FieldIsRecurring,
-	FieldIsRecurActive,
-	FieldRecurDescription,
 	FieldStart,
 	FieldEnd,
 }
@@ -83,21 +74,6 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 // ByDescription orders the results by the description field.
 func ByDescription(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDescription, opts...).ToFunc()
-}
-
-// ByIsRecurring orders the results by the is_recurring field.
-func ByIsRecurring(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldIsRecurring, opts...).ToFunc()
-}
-
-// ByIsRecurActive orders the results by the is_recur_active field.
-func ByIsRecurActive(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldIsRecurActive, opts...).ToFunc()
-}
-
-// ByRecurDescription orders the results by the recur_description field.
-func ByRecurDescription(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldRecurDescription, opts...).ToFunc()
 }
 
 // ByStart orders the results by the start field.

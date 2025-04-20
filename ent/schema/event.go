@@ -18,11 +18,8 @@ func (Event) Fields() []ent.Field {
 		field.UUID("id", uuid.UUID{}).Default(uuid.New).Unique(),
 		field.String("name"),
 		field.String("description"),
-		field.Bool("is_recurring"),
-		field.Bool("is_recur_active").Optional().Nillable(),
-		field.String("recur_description").Optional().Nillable(),
-		field.Time("start").Optional().Nillable(),
-		field.Time("end").Optional().Nillable(),
+		field.Time("start"),
+		field.Time("end"),
 	}
 }
 

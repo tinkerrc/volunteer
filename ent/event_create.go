@@ -34,65 +34,15 @@ func (ec *EventCreate) SetDescription(s string) *EventCreate {
 	return ec
 }
 
-// SetIsRecurring sets the "is_recurring" field.
-func (ec *EventCreate) SetIsRecurring(b bool) *EventCreate {
-	ec.mutation.SetIsRecurring(b)
-	return ec
-}
-
-// SetIsRecurActive sets the "is_recur_active" field.
-func (ec *EventCreate) SetIsRecurActive(b bool) *EventCreate {
-	ec.mutation.SetIsRecurActive(b)
-	return ec
-}
-
-// SetNillableIsRecurActive sets the "is_recur_active" field if the given value is not nil.
-func (ec *EventCreate) SetNillableIsRecurActive(b *bool) *EventCreate {
-	if b != nil {
-		ec.SetIsRecurActive(*b)
-	}
-	return ec
-}
-
-// SetRecurDescription sets the "recur_description" field.
-func (ec *EventCreate) SetRecurDescription(s string) *EventCreate {
-	ec.mutation.SetRecurDescription(s)
-	return ec
-}
-
-// SetNillableRecurDescription sets the "recur_description" field if the given value is not nil.
-func (ec *EventCreate) SetNillableRecurDescription(s *string) *EventCreate {
-	if s != nil {
-		ec.SetRecurDescription(*s)
-	}
-	return ec
-}
-
 // SetStart sets the "start" field.
 func (ec *EventCreate) SetStart(t time.Time) *EventCreate {
 	ec.mutation.SetStart(t)
 	return ec
 }
 
-// SetNillableStart sets the "start" field if the given value is not nil.
-func (ec *EventCreate) SetNillableStart(t *time.Time) *EventCreate {
-	if t != nil {
-		ec.SetStart(*t)
-	}
-	return ec
-}
-
 // SetEnd sets the "end" field.
 func (ec *EventCreate) SetEnd(t time.Time) *EventCreate {
 	ec.mutation.SetEnd(t)
-	return ec
-}
-
-// SetNillableEnd sets the "end" field if the given value is not nil.
-func (ec *EventCreate) SetNillableEnd(t *time.Time) *EventCreate {
-	if t != nil {
-		ec.SetEnd(*t)
-	}
 	return ec
 }
 
@@ -174,8 +124,11 @@ func (ec *EventCreate) check() error {
 	if _, ok := ec.mutation.Description(); !ok {
 		return &ValidationError{Name: "description", err: errors.New(`ent: missing required field "Event.description"`)}
 	}
-	if _, ok := ec.mutation.IsRecurring(); !ok {
-		return &ValidationError{Name: "is_recurring", err: errors.New(`ent: missing required field "Event.is_recurring"`)}
+	if _, ok := ec.mutation.Start(); !ok {
+		return &ValidationError{Name: "start", err: errors.New(`ent: missing required field "Event.start"`)}
+	}
+	if _, ok := ec.mutation.End(); !ok {
+		return &ValidationError{Name: "end", err: errors.New(`ent: missing required field "Event.end"`)}
 	}
 	return nil
 }
@@ -220,25 +173,13 @@ func (ec *EventCreate) createSpec() (*Event, *sqlgraph.CreateSpec) {
 		_spec.SetField(event.FieldDescription, field.TypeString, value)
 		_node.Description = value
 	}
-	if value, ok := ec.mutation.IsRecurring(); ok {
-		_spec.SetField(event.FieldIsRecurring, field.TypeBool, value)
-		_node.IsRecurring = value
-	}
-	if value, ok := ec.mutation.IsRecurActive(); ok {
-		_spec.SetField(event.FieldIsRecurActive, field.TypeBool, value)
-		_node.IsRecurActive = &value
-	}
-	if value, ok := ec.mutation.RecurDescription(); ok {
-		_spec.SetField(event.FieldRecurDescription, field.TypeString, value)
-		_node.RecurDescription = &value
-	}
 	if value, ok := ec.mutation.Start(); ok {
 		_spec.SetField(event.FieldStart, field.TypeTime, value)
-		_node.Start = &value
+		_node.Start = value
 	}
 	if value, ok := ec.mutation.End(); ok {
 		_spec.SetField(event.FieldEnd, field.TypeTime, value)
-		_node.End = &value
+		_node.End = value
 	}
 	if nodes := ec.mutation.CertsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

@@ -58,60 +58,6 @@ func (eu *EventUpdate) SetNillableDescription(s *string) *EventUpdate {
 	return eu
 }
 
-// SetIsRecurring sets the "is_recurring" field.
-func (eu *EventUpdate) SetIsRecurring(b bool) *EventUpdate {
-	eu.mutation.SetIsRecurring(b)
-	return eu
-}
-
-// SetNillableIsRecurring sets the "is_recurring" field if the given value is not nil.
-func (eu *EventUpdate) SetNillableIsRecurring(b *bool) *EventUpdate {
-	if b != nil {
-		eu.SetIsRecurring(*b)
-	}
-	return eu
-}
-
-// SetIsRecurActive sets the "is_recur_active" field.
-func (eu *EventUpdate) SetIsRecurActive(b bool) *EventUpdate {
-	eu.mutation.SetIsRecurActive(b)
-	return eu
-}
-
-// SetNillableIsRecurActive sets the "is_recur_active" field if the given value is not nil.
-func (eu *EventUpdate) SetNillableIsRecurActive(b *bool) *EventUpdate {
-	if b != nil {
-		eu.SetIsRecurActive(*b)
-	}
-	return eu
-}
-
-// ClearIsRecurActive clears the value of the "is_recur_active" field.
-func (eu *EventUpdate) ClearIsRecurActive() *EventUpdate {
-	eu.mutation.ClearIsRecurActive()
-	return eu
-}
-
-// SetRecurDescription sets the "recur_description" field.
-func (eu *EventUpdate) SetRecurDescription(s string) *EventUpdate {
-	eu.mutation.SetRecurDescription(s)
-	return eu
-}
-
-// SetNillableRecurDescription sets the "recur_description" field if the given value is not nil.
-func (eu *EventUpdate) SetNillableRecurDescription(s *string) *EventUpdate {
-	if s != nil {
-		eu.SetRecurDescription(*s)
-	}
-	return eu
-}
-
-// ClearRecurDescription clears the value of the "recur_description" field.
-func (eu *EventUpdate) ClearRecurDescription() *EventUpdate {
-	eu.mutation.ClearRecurDescription()
-	return eu
-}
-
 // SetStart sets the "start" field.
 func (eu *EventUpdate) SetStart(t time.Time) *EventUpdate {
 	eu.mutation.SetStart(t)
@@ -126,12 +72,6 @@ func (eu *EventUpdate) SetNillableStart(t *time.Time) *EventUpdate {
 	return eu
 }
 
-// ClearStart clears the value of the "start" field.
-func (eu *EventUpdate) ClearStart() *EventUpdate {
-	eu.mutation.ClearStart()
-	return eu
-}
-
 // SetEnd sets the "end" field.
 func (eu *EventUpdate) SetEnd(t time.Time) *EventUpdate {
 	eu.mutation.SetEnd(t)
@@ -143,12 +83,6 @@ func (eu *EventUpdate) SetNillableEnd(t *time.Time) *EventUpdate {
 	if t != nil {
 		eu.SetEnd(*t)
 	}
-	return eu
-}
-
-// ClearEnd clears the value of the "end" field.
-func (eu *EventUpdate) ClearEnd() *EventUpdate {
-	eu.mutation.ClearEnd()
 	return eu
 }
 
@@ -235,32 +169,11 @@ func (eu *EventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := eu.mutation.Description(); ok {
 		_spec.SetField(event.FieldDescription, field.TypeString, value)
 	}
-	if value, ok := eu.mutation.IsRecurring(); ok {
-		_spec.SetField(event.FieldIsRecurring, field.TypeBool, value)
-	}
-	if value, ok := eu.mutation.IsRecurActive(); ok {
-		_spec.SetField(event.FieldIsRecurActive, field.TypeBool, value)
-	}
-	if eu.mutation.IsRecurActiveCleared() {
-		_spec.ClearField(event.FieldIsRecurActive, field.TypeBool)
-	}
-	if value, ok := eu.mutation.RecurDescription(); ok {
-		_spec.SetField(event.FieldRecurDescription, field.TypeString, value)
-	}
-	if eu.mutation.RecurDescriptionCleared() {
-		_spec.ClearField(event.FieldRecurDescription, field.TypeString)
-	}
 	if value, ok := eu.mutation.Start(); ok {
 		_spec.SetField(event.FieldStart, field.TypeTime, value)
 	}
-	if eu.mutation.StartCleared() {
-		_spec.ClearField(event.FieldStart, field.TypeTime)
-	}
 	if value, ok := eu.mutation.End(); ok {
 		_spec.SetField(event.FieldEnd, field.TypeTime, value)
-	}
-	if eu.mutation.EndCleared() {
-		_spec.ClearField(event.FieldEnd, field.TypeTime)
 	}
 	if eu.mutation.CertsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -355,60 +268,6 @@ func (euo *EventUpdateOne) SetNillableDescription(s *string) *EventUpdateOne {
 	return euo
 }
 
-// SetIsRecurring sets the "is_recurring" field.
-func (euo *EventUpdateOne) SetIsRecurring(b bool) *EventUpdateOne {
-	euo.mutation.SetIsRecurring(b)
-	return euo
-}
-
-// SetNillableIsRecurring sets the "is_recurring" field if the given value is not nil.
-func (euo *EventUpdateOne) SetNillableIsRecurring(b *bool) *EventUpdateOne {
-	if b != nil {
-		euo.SetIsRecurring(*b)
-	}
-	return euo
-}
-
-// SetIsRecurActive sets the "is_recur_active" field.
-func (euo *EventUpdateOne) SetIsRecurActive(b bool) *EventUpdateOne {
-	euo.mutation.SetIsRecurActive(b)
-	return euo
-}
-
-// SetNillableIsRecurActive sets the "is_recur_active" field if the given value is not nil.
-func (euo *EventUpdateOne) SetNillableIsRecurActive(b *bool) *EventUpdateOne {
-	if b != nil {
-		euo.SetIsRecurActive(*b)
-	}
-	return euo
-}
-
-// ClearIsRecurActive clears the value of the "is_recur_active" field.
-func (euo *EventUpdateOne) ClearIsRecurActive() *EventUpdateOne {
-	euo.mutation.ClearIsRecurActive()
-	return euo
-}
-
-// SetRecurDescription sets the "recur_description" field.
-func (euo *EventUpdateOne) SetRecurDescription(s string) *EventUpdateOne {
-	euo.mutation.SetRecurDescription(s)
-	return euo
-}
-
-// SetNillableRecurDescription sets the "recur_description" field if the given value is not nil.
-func (euo *EventUpdateOne) SetNillableRecurDescription(s *string) *EventUpdateOne {
-	if s != nil {
-		euo.SetRecurDescription(*s)
-	}
-	return euo
-}
-
-// ClearRecurDescription clears the value of the "recur_description" field.
-func (euo *EventUpdateOne) ClearRecurDescription() *EventUpdateOne {
-	euo.mutation.ClearRecurDescription()
-	return euo
-}
-
 // SetStart sets the "start" field.
 func (euo *EventUpdateOne) SetStart(t time.Time) *EventUpdateOne {
 	euo.mutation.SetStart(t)
@@ -423,12 +282,6 @@ func (euo *EventUpdateOne) SetNillableStart(t *time.Time) *EventUpdateOne {
 	return euo
 }
 
-// ClearStart clears the value of the "start" field.
-func (euo *EventUpdateOne) ClearStart() *EventUpdateOne {
-	euo.mutation.ClearStart()
-	return euo
-}
-
 // SetEnd sets the "end" field.
 func (euo *EventUpdateOne) SetEnd(t time.Time) *EventUpdateOne {
 	euo.mutation.SetEnd(t)
@@ -440,12 +293,6 @@ func (euo *EventUpdateOne) SetNillableEnd(t *time.Time) *EventUpdateOne {
 	if t != nil {
 		euo.SetEnd(*t)
 	}
-	return euo
-}
-
-// ClearEnd clears the value of the "end" field.
-func (euo *EventUpdateOne) ClearEnd() *EventUpdateOne {
-	euo.mutation.ClearEnd()
 	return euo
 }
 
@@ -562,32 +409,11 @@ func (euo *EventUpdateOne) sqlSave(ctx context.Context) (_node *Event, err error
 	if value, ok := euo.mutation.Description(); ok {
 		_spec.SetField(event.FieldDescription, field.TypeString, value)
 	}
-	if value, ok := euo.mutation.IsRecurring(); ok {
-		_spec.SetField(event.FieldIsRecurring, field.TypeBool, value)
-	}
-	if value, ok := euo.mutation.IsRecurActive(); ok {
-		_spec.SetField(event.FieldIsRecurActive, field.TypeBool, value)
-	}
-	if euo.mutation.IsRecurActiveCleared() {
-		_spec.ClearField(event.FieldIsRecurActive, field.TypeBool)
-	}
-	if value, ok := euo.mutation.RecurDescription(); ok {
-		_spec.SetField(event.FieldRecurDescription, field.TypeString, value)
-	}
-	if euo.mutation.RecurDescriptionCleared() {
-		_spec.ClearField(event.FieldRecurDescription, field.TypeString)
-	}
 	if value, ok := euo.mutation.Start(); ok {
 		_spec.SetField(event.FieldStart, field.TypeTime, value)
 	}
-	if euo.mutation.StartCleared() {
-		_spec.ClearField(event.FieldStart, field.TypeTime)
-	}
 	if value, ok := euo.mutation.End(); ok {
 		_spec.SetField(event.FieldEnd, field.TypeTime, value)
-	}
-	if euo.mutation.EndCleared() {
-		_spec.ClearField(event.FieldEnd, field.TypeTime)
 	}
 	if euo.mutation.CertsCleared() {
 		edge := &sqlgraph.EdgeSpec{
