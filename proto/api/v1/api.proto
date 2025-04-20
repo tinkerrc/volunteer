@@ -215,8 +215,6 @@ message ListTimeLogsResponse {
 
 message UpdateTimeLogRequest {
   string id = 1;
-  optional string volunteer_id = 2;
-  optional string event_id = 3;
   optional Duration duration = 4;
   optional google.protobuf.Timestamp date = 5;
 }
