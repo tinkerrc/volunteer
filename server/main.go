@@ -69,7 +69,7 @@ func main() {
 	handler = middleware.Wrap(mux)
 	handler = withCORS(handler)
 	http.ListenAndServeTLS(
-		"0.0.0.0:443",
+		os.Getenv("ADDR"),
 		os.Getenv("TLS_CERT"),
 		os.Getenv("TLS_KEY"),
 		handler,
