@@ -16,6 +16,7 @@ export function EventList() {
         const getEvents = async () => {
             try {
                 if (!isAuthenticated) {
+                    console.log("not authenticated")
                     return
                 }
                 const accessToken = await getAccessTokenSilently({
@@ -24,9 +25,11 @@ export function EventList() {
                         scope: "read:current_user",
                     },
                 });
+                console.log("got access token")
                 const headers = new Headers();
                 headers.set("Authorization", `Bearer ${accessToken}`)
                 const res = await useClient().listEvents({ pageNumber: 1, pageSize: 50 }, { headers })
+                console.log("got events")
                 setEvents(res.events)
             } catch (err) {
                 console.log(err)
