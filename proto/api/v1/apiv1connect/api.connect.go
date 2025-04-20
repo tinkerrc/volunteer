@@ -176,6 +176,7 @@ type VolunteerServiceClient interface {
 	// === VOLUNTEER TRAINING
 	// Requires admin
 	StartTraining(context.Context, *connect.Request[v1.StartTrainingRequest]) (*connect.Response[v1.StartTrainingResponse], error)
+	// Requires admin
 	FinishTraining(context.Context, *connect.Request[v1.FinishTrainingRequest]) (*connect.Response[v1.FinishTrainingResponse], error)
 	ListTrainings(context.Context, *connect.Request[v1.ListTrainingsRequest]) (*connect.Response[v1.ListTrainingsResponse], error)
 	DeleteTraining(context.Context, *connect.Request[v1.DeleteTrainingRequest]) (*connect.Response[v1.DeleteTrainingResponse], error)
@@ -557,6 +558,7 @@ type VolunteerServiceHandler interface {
 	// === VOLUNTEER TRAINING
 	// Requires admin
 	StartTraining(context.Context, *connect.Request[v1.StartTrainingRequest]) (*connect.Response[v1.StartTrainingResponse], error)
+	// Requires admin
 	FinishTraining(context.Context, *connect.Request[v1.FinishTrainingRequest]) (*connect.Response[v1.FinishTrainingResponse], error)
 	ListTrainings(context.Context, *connect.Request[v1.ListTrainingsRequest]) (*connect.Response[v1.ListTrainingsResponse], error)
 	DeleteTraining(context.Context, *connect.Request[v1.DeleteTrainingRequest]) (*connect.Response[v1.DeleteTrainingResponse], error)
