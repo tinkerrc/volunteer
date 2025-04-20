@@ -1,4 +1,4 @@
-import { AppShell, AppShellNavbar } from '@mantine/core';
+import { AppShell, AppShellMain, AppShellNavbar } from '@mantine/core';
 import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom';
 import { Nav } from './components/Nav/Nav';
 import { CertsPage } from './pages/Certs.page';
@@ -9,7 +9,7 @@ const AppLayout = () => (
   <>
     <AppShell>
       <AppShellNavbar><Nav></Nav></AppShellNavbar>
-      <Outlet />
+      <AppShellMain><Outlet /></AppShellMain>
     </AppShell>
   </>
 )
