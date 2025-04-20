@@ -183,8 +183,11 @@ type VolunteerServiceClient interface {
 	// Requires user
 	DeleteTraining(context.Context, *connect.Request[v1.DeleteTrainingRequest]) (*connect.Response[v1.DeleteTrainingResponse], error)
 	// === CERTS
+	// Requires user
 	CreateCert(context.Context, *connect.Request[v1.CreateCertRequest]) (*connect.Response[v1.CreateCertResponse], error)
+	// Requires user
 	ListCerts(context.Context, *connect.Request[v1.ListCertsRequest]) (*connect.Response[v1.ListCertsResponse], error)
+	// Requires user
 	GetCert(context.Context, *connect.Request[v1.GetCertRequest]) (*connect.Response[v1.GetCertResponse], error)
 	UpdateCert(context.Context, *connect.Request[v1.UpdateCertRequest]) (*connect.Response[v1.UpdateCertResponse], error)
 	DeleteCert(context.Context, *connect.Request[v1.DeleteCertRequest]) (*connect.Response[v1.DeleteCertResponse], error)
@@ -567,8 +570,11 @@ type VolunteerServiceHandler interface {
 	// Requires user
 	DeleteTraining(context.Context, *connect.Request[v1.DeleteTrainingRequest]) (*connect.Response[v1.DeleteTrainingResponse], error)
 	// === CERTS
+	// Requires user
 	CreateCert(context.Context, *connect.Request[v1.CreateCertRequest]) (*connect.Response[v1.CreateCertResponse], error)
+	// Requires user
 	ListCerts(context.Context, *connect.Request[v1.ListCertsRequest]) (*connect.Response[v1.ListCertsResponse], error)
+	// Requires user
 	GetCert(context.Context, *connect.Request[v1.GetCertRequest]) (*connect.Response[v1.GetCertResponse], error)
 	UpdateCert(context.Context, *connect.Request[v1.UpdateCertRequest]) (*connect.Response[v1.UpdateCertResponse], error)
 	DeleteCert(context.Context, *connect.Request[v1.DeleteCertRequest]) (*connect.Response[v1.DeleteCertResponse], error)
