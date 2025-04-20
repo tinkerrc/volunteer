@@ -25,6 +25,7 @@ func (s *APIServer) CreateVolunteer(
 		SetLastName(msg.LastName).
 		SetPhone(msg.Phone).
 		SetAddress(msg.Address).
+		SetNotes("").
 		Save(ctx)
 	if err != nil {
 		// return nil, connect.NewError(connect.CodeInternal, errors.New("failed to create volunteer"))
