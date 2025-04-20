@@ -10,4 +10,9 @@ export default defineConfig({
     setupFiles: './vitest.setup.mjs',
   },
   server: { allowedHosts: ["127.0.0.1", "yolovms.org"] },
+  resolve: {
+    alias: {
+      '@tabler/icons-react': '@tabler/icons-react/dist/esm/icons/index.mjs',
+    }
+  }
 });
