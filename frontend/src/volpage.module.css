@@ -1,0 +1,357 @@
+.finalVolPageChild {
+    position: absolute;
+    top: -97px;
+    left: 306px;
+    background-color: #d9d9d9;
+    width: 1px;
+    height: 1216px;
+}
+.finalVolPageItem {
+    position: absolute;
+    top: 1172px;
+    left: 369px;
+    background-color: #d9d9d9;
+    width: 999px;
+    height: 54px;
+}
+.name {
+    position: absolute;
+    top: 169px;
+    left: 359px;
+}
+.email {
+    position: absolute;
+    top: 168px;
+    left: 535px;
+}
+.phone {
+    position: absolute;
+    top: 169px;
+    left: 788px;
+}
+.hours {
+    position: absolute;
+    top: 169px;
+    left: 986px;
+}
+.role {
+    position: absolute;
+    top: 169px;
+    left: 1300px;
+}
+.component1Child {
+    position: absolute;
+    height: 100%;
+    width: 89.55%;
+    top: 0%;
+    right: 0%;
+    bottom: 0%;
+    left: 10.45%;
+    border-radius: 20px;
+    background-color: #f7f7f7;
+}
+.searchVolunteers {
+    position: absolute;
+    height: 62.86%;
+    width: 14.33%;
+    top: 25.71%;
+    left: 17.23%;
+    display: inline-block;
+}
+.icroundAddIcon {
+    position: absolute;
+    width: 3%;
+    top: 1px;
+    right: 97%;
+    left: 0%;
+    max-width: 100%;
+    overflow: hidden;
+    height: 31px;
+}
+.materialSymbolseditOutlineIcon {
+    position: absolute;
+    width: 2.23%;
+    top: 5px;
+    right: 92.06%;
+    left: 5.71%;
+    max-width: 100%;
+    overflow: hidden;
+    height: 22px;
+}
+.materialSymbolssearchRoundeIcon {
+    position: absolute;
+    width: 2.81%;
+    top: 4px;
+    right: 85.96%;
+    left: 11.23%;
+    max-width: 100%;
+    overflow: hidden;
+    height: 29px;
+}
+.component1 {
+    position: absolute;
+    top: 57px;
+    left: 366px;
+    width: 1033px;
+    height: 35px;
+    font-size: 16px;
+}
+.image7Icon {
+    position: absolute;
+    top: 55px;
+    left: 41px;
+    width: 232.9px;
+    height: 36px;
+    object-fit: cover;
+}
+.status {
+    position: relative;
+}
+.fluentfilter24FilledIcon {
+    width: 24px;
+    position: relative;
+    max-height: 100%;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+.statusParent {
+    position: absolute;
+    top: 166px;
+    left: 1100px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+}
+.cardVolChild {
+    width: 1058px;
+    position: relative;
+    border-radius: 20px;
+    background-color: #d9d9d9;
+    height: 1px;
+}
+.gillianBarnesWong {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+}
+.gbarneswonggmailcom {
+    position: absolute;
+    top: 0px;
+    left: 172px;
+}
+.div {
+    position: absolute;
+    top: 0px;
+    left: 425px;
+}
+.gillianBarnesWongParent {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 636px;
+    height: 19px;
+}
+.div1 {
+    position: absolute;
+    top: 10px;
+    left: 646px;
+}
+.frameGroup {
+    width: 656px;
+    position: relative;
+    height: 39px;
+}
+.trainingInProgress {
+    position: relative;
+    font-weight: 500;
+}
+.trainingInProgressWrapper {
+    border-radius: 10px;
+    background-color: rgba(8, 97, 180, 0.14);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    color: #0053a0;
+}
+.peerMentorWrapper {
+    border-radius: 7.5px;
+    background-color: #f5f5f5;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 7.5px;
+    font-size: 12px;
+}
+.frameParent {
+    align-self: stretch;
+    background-color: #fff;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 10px 20px;
+    gap: 50px;
+}
+.cardVol {
+    position: absolute;
+    top: 443px;
+    left: 333px;
+    width: 1072px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 10px;
+    font-size: 16px;
+    color: #222;
+}
+.cardVol1 {
+    position: absolute;
+    top: 363px;
+    left: 333px;
+    width: 1072px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 10px;
+    font-size: 16px;
+    color: #222;
+}
+.div5 {
+    position: absolute;
+    top: 10px;
+    left: 638px;
+}
+.availableWrapper {
+    border-radius: 10px;
+    background-color: rgba(137, 166, 32, 0.17);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    color: #546b00;
+}
+.frameParent1 {
+    align-self: stretch;
+    background-color: #fff;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 10px 20px;
+    gap: 91px;
+}
+.cardAailable {
+    position: absolute;
+    top: 283px;
+    left: 333px;
+    width: 1072px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 10px;
+    font-size: 16px;
+    color: #222;
+}
+.cardAailable1 {
+    position: absolute;
+    top: 202px;
+    left: 333px;
+    width: 1072px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 10px;
+    font-size: 16px;
+    color: #222;
+}
+.awaitingTrainingWrapper {
+    border-radius: 10px;
+    background-color: rgba(224, 0, 0, 0.13);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    color: #e00000;
+}
+.frameParent5 {
+    align-self: stretch;
+    background-color: #fff;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 10px 20px;
+    gap: 60px;
+}
+.cardAwaitingTraining {
+    position: absolute;
+    top: 523px;
+    left: 333px;
+    width: 1072px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 10px;
+    font-size: 16px;
+    color: #222;
+}
+.navDashChild {
+    position: absolute;
+    height: 17.2%;
+    width: 101.48%;
+    top: 39.78%;
+    right: -1.48%;
+    bottom: 43.01%;
+    left: 0%;
+    border-radius: 10px;
+    background-color: #0053a0;
+}
+.dashboard {
+    position: absolute;
+    top: 17.2%;
+    left: 9.63%;
+    line-height: 121.47%;
+}
+.volunteers {
+    position: absolute;
+    top: 43.55%;
+    left: 9.63%;
+    color: #fff;
+}
+.coordinatorInfo {
+    position: absolute;
+    top: 70.43%;
+    left: 9.63%;
+}
+.navDash {
+    position: absolute;
+    top: 142px;
+    left: 22px;
+    width: 270px;
+    height: 186px;
+    font-size: 14px;
+}
+.finalVolPage {
+    width: 100%;
+    position: relative;
+    background-color: #fff;
+    height: 1024px;
+    overflow: hidden;
+    text-align: left;
+    font-size: 15px;
+    color: #535353;
+    font-family: Inter;
+}
+

@@ -1,0 +1,435 @@
+.finalDashChild {
+    position: absolute;
+    top: 1352px;
+    left: 361px;
+    border-radius: 20px;
+    border: 2px solid rgba(159, 159, 159, 0.31);
+    box-sizing: border-box;
+    width: 1014px;
+    height: 151px;
+}
+.june {
+    margin: 0;
+}
+.june6 {
+    position: absolute;
+    top: 1402px;
+    left: 444px;
+    text-align: center;
+}
+.familySupportGroup {
+    position: absolute;
+    top: 1378px;
+    left: 614px;
+}
+.unfilledSlots {
+    position: absolute;
+    top: 1371px;
+    left: 1208px;
+    font-size: 20px;
+    color: #ff0000;
+}
+.pm4pm {
+    position: absolute;
+    top: 1431px;
+    left: 614px;
+    font-size: 20px;
+    color: #6b6767;
+}
+.fri {
+    position: absolute;
+    top: 1378px;
+    left: 468px;
+    font-size: 20px;
+}
+.finalDashItem {
+    position: absolute;
+    top: 1379px;
+    left: 585px;
+    background-color: #d9d9d9;
+    width: 2px;
+    height: 97px;
+}
+.finalDashInner {
+    position: absolute;
+    top: 0px;
+    left: 305px;
+    background-color: #d9d9d9;
+    width: 1px;
+    height: 1274px;
+}
+.rectangleDiv {
+    position: absolute;
+    top: 1434px;
+    left: 1105px;
+    border-radius: 20px;
+    border: 2px solid #ff0000;
+    box-sizing: border-box;
+    width: 253px;
+    height: 36px;
+}
+.requestVolunteer {
+    position: absolute;
+    top: 1440px;
+    left: 1143px;
+    font-size: 20px;
+    font-weight: 500;
+    color: #ff0000;
+}
+.required {
+    position: absolute;
+    top: 1395px;
+    left: 1268px;
+    font-size: 16px;
+    color: #6b6767;
+}
+.rimoreFillIcon {
+    position: absolute;
+    top: 1416px;
+    left: 1382px;
+    width: 24px;
+    height: 24px;
+    overflow: hidden;
+    object-fit: contain;
+}
+.finalDashChild1 {
+    position: absolute;
+    top: 57px;
+    left: 361px;
+    border-radius: 20px;
+    background-color: #0053a0;
+    width: 39px;
+    height: 39px;
+}
+.icroundAddIcon {
+    position: absolute;
+    top: 60px;
+    left: 365px;
+    width: 31px;
+    height: 31px;
+    overflow: hidden;
+}
+.materialSymbolseditOutlineIcon {
+    position: absolute;
+    top: 60px;
+    left: 1281px;
+    width: 28px;
+    height: 29px;
+    overflow: hidden;
+}
+.mifilterIcon {
+    position: absolute;
+    top: 59px;
+    left: 1330px;
+    width: 31px;
+    height: 31px;
+    overflow: hidden;
+}
+.upcomingEvents {
+    align-self: stretch;
+    position: relative;
+}
+.next6Months {
+    align-self: stretch;
+    position: relative;
+    font-size: 20px;
+    color: #6b6767;
+}
+.upcomingEventsParent {
+    width: 275px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 13px;
+}
+.may26 {
+    align-self: stretch;
+    position: relative;
+    font-size: 32px;
+    color: #222;
+}
+.monParent {
+    width: 66px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+}
+.frameChild {
+    width: 2px;
+    position: relative;
+    border-radius: 0.5px;
+    background-color: #d9d9d9;
+    height: 97px;
+}
+.familySupportGroup1 {
+    align-self: stretch;
+    position: relative;
+    font-weight: 500;
+}
+.pm3pm {
+    position: relative;
+}
+.frameItem {
+    width: 4px;
+    position: relative;
+    border-radius: 50%;
+    background-color: #6b6767;
+    height: 4px;
+}
+.filledSlots {
+    position: relative;
+    color: #009951;
+}
+.pm3pmParent {
+    align-self: stretch;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    font-size: 20px;
+    color: #6b6767;
+}
+.familySupportGroupParent {
+    width: 275px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 10px;
+    text-align: left;
+    font-size: 24px;
+    color: #222;
+}
+.frameGroup {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 38px;
+}
+.manageVolunteers {
+    position: relative;
+    font-weight: 500;
+}
+.manageVolunteersWrapper {
+    border-radius: 10px;
+    border: 1px solid #6b6767;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+}
+.rimoreFillIcon1 {
+    width: 24px;
+    position: relative;
+    max-height: 100%;
+    overflow: hidden;
+    flex-shrink: 0;
+    object-fit: contain;
+}
+.frameContainer {
+    width: 275px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 25px;
+    text-align: left;
+    color: #6b6767;
+}
+.card {
+    align-self: stretch;
+    border-radius: 20px;
+    border: 2px solid rgba(159, 159, 159, 0.31);
+    box-sizing: border-box;
+    height: 151px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0px 22px 0px 38px;
+    gap: 257px;
+    text-align: center;
+    font-size: 20px;
+    color: #8f8f8f;
+}
+.frameParent {
+    position: absolute;
+    top: 862px;
+    left: 361px;
+    width: 1014px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 31px;
+}
+.unfilledEventsParent {
+    width: 236px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 13px;
+}
+.filledSlots1 {
+    position: relative;
+    color: #ec221f;
+}
+.manageVolunteersContainer {
+    border-radius: 10px;
+    background-color: #0053a0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+}
+.frameParent2 {
+    width: 275px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 25px;
+    text-align: left;
+    color: #fff;
+}
+.card1 {
+    align-self: stretch;
+    border-radius: 20px;
+    border: 2px solid rgba(159, 159, 159, 0.31);
+    box-sizing: border-box;
+    height: 151px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0px 22px 0px 38px;
+    gap: 257px;
+}
+.cardParent {
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 17px;
+    text-align: center;
+    font-size: 20px;
+    color: #8f8f8f;
+    height: 500px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+.frameDiv {
+    position: absolute;
+    top: 147px;
+    left: 361px;
+    width: 1014px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 31px;
+}
+.finalDashChild2 {
+    position: absolute;
+    top: 57px;
+    left: 425px;
+    border-radius: 20px;
+    background-color: #f7f7f7;
+    width: 837px;
+    height: 35px;
+}
+.searchEvent {
+    position: absolute;
+    top: 66px;
+    left: 476px;
+    font-size: 16px;
+    color: #535353;
+    display: inline-block;
+    width: 130px;
+    height: 22px;
+}
+.view5More {
+    position: absolute;
+    top: 758px;
+    left: 1245px;
+    font-size: 16px;
+    text-decoration: underline;
+    color: #535353;
+    text-align: right;
+    display: inline-block;
+    width: 130px;
+    height: 22px;
+}
+.materialSymbolssearchRoundeIcon {
+    position: absolute;
+    top: 61px;
+    left: 436px;
+    width: 29px;
+    height: 29px;
+    overflow: hidden;
+}
+.image7Icon {
+    position: absolute;
+    top: 55px;
+    left: 41px;
+    width: 232.9px;
+    height: 36px;
+    object-fit: cover;
+}
+.navDashChild {
+    position: absolute;
+    height: 17.2%;
+    width: 101.48%;
+    top: -3.76%;
+    right: -1.48%;
+    bottom: 86.56%;
+    left: 0%;
+    border-radius: 10px;
+    background-color: #0053a0;
+}
+.dashboard {
+    position: absolute;
+    top: 0%;
+    left: 9.63%;
+    color: #fff;
+}
+.volunteers {
+    position: absolute;
+    top: 26.88%;
+    left: 9.63%;
+}
+.coordinatorInfo {
+    position: absolute;
+    top: 49.46%;
+    left: 9.63%;
+}
+.navDash {
+    position: absolute;
+    top: 147px;
+    left: 22px;
+    width: 270px;
+    height: 186px;
+    font-size: 14px;
+    color: #535353;
+}
+.finalDash {
+    width: 100%;
+    position: relative;
+    background-color: #fff;
+    height: 1226px;
+    overflow: hidden;
+    text-align: left;
+    font-size: 32px;
+    color: #222;
+    font-family: Inter;
+}
+

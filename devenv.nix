@@ -23,13 +23,19 @@
 
     buf
     grpcurl
-    protoc-gen-go
+    protoc-gen-go    
+    protoc-gen-es
     protoc-gen-connect-go
+    protoc-gen-connect-es
 
     nixfmt-rfc-style
   ];
 
   languages.go.enable = true;
+  languages.javascript = {
+    enable = true;
+    npm.enable = true;
+  };
 
   git-hooks.hooks.gofmt.enable = true;
 
