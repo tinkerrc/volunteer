@@ -64,7 +64,7 @@ export function Nav() {
                 </Stack>
             </div>
 
-            <Stack justify="center" gap={0}>
+            <Stack justify="center" gap={0} mb="md">
                 <NavbarLink icon={IconSwitchHorizontal} label="Change account" to="/login" />
                 <NavbarLink icon={IconLogout} label="Logout" to="/logout" />
             </Stack>
