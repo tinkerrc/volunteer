@@ -46,7 +46,7 @@ export const CreateVolunteerForm = () => {
             });
             const headers = new Headers();
             headers.set("Authorization", `Bearer ${accessToken}`)
-            const res = await client.createVolunteer({ ...values });
+            const res = await client.createVolunteer({ ...values }, { headers });
         } catch (err) {
             console.log(err)
         }
