@@ -13,13 +13,16 @@ func (s *APIServer) GetVolunteer(
 	ctx context.Context,
 	req *connect.Request[apiv1.GetVolunteerRequest],
 ) (*connect.Response[apiv1.GetVolunteerResponse], error) {
-	// u, ok := authn.GetInfo(ctx).(ent.User)
-	// if !ok {
-	// 	return nil, authn.Errorf("unauthenticated")
-	// }
-
+	v, err := s.ensureVolunteer(ctx)
+	if err != nil {
+		return nil, err
+	}
+	p, err := s.getVolunteerProto(ctx, v)
+	if err != nil {
+		return nil, err
+	}
 	res := connect.NewResponse(&apiv1.GetVolunteerResponse{
-		Volunteer: &apiv1.Volunteer{},
+		Volunteer: p,
 	})
 	return res, nil
 }

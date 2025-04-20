@@ -11,17 +11,23 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
+	"github.com/tinkerrc/volunteer/ent/event"
 	"github.com/tinkerrc/volunteer/ent/predicate"
 	"github.com/tinkerrc/volunteer/ent/timelog"
+	"github.com/tinkerrc/volunteer/ent/volunteer"
 )
 
 // TimeLogQuery is the builder for querying TimeLog entities.
 type TimeLogQuery struct {
 	config
-	ctx        *QueryContext
-	order      []timelog.OrderOption
-	inters     []Interceptor
-	predicates []predicate.TimeLog
+	ctx           *QueryContext
+	order         []timelog.OrderOption
+	inters        []Interceptor
+	predicates    []predicate.TimeLog
+	withVolunteer *VolunteerQuery
+	withEvent     *EventQuery
+	withFKs       bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -58,6 +64,50 @@ func (tlq *TimeLogQuery) Order(o ...timelog.OrderOption) *TimeLogQuery {
 	return tlq
 }
 
+// QueryVolunteer chains the current query on the "volunteer" edge.
+func (tlq *TimeLogQuery) QueryVolunteer() *VolunteerQuery {
+	query := (&VolunteerClient{config: tlq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := tlq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := tlq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(timelog.Table, timelog.FieldID, selector),
+			sqlgraph.To(volunteer.Table, volunteer.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, timelog.VolunteerTable, timelog.VolunteerColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(tlq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryEvent chains the current query on the "event" edge.
+func (tlq *TimeLogQuery) QueryEvent() *EventQuery {
+	query := (&EventClient{config: tlq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := tlq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := tlq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(timelog.Table, timelog.FieldID, selector),
+			sqlgraph.To(event.Table, event.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, timelog.EventTable, timelog.EventColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(tlq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // First returns the first TimeLog entity from the query.
 // Returns a *NotFoundError when no TimeLog was found.
 func (tlq *TimeLogQuery) First(ctx context.Context) (*TimeLog, error) {
@@ -82,8 +132,8 @@ func (tlq *TimeLogQuery) FirstX(ctx context.Context) *TimeLog {
 
 // FirstID returns the first TimeLog ID from the query.
 // Returns a *NotFoundError when no TimeLog ID was found.
-func (tlq *TimeLogQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (tlq *TimeLogQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = tlq.Limit(1).IDs(setContextOp(ctx, tlq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
@@ -95,7 +145,7 @@ func (tlq *TimeLogQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (tlq *TimeLogQuery) FirstIDX(ctx context.Context) int {
+func (tlq *TimeLogQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	id, err := tlq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -133,8 +183,8 @@ func (tlq *TimeLogQuery) OnlyX(ctx context.Context) *TimeLog {
 // OnlyID is like Only, but returns the only TimeLog ID in the query.
 // Returns a *NotSingularError when more than one TimeLog ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (tlq *TimeLogQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (tlq *TimeLogQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = tlq.Limit(2).IDs(setContextOp(ctx, tlq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
@@ -150,7 +200,7 @@ func (tlq *TimeLogQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (tlq *TimeLogQuery) OnlyIDX(ctx context.Context) int {
+func (tlq *TimeLogQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	id, err := tlq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -178,7 +228,7 @@ func (tlq *TimeLogQuery) AllX(ctx context.Context) []*TimeLog {
 }
 
 // IDs executes the query and returns a list of TimeLog IDs.
-func (tlq *TimeLogQuery) IDs(ctx context.Context) (ids []int, err error) {
+func (tlq *TimeLogQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error) {
 	if tlq.ctx.Unique == nil && tlq.path != nil {
 		tlq.Unique(true)
 	}
@@ -190,7 +240,7 @@ func (tlq *TimeLogQuery) IDs(ctx context.Context) (ids []int, err error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (tlq *TimeLogQuery) IDsX(ctx context.Context) []int {
+func (tlq *TimeLogQuery) IDsX(ctx context.Context) []uuid.UUID {
 	ids, err := tlq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -245,19 +295,55 @@ func (tlq *TimeLogQuery) Clone() *TimeLogQuery {
 		return nil
 	}
 	return &TimeLogQuery{
-		config:     tlq.config,
-		ctx:        tlq.ctx.Clone(),
-		order:      append([]timelog.OrderOption{}, tlq.order...),
-		inters:     append([]Interceptor{}, tlq.inters...),
-		predicates: append([]predicate.TimeLog{}, tlq.predicates...),
+		config:        tlq.config,
+		ctx:           tlq.ctx.Clone(),
+		order:         append([]timelog.OrderOption{}, tlq.order...),
+		inters:        append([]Interceptor{}, tlq.inters...),
+		predicates:    append([]predicate.TimeLog{}, tlq.predicates...),
+		withVolunteer: tlq.withVolunteer.Clone(),
+		withEvent:     tlq.withEvent.Clone(),
 		// clone intermediate query.
 		sql:  tlq.sql.Clone(),
 		path: tlq.path,
 	}
 }
 
+// WithVolunteer tells the query-builder to eager-load the nodes that are connected to
+// the "volunteer" edge. The optional arguments are used to configure the query builder of the edge.
+func (tlq *TimeLogQuery) WithVolunteer(opts ...func(*VolunteerQuery)) *TimeLogQuery {
+	query := (&VolunteerClient{config: tlq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	tlq.withVolunteer = query
+	return tlq
+}
+
+// WithEvent tells the query-builder to eager-load the nodes that are connected to
+// the "event" edge. The optional arguments are used to configure the query builder of the edge.
+func (tlq *TimeLogQuery) WithEvent(opts ...func(*EventQuery)) *TimeLogQuery {
+	query := (&EventClient{config: tlq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	tlq.withEvent = query
+	return tlq
+}
+
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
+//
+// Example:
+//
+//	var v []struct {
+//		Hours int `json:"hours,omitempty"`
+//		Count int `json:"count,omitempty"`
+//	}
+//
+//	client.TimeLog.Query().
+//		GroupBy(timelog.FieldHours).
+//		Aggregate(ent.Count()).
+//		Scan(ctx, &v)
 func (tlq *TimeLogQuery) GroupBy(field string, fields ...string) *TimeLogGroupBy {
 	tlq.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &TimeLogGroupBy{build: tlq}
@@ -269,6 +355,16 @@ func (tlq *TimeLogQuery) GroupBy(field string, fields ...string) *TimeLogGroupBy
 
 // Select allows the selection one or more fields/columns for the given query,
 // instead of selecting all fields in the entity.
+//
+// Example:
+//
+//	var v []struct {
+//		Hours int `json:"hours,omitempty"`
+//	}
+//
+//	client.TimeLog.Query().
+//		Select(timelog.FieldHours).
+//		Scan(ctx, &v)
 func (tlq *TimeLogQuery) Select(fields ...string) *TimeLogSelect {
 	tlq.ctx.Fields = append(tlq.ctx.Fields, fields...)
 	sbuild := &TimeLogSelect{TimeLogQuery: tlq}
@@ -310,15 +406,27 @@ func (tlq *TimeLogQuery) prepareQuery(ctx context.Context) error {
 
 func (tlq *TimeLogQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*TimeLog, error) {
 	var (
-		nodes = []*TimeLog{}
-		_spec = tlq.querySpec()
+		nodes       = []*TimeLog{}
+		withFKs     = tlq.withFKs
+		_spec       = tlq.querySpec()
+		loadedTypes = [2]bool{
+			tlq.withVolunteer != nil,
+			tlq.withEvent != nil,
+		}
 	)
+	if tlq.withVolunteer != nil || tlq.withEvent != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, timelog.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*TimeLog).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &TimeLog{config: tlq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -330,7 +438,84 @@ func (tlq *TimeLogQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Tim
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := tlq.withVolunteer; query != nil {
+		if err := tlq.loadVolunteer(ctx, query, nodes, nil,
+			func(n *TimeLog, e *Volunteer) { n.Edges.Volunteer = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := tlq.withEvent; query != nil {
+		if err := tlq.loadEvent(ctx, query, nodes, nil,
+			func(n *TimeLog, e *Event) { n.Edges.Event = e }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
+}
+
+func (tlq *TimeLogQuery) loadVolunteer(ctx context.Context, query *VolunteerQuery, nodes []*TimeLog, init func(*TimeLog), assign func(*TimeLog, *Volunteer)) error {
+	ids := make([]uuid.UUID, 0, len(nodes))
+	nodeids := make(map[uuid.UUID][]*TimeLog)
+	for i := range nodes {
+		if nodes[i].time_log_volunteer == nil {
+			continue
+		}
+		fk := *nodes[i].time_log_volunteer
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(volunteer.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "time_log_volunteer" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (tlq *TimeLogQuery) loadEvent(ctx context.Context, query *EventQuery, nodes []*TimeLog, init func(*TimeLog), assign func(*TimeLog, *Event)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*TimeLog)
+	for i := range nodes {
+		if nodes[i].time_log_event == nil {
+			continue
+		}
+		fk := *nodes[i].time_log_event
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(event.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "time_log_event" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
 }
 
 func (tlq *TimeLogQuery) sqlCount(ctx context.Context) (int, error) {
@@ -343,7 +528,7 @@ func (tlq *TimeLogQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (tlq *TimeLogQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(timelog.Table, timelog.Columns, sqlgraph.NewFieldSpec(timelog.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewQuerySpec(timelog.Table, timelog.Columns, sqlgraph.NewFieldSpec(timelog.FieldID, field.TypeUUID))
 	_spec.From = tlq.sql
 	if unique := tlq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique

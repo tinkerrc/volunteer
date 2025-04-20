@@ -6,12 +6,16 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
+	"github.com/tinkerrc/volunteer/ent/event"
 	"github.com/tinkerrc/volunteer/ent/predicate"
 	"github.com/tinkerrc/volunteer/ent/timelog"
+	"github.com/tinkerrc/volunteer/ent/volunteer"
 )
 
 // TimeLogUpdate is the builder for updating TimeLog entities.
@@ -27,9 +31,107 @@ func (tlu *TimeLogUpdate) Where(ps ...predicate.TimeLog) *TimeLogUpdate {
 	return tlu
 }
 
+// SetHours sets the "hours" field.
+func (tlu *TimeLogUpdate) SetHours(i int) *TimeLogUpdate {
+	tlu.mutation.ResetHours()
+	tlu.mutation.SetHours(i)
+	return tlu
+}
+
+// SetNillableHours sets the "hours" field if the given value is not nil.
+func (tlu *TimeLogUpdate) SetNillableHours(i *int) *TimeLogUpdate {
+	if i != nil {
+		tlu.SetHours(*i)
+	}
+	return tlu
+}
+
+// AddHours adds i to the "hours" field.
+func (tlu *TimeLogUpdate) AddHours(i int) *TimeLogUpdate {
+	tlu.mutation.AddHours(i)
+	return tlu
+}
+
+// SetMinutes sets the "minutes" field.
+func (tlu *TimeLogUpdate) SetMinutes(i int) *TimeLogUpdate {
+	tlu.mutation.ResetMinutes()
+	tlu.mutation.SetMinutes(i)
+	return tlu
+}
+
+// SetNillableMinutes sets the "minutes" field if the given value is not nil.
+func (tlu *TimeLogUpdate) SetNillableMinutes(i *int) *TimeLogUpdate {
+	if i != nil {
+		tlu.SetMinutes(*i)
+	}
+	return tlu
+}
+
+// AddMinutes adds i to the "minutes" field.
+func (tlu *TimeLogUpdate) AddMinutes(i int) *TimeLogUpdate {
+	tlu.mutation.AddMinutes(i)
+	return tlu
+}
+
+// SetDate sets the "date" field.
+func (tlu *TimeLogUpdate) SetDate(t time.Time) *TimeLogUpdate {
+	tlu.mutation.SetDate(t)
+	return tlu
+}
+
+// SetNillableDate sets the "date" field if the given value is not nil.
+func (tlu *TimeLogUpdate) SetNillableDate(t *time.Time) *TimeLogUpdate {
+	if t != nil {
+		tlu.SetDate(*t)
+	}
+	return tlu
+}
+
+// SetVolunteerID sets the "volunteer" edge to the Volunteer entity by ID.
+func (tlu *TimeLogUpdate) SetVolunteerID(id uuid.UUID) *TimeLogUpdate {
+	tlu.mutation.SetVolunteerID(id)
+	return tlu
+}
+
+// SetVolunteer sets the "volunteer" edge to the Volunteer entity.
+func (tlu *TimeLogUpdate) SetVolunteer(v *Volunteer) *TimeLogUpdate {
+	return tlu.SetVolunteerID(v.ID)
+}
+
+// SetEventID sets the "event" edge to the Event entity by ID.
+func (tlu *TimeLogUpdate) SetEventID(id int) *TimeLogUpdate {
+	tlu.mutation.SetEventID(id)
+	return tlu
+}
+
+// SetNillableEventID sets the "event" edge to the Event entity by ID if the given value is not nil.
+func (tlu *TimeLogUpdate) SetNillableEventID(id *int) *TimeLogUpdate {
+	if id != nil {
+		tlu = tlu.SetEventID(*id)
+	}
+	return tlu
+}
+
+// SetEvent sets the "event" edge to the Event entity.
+func (tlu *TimeLogUpdate) SetEvent(e *Event) *TimeLogUpdate {
+	return tlu.SetEventID(e.ID)
+}
+
 // Mutation returns the TimeLogMutation object of the builder.
 func (tlu *TimeLogUpdate) Mutation() *TimeLogMutation {
 	return tlu.mutation
+}
+
+// ClearVolunteer clears the "volunteer" edge to the Volunteer entity.
+func (tlu *TimeLogUpdate) ClearVolunteer() *TimeLogUpdate {
+	tlu.mutation.ClearVolunteer()
+	return tlu
+}
+
+// ClearEvent clears the "event" edge to the Event entity.
+func (tlu *TimeLogUpdate) ClearEvent() *TimeLogUpdate {
+	tlu.mutation.ClearEvent()
+	return tlu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -59,14 +161,98 @@ func (tlu *TimeLogUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (tlu *TimeLogUpdate) check() error {
+	if tlu.mutation.VolunteerCleared() && len(tlu.mutation.VolunteerIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "TimeLog.volunteer"`)
+	}
+	return nil
+}
+
 func (tlu *TimeLogUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	_spec := sqlgraph.NewUpdateSpec(timelog.Table, timelog.Columns, sqlgraph.NewFieldSpec(timelog.FieldID, field.TypeInt))
+	if err := tlu.check(); err != nil {
+		return n, err
+	}
+	_spec := sqlgraph.NewUpdateSpec(timelog.Table, timelog.Columns, sqlgraph.NewFieldSpec(timelog.FieldID, field.TypeUUID))
 	if ps := tlu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := tlu.mutation.Hours(); ok {
+		_spec.SetField(timelog.FieldHours, field.TypeInt, value)
+	}
+	if value, ok := tlu.mutation.AddedHours(); ok {
+		_spec.AddField(timelog.FieldHours, field.TypeInt, value)
+	}
+	if value, ok := tlu.mutation.Minutes(); ok {
+		_spec.SetField(timelog.FieldMinutes, field.TypeInt, value)
+	}
+	if value, ok := tlu.mutation.AddedMinutes(); ok {
+		_spec.AddField(timelog.FieldMinutes, field.TypeInt, value)
+	}
+	if value, ok := tlu.mutation.Date(); ok {
+		_spec.SetField(timelog.FieldDate, field.TypeTime, value)
+	}
+	if tlu.mutation.VolunteerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   timelog.VolunteerTable,
+			Columns: []string{timelog.VolunteerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(volunteer.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tlu.mutation.VolunteerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   timelog.VolunteerTable,
+			Columns: []string{timelog.VolunteerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(volunteer.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if tlu.mutation.EventCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   timelog.EventTable,
+			Columns: []string{timelog.EventColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tlu.mutation.EventIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   timelog.EventTable,
+			Columns: []string{timelog.EventColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, tlu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -88,9 +274,107 @@ type TimeLogUpdateOne struct {
 	mutation *TimeLogMutation
 }
 
+// SetHours sets the "hours" field.
+func (tluo *TimeLogUpdateOne) SetHours(i int) *TimeLogUpdateOne {
+	tluo.mutation.ResetHours()
+	tluo.mutation.SetHours(i)
+	return tluo
+}
+
+// SetNillableHours sets the "hours" field if the given value is not nil.
+func (tluo *TimeLogUpdateOne) SetNillableHours(i *int) *TimeLogUpdateOne {
+	if i != nil {
+		tluo.SetHours(*i)
+	}
+	return tluo
+}
+
+// AddHours adds i to the "hours" field.
+func (tluo *TimeLogUpdateOne) AddHours(i int) *TimeLogUpdateOne {
+	tluo.mutation.AddHours(i)
+	return tluo
+}
+
+// SetMinutes sets the "minutes" field.
+func (tluo *TimeLogUpdateOne) SetMinutes(i int) *TimeLogUpdateOne {
+	tluo.mutation.ResetMinutes()
+	tluo.mutation.SetMinutes(i)
+	return tluo
+}
+
+// SetNillableMinutes sets the "minutes" field if the given value is not nil.
+func (tluo *TimeLogUpdateOne) SetNillableMinutes(i *int) *TimeLogUpdateOne {
+	if i != nil {
+		tluo.SetMinutes(*i)
+	}
+	return tluo
+}
+
+// AddMinutes adds i to the "minutes" field.
+func (tluo *TimeLogUpdateOne) AddMinutes(i int) *TimeLogUpdateOne {
+	tluo.mutation.AddMinutes(i)
+	return tluo
+}
+
+// SetDate sets the "date" field.
+func (tluo *TimeLogUpdateOne) SetDate(t time.Time) *TimeLogUpdateOne {
+	tluo.mutation.SetDate(t)
+	return tluo
+}
+
+// SetNillableDate sets the "date" field if the given value is not nil.
+func (tluo *TimeLogUpdateOne) SetNillableDate(t *time.Time) *TimeLogUpdateOne {
+	if t != nil {
+		tluo.SetDate(*t)
+	}
+	return tluo
+}
+
+// SetVolunteerID sets the "volunteer" edge to the Volunteer entity by ID.
+func (tluo *TimeLogUpdateOne) SetVolunteerID(id uuid.UUID) *TimeLogUpdateOne {
+	tluo.mutation.SetVolunteerID(id)
+	return tluo
+}
+
+// SetVolunteer sets the "volunteer" edge to the Volunteer entity.
+func (tluo *TimeLogUpdateOne) SetVolunteer(v *Volunteer) *TimeLogUpdateOne {
+	return tluo.SetVolunteerID(v.ID)
+}
+
+// SetEventID sets the "event" edge to the Event entity by ID.
+func (tluo *TimeLogUpdateOne) SetEventID(id int) *TimeLogUpdateOne {
+	tluo.mutation.SetEventID(id)
+	return tluo
+}
+
+// SetNillableEventID sets the "event" edge to the Event entity by ID if the given value is not nil.
+func (tluo *TimeLogUpdateOne) SetNillableEventID(id *int) *TimeLogUpdateOne {
+	if id != nil {
+		tluo = tluo.SetEventID(*id)
+	}
+	return tluo
+}
+
+// SetEvent sets the "event" edge to the Event entity.
+func (tluo *TimeLogUpdateOne) SetEvent(e *Event) *TimeLogUpdateOne {
+	return tluo.SetEventID(e.ID)
+}
+
 // Mutation returns the TimeLogMutation object of the builder.
 func (tluo *TimeLogUpdateOne) Mutation() *TimeLogMutation {
 	return tluo.mutation
+}
+
+// ClearVolunteer clears the "volunteer" edge to the Volunteer entity.
+func (tluo *TimeLogUpdateOne) ClearVolunteer() *TimeLogUpdateOne {
+	tluo.mutation.ClearVolunteer()
+	return tluo
+}
+
+// ClearEvent clears the "event" edge to the Event entity.
+func (tluo *TimeLogUpdateOne) ClearEvent() *TimeLogUpdateOne {
+	tluo.mutation.ClearEvent()
+	return tluo
 }
 
 // Where appends a list predicates to the TimeLogUpdate builder.
@@ -133,8 +417,19 @@ func (tluo *TimeLogUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (tluo *TimeLogUpdateOne) check() error {
+	if tluo.mutation.VolunteerCleared() && len(tluo.mutation.VolunteerIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "TimeLog.volunteer"`)
+	}
+	return nil
+}
+
 func (tluo *TimeLogUpdateOne) sqlSave(ctx context.Context) (_node *TimeLog, err error) {
-	_spec := sqlgraph.NewUpdateSpec(timelog.Table, timelog.Columns, sqlgraph.NewFieldSpec(timelog.FieldID, field.TypeInt))
+	if err := tluo.check(); err != nil {
+		return _node, err
+	}
+	_spec := sqlgraph.NewUpdateSpec(timelog.Table, timelog.Columns, sqlgraph.NewFieldSpec(timelog.FieldID, field.TypeUUID))
 	id, ok := tluo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "TimeLog.id" for update`)}
@@ -158,6 +453,79 @@ func (tluo *TimeLogUpdateOne) sqlSave(ctx context.Context) (_node *TimeLog, err 
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := tluo.mutation.Hours(); ok {
+		_spec.SetField(timelog.FieldHours, field.TypeInt, value)
+	}
+	if value, ok := tluo.mutation.AddedHours(); ok {
+		_spec.AddField(timelog.FieldHours, field.TypeInt, value)
+	}
+	if value, ok := tluo.mutation.Minutes(); ok {
+		_spec.SetField(timelog.FieldMinutes, field.TypeInt, value)
+	}
+	if value, ok := tluo.mutation.AddedMinutes(); ok {
+		_spec.AddField(timelog.FieldMinutes, field.TypeInt, value)
+	}
+	if value, ok := tluo.mutation.Date(); ok {
+		_spec.SetField(timelog.FieldDate, field.TypeTime, value)
+	}
+	if tluo.mutation.VolunteerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   timelog.VolunteerTable,
+			Columns: []string{timelog.VolunteerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(volunteer.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tluo.mutation.VolunteerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   timelog.VolunteerTable,
+			Columns: []string{timelog.VolunteerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(volunteer.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if tluo.mutation.EventCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   timelog.EventTable,
+			Columns: []string{timelog.EventColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tluo.mutation.EventIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   timelog.EventTable,
+			Columns: []string{timelog.EventColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &TimeLog{config: tluo.config}
 	_spec.Assign = _node.assignValues

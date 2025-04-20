@@ -7,11 +7,13 @@ import (
 	"errors"
 	"fmt"
 	"sync"
+	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/google/uuid"
 	"github.com/tinkerrc/volunteer/ent/predicate"
+	"github.com/tinkerrc/volunteer/ent/timelog"
 	"github.com/tinkerrc/volunteer/ent/user"
 	"github.com/tinkerrc/volunteer/ent/volunteer"
 )
@@ -563,13 +565,22 @@ func (m *EventMutation) ResetEdge(name string) error {
 // TimeLogMutation represents an operation that mutates the TimeLog nodes in the graph.
 type TimeLogMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *int
-	clearedFields map[string]struct{}
-	done          bool
-	oldValue      func(context.Context) (*TimeLog, error)
-	predicates    []predicate.TimeLog
+	op               Op
+	typ              string
+	id               *uuid.UUID
+	hours            *int
+	addhours         *int
+	minutes          *int
+	addminutes       *int
+	date             *time.Time
+	clearedFields    map[string]struct{}
+	volunteer        *uuid.UUID
+	clearedvolunteer bool
+	event            *int
+	clearedevent     bool
+	done             bool
+	oldValue         func(context.Context) (*TimeLog, error)
+	predicates       []predicate.TimeLog
 }
 
 var _ ent.Mutation = (*TimeLogMutation)(nil)
@@ -592,7 +603,7 @@ func newTimeLogMutation(c config, op Op, opts ...timelogOption) *TimeLogMutation
 }
 
 // withTimeLogID sets the ID field of the mutation.
-func withTimeLogID(id int) timelogOption {
+func withTimeLogID(id uuid.UUID) timelogOption {
 	return func(m *TimeLogMutation) {
 		var (
 			err   error
@@ -642,9 +653,15 @@ func (m TimeLogMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of TimeLog entities.
+func (m *TimeLogMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *TimeLogMutation) ID() (id int, exists bool) {
+func (m *TimeLogMutation) ID() (id uuid.UUID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -655,12 +672,12 @@ func (m *TimeLogMutation) ID() (id int, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *TimeLogMutation) IDs(ctx context.Context) ([]int, error) {
+func (m *TimeLogMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []int{id}, nil
+			return []uuid.UUID{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
@@ -668,6 +685,232 @@ func (m *TimeLogMutation) IDs(ctx context.Context) ([]int, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
+}
+
+// SetHours sets the "hours" field.
+func (m *TimeLogMutation) SetHours(i int) {
+	m.hours = &i
+	m.addhours = nil
+}
+
+// Hours returns the value of the "hours" field in the mutation.
+func (m *TimeLogMutation) Hours() (r int, exists bool) {
+	v := m.hours
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldHours returns the old "hours" field's value of the TimeLog entity.
+// If the TimeLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TimeLogMutation) OldHours(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldHours is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldHours requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldHours: %w", err)
+	}
+	return oldValue.Hours, nil
+}
+
+// AddHours adds i to the "hours" field.
+func (m *TimeLogMutation) AddHours(i int) {
+	if m.addhours != nil {
+		*m.addhours += i
+	} else {
+		m.addhours = &i
+	}
+}
+
+// AddedHours returns the value that was added to the "hours" field in this mutation.
+func (m *TimeLogMutation) AddedHours() (r int, exists bool) {
+	v := m.addhours
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetHours resets all changes to the "hours" field.
+func (m *TimeLogMutation) ResetHours() {
+	m.hours = nil
+	m.addhours = nil
+}
+
+// SetMinutes sets the "minutes" field.
+func (m *TimeLogMutation) SetMinutes(i int) {
+	m.minutes = &i
+	m.addminutes = nil
+}
+
+// Minutes returns the value of the "minutes" field in the mutation.
+func (m *TimeLogMutation) Minutes() (r int, exists bool) {
+	v := m.minutes
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMinutes returns the old "minutes" field's value of the TimeLog entity.
+// If the TimeLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TimeLogMutation) OldMinutes(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMinutes is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMinutes requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMinutes: %w", err)
+	}
+	return oldValue.Minutes, nil
+}
+
+// AddMinutes adds i to the "minutes" field.
+func (m *TimeLogMutation) AddMinutes(i int) {
+	if m.addminutes != nil {
+		*m.addminutes += i
+	} else {
+		m.addminutes = &i
+	}
+}
+
+// AddedMinutes returns the value that was added to the "minutes" field in this mutation.
+func (m *TimeLogMutation) AddedMinutes() (r int, exists bool) {
+	v := m.addminutes
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetMinutes resets all changes to the "minutes" field.
+func (m *TimeLogMutation) ResetMinutes() {
+	m.minutes = nil
+	m.addminutes = nil
+}
+
+// SetDate sets the "date" field.
+func (m *TimeLogMutation) SetDate(t time.Time) {
+	m.date = &t
+}
+
+// Date returns the value of the "date" field in the mutation.
+func (m *TimeLogMutation) Date() (r time.Time, exists bool) {
+	v := m.date
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDate returns the old "date" field's value of the TimeLog entity.
+// If the TimeLog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TimeLogMutation) OldDate(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDate is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDate requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDate: %w", err)
+	}
+	return oldValue.Date, nil
+}
+
+// ResetDate resets all changes to the "date" field.
+func (m *TimeLogMutation) ResetDate() {
+	m.date = nil
+}
+
+// SetVolunteerID sets the "volunteer" edge to the Volunteer entity by id.
+func (m *TimeLogMutation) SetVolunteerID(id uuid.UUID) {
+	m.volunteer = &id
+}
+
+// ClearVolunteer clears the "volunteer" edge to the Volunteer entity.
+func (m *TimeLogMutation) ClearVolunteer() {
+	m.clearedvolunteer = true
+}
+
+// VolunteerCleared reports if the "volunteer" edge to the Volunteer entity was cleared.
+func (m *TimeLogMutation) VolunteerCleared() bool {
+	return m.clearedvolunteer
+}
+
+// VolunteerID returns the "volunteer" edge ID in the mutation.
+func (m *TimeLogMutation) VolunteerID() (id uuid.UUID, exists bool) {
+	if m.volunteer != nil {
+		return *m.volunteer, true
+	}
+	return
+}
+
+// VolunteerIDs returns the "volunteer" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// VolunteerID instead. It exists only for internal usage by the builders.
+func (m *TimeLogMutation) VolunteerIDs() (ids []uuid.UUID) {
+	if id := m.volunteer; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetVolunteer resets all changes to the "volunteer" edge.
+func (m *TimeLogMutation) ResetVolunteer() {
+	m.volunteer = nil
+	m.clearedvolunteer = false
+}
+
+// SetEventID sets the "event" edge to the Event entity by id.
+func (m *TimeLogMutation) SetEventID(id int) {
+	m.event = &id
+}
+
+// ClearEvent clears the "event" edge to the Event entity.
+func (m *TimeLogMutation) ClearEvent() {
+	m.clearedevent = true
+}
+
+// EventCleared reports if the "event" edge to the Event entity was cleared.
+func (m *TimeLogMutation) EventCleared() bool {
+	return m.clearedevent
+}
+
+// EventID returns the "event" edge ID in the mutation.
+func (m *TimeLogMutation) EventID() (id int, exists bool) {
+	if m.event != nil {
+		return *m.event, true
+	}
+	return
+}
+
+// EventIDs returns the "event" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// EventID instead. It exists only for internal usage by the builders.
+func (m *TimeLogMutation) EventIDs() (ids []int) {
+	if id := m.event; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetEvent resets all changes to the "event" edge.
+func (m *TimeLogMutation) ResetEvent() {
+	m.event = nil
+	m.clearedevent = false
 }
 
 // Where appends a list predicates to the TimeLogMutation builder.
@@ -704,7 +947,16 @@ func (m *TimeLogMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *TimeLogMutation) Fields() []string {
-	fields := make([]string, 0, 0)
+	fields := make([]string, 0, 3)
+	if m.hours != nil {
+		fields = append(fields, timelog.FieldHours)
+	}
+	if m.minutes != nil {
+		fields = append(fields, timelog.FieldMinutes)
+	}
+	if m.date != nil {
+		fields = append(fields, timelog.FieldDate)
+	}
 	return fields
 }
 
@@ -712,6 +964,14 @@ func (m *TimeLogMutation) Fields() []string {
 // return value indicates that this field was not set, or was not defined in the
 // schema.
 func (m *TimeLogMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case timelog.FieldHours:
+		return m.Hours()
+	case timelog.FieldMinutes:
+		return m.Minutes()
+	case timelog.FieldDate:
+		return m.Date()
+	}
 	return nil, false
 }
 
@@ -719,6 +979,14 @@ func (m *TimeLogMutation) Field(name string) (ent.Value, bool) {
 // returned if the mutation operation is not UpdateOne, or the query to the
 // database failed.
 func (m *TimeLogMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case timelog.FieldHours:
+		return m.OldHours(ctx)
+	case timelog.FieldMinutes:
+		return m.OldMinutes(ctx)
+	case timelog.FieldDate:
+		return m.OldDate(ctx)
+	}
 	return nil, fmt.Errorf("unknown TimeLog field %s", name)
 }
 
@@ -727,6 +995,27 @@ func (m *TimeLogMutation) OldField(ctx context.Context, name string) (ent.Value,
 // type.
 func (m *TimeLogMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case timelog.FieldHours:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetHours(v)
+		return nil
+	case timelog.FieldMinutes:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMinutes(v)
+		return nil
+	case timelog.FieldDate:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDate(v)
+		return nil
 	}
 	return fmt.Errorf("unknown TimeLog field %s", name)
 }
@@ -734,13 +1023,26 @@ func (m *TimeLogMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *TimeLogMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addhours != nil {
+		fields = append(fields, timelog.FieldHours)
+	}
+	if m.addminutes != nil {
+		fields = append(fields, timelog.FieldMinutes)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *TimeLogMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case timelog.FieldHours:
+		return m.AddedHours()
+	case timelog.FieldMinutes:
+		return m.AddedMinutes()
+	}
 	return nil, false
 }
 
@@ -748,6 +1050,22 @@ func (m *TimeLogMutation) AddedField(name string) (ent.Value, bool) {
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
 func (m *TimeLogMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case timelog.FieldHours:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddHours(v)
+		return nil
+	case timelog.FieldMinutes:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddMinutes(v)
+		return nil
+	}
 	return fmt.Errorf("unknown TimeLog numeric field %s", name)
 }
 
@@ -773,24 +1091,51 @@ func (m *TimeLogMutation) ClearField(name string) error {
 // ResetField resets all changes in the mutation for the field with the given name.
 // It returns an error if the field is not defined in the schema.
 func (m *TimeLogMutation) ResetField(name string) error {
+	switch name {
+	case timelog.FieldHours:
+		m.ResetHours()
+		return nil
+	case timelog.FieldMinutes:
+		m.ResetMinutes()
+		return nil
+	case timelog.FieldDate:
+		m.ResetDate()
+		return nil
+	}
 	return fmt.Errorf("unknown TimeLog field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *TimeLogMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 2)
+	if m.volunteer != nil {
+		edges = append(edges, timelog.EdgeVolunteer)
+	}
+	if m.event != nil {
+		edges = append(edges, timelog.EdgeEvent)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *TimeLogMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case timelog.EdgeVolunteer:
+		if id := m.volunteer; id != nil {
+			return []ent.Value{*id}
+		}
+	case timelog.EdgeEvent:
+		if id := m.event; id != nil {
+			return []ent.Value{*id}
+		}
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *TimeLogMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 2)
 	return edges
 }
 
@@ -802,25 +1147,53 @@ func (m *TimeLogMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *TimeLogMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 2)
+	if m.clearedvolunteer {
+		edges = append(edges, timelog.EdgeVolunteer)
+	}
+	if m.clearedevent {
+		edges = append(edges, timelog.EdgeEvent)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *TimeLogMutation) EdgeCleared(name string) bool {
+	switch name {
+	case timelog.EdgeVolunteer:
+		return m.clearedvolunteer
+	case timelog.EdgeEvent:
+		return m.clearedevent
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *TimeLogMutation) ClearEdge(name string) error {
+	switch name {
+	case timelog.EdgeVolunteer:
+		m.ClearVolunteer()
+		return nil
+	case timelog.EdgeEvent:
+		m.ClearEvent()
+		return nil
+	}
 	return fmt.Errorf("unknown TimeLog unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *TimeLogMutation) ResetEdge(name string) error {
+	switch name {
+	case timelog.EdgeVolunteer:
+		m.ResetVolunteer()
+		return nil
+	case timelog.EdgeEvent:
+		m.ResetEvent()
+		return nil
+	}
 	return fmt.Errorf("unknown TimeLog edge %s", name)
 }
 

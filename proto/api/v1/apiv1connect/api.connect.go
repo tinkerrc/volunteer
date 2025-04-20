@@ -151,35 +151,41 @@ type VolunteerServiceClient interface {
 	// rpc GetUser(GetUserRequest) returns (GetUserResponse);
 	// rpc ListUsers(GetUserRequest) returns (GetUserResponse);
 	// rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
-	// volunteers
+	// === VOLUNTEERS
+	// Registration
 	CreateVolunteer(context.Context, *connect.Request[v1.CreateVolunteerRequest]) (*connect.Response[v1.CreateVolunteerResponse], error)
+	// Requires user
 	GetVolunteer(context.Context, *connect.Request[v1.GetVolunteerRequest]) (*connect.Response[v1.GetVolunteerResponse], error)
+	// Requires volunteer
 	GetVolunteerProfile(context.Context, *connect.Request[v1.GetVolunteerProfileRequest]) (*connect.Response[v1.GetVolunteerProfileResponse], error)
+	// Requires user
 	ListVolunteers(context.Context, *connect.Request[v1.ListVolunteersRequest]) (*connect.Response[v1.ListVolunteersResponse], error)
+	// Requires user
 	UpdateVolunteer(context.Context, *connect.Request[v1.UpdateVolunteerRequest]) (*connect.Response[v1.UpdateVolunteerResponse], error)
+	// Requires volunteer
 	UpdateVolunteerProfile(context.Context, *connect.Request[v1.UpdateVolunteerProfileRequest]) (*connect.Response[v1.UpdateVolunteerProfileResponse], error)
-	// time logs
+	// === TIME LOGS
 	CreateTimeLog(context.Context, *connect.Request[v1.CreateTimeLogRequest]) (*connect.Response[v1.CreateTimeLogResponse], error)
 	ListTimeLogs(context.Context, *connect.Request[v1.ListTimeLogsRequest]) (*connect.Response[v1.ListTimeLogsResponse], error)
 	UpdateTimeLog(context.Context, *connect.Request[v1.UpdateTimeLogRequest]) (*connect.Response[v1.UpdateTimeLogResponse], error)
 	DeleteTimeLog(context.Context, *connect.Request[v1.DeleteTimeLogRequest]) (*connect.Response[v1.DeleteTimeLogResponse], error)
-	// volunteer training
+	// === VOLUNTEER TRAINING
 	StartTraining(context.Context, *connect.Request[v1.StartTrainingRequest]) (*connect.Response[v1.StartTrainingResponse], error)
 	FinishTraining(context.Context, *connect.Request[v1.FinishTrainingRequest]) (*connect.Response[v1.FinishTrainingResponse], error)
 	ListTrainings(context.Context, *connect.Request[v1.ListTrainingsRequest]) (*connect.Response[v1.ListTrainingsResponse], error)
 	DeleteTraining(context.Context, *connect.Request[v1.DeleteTrainingRequest]) (*connect.Response[v1.DeleteTrainingResponse], error)
-	// certs
+	// === CERTS
 	CreateCert(context.Context, *connect.Request[v1.CreateCertRequest]) (*connect.Response[v1.CreateCertResponse], error)
 	ListCerts(context.Context, *connect.Request[v1.ListCertsRequest]) (*connect.Response[v1.ListCertsResponse], error)
 	GetCert(context.Context, *connect.Request[v1.GetCertRequest]) (*connect.Response[v1.GetCertResponse], error)
 	UpdateCert(context.Context, *connect.Request[v1.UpdateCertRequest]) (*connect.Response[v1.UpdateCertResponse], error)
 	DeleteCert(context.Context, *connect.Request[v1.DeleteCertRequest]) (*connect.Response[v1.DeleteCertResponse], error)
-	// events
+	// === EVENTS
 	CreateEvent(context.Context, *connect.Request[v1.CreateEventRequest]) (*connect.Response[v1.CreateEventResponse], error)
 	ListEvents(context.Context, *connect.Request[v1.ListEventsRequest]) (*connect.Response[v1.ListEventsResponse], error)
 	UpdateEvent(context.Context, *connect.Request[v1.UpdateEventRequest]) (*connect.Response[v1.UpdateEventResponse], error)
 	DeleteEvent(context.Context, *connect.Request[v1.DeleteEventRequest]) (*connect.Response[v1.DeleteEventResponse], error)
-	// event volunteers
+	// === EVENT VOLUNTEERS
 	ListEventVolunteers(context.Context, *connect.Request[v1.ListEventVolunteersRequest]) (*connect.Response[v1.ListEventVolunteersResponse], error)
 	AddEventVolunteers(context.Context, *connect.Request[v1.AddEventVolunteersRequest]) (*connect.Response[v1.AddEventVolunteersResponse], error)
 	RemoveEventVolunteers(context.Context, *connect.Request[v1.RemoveEventVolunteersRequest]) (*connect.Response[v1.RemoveEventVolunteersResponse], error)
@@ -521,35 +527,41 @@ type VolunteerServiceHandler interface {
 	// rpc GetUser(GetUserRequest) returns (GetUserResponse);
 	// rpc ListUsers(GetUserRequest) returns (GetUserResponse);
 	// rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
-	// volunteers
+	// === VOLUNTEERS
+	// Registration
 	CreateVolunteer(context.Context, *connect.Request[v1.CreateVolunteerRequest]) (*connect.Response[v1.CreateVolunteerResponse], error)
+	// Requires user
 	GetVolunteer(context.Context, *connect.Request[v1.GetVolunteerRequest]) (*connect.Response[v1.GetVolunteerResponse], error)
+	// Requires volunteer
 	GetVolunteerProfile(context.Context, *connect.Request[v1.GetVolunteerProfileRequest]) (*connect.Response[v1.GetVolunteerProfileResponse], error)
+	// Requires user
 	ListVolunteers(context.Context, *connect.Request[v1.ListVolunteersRequest]) (*connect.Response[v1.ListVolunteersResponse], error)
+	// Requires user
 	UpdateVolunteer(context.Context, *connect.Request[v1.UpdateVolunteerRequest]) (*connect.Response[v1.UpdateVolunteerResponse], error)
+	// Requires volunteer
 	UpdateVolunteerProfile(context.Context, *connect.Request[v1.UpdateVolunteerProfileRequest]) (*connect.Response[v1.UpdateVolunteerProfileResponse], error)
-	// time logs
+	// === TIME LOGS
 	CreateTimeLog(context.Context, *connect.Request[v1.CreateTimeLogRequest]) (*connect.Response[v1.CreateTimeLogResponse], error)
 	ListTimeLogs(context.Context, *connect.Request[v1.ListTimeLogsRequest]) (*connect.Response[v1.ListTimeLogsResponse], error)
 	UpdateTimeLog(context.Context, *connect.Request[v1.UpdateTimeLogRequest]) (*connect.Response[v1.UpdateTimeLogResponse], error)
 	DeleteTimeLog(context.Context, *connect.Request[v1.DeleteTimeLogRequest]) (*connect.Response[v1.DeleteTimeLogResponse], error)
-	// volunteer training
+	// === VOLUNTEER TRAINING
 	StartTraining(context.Context, *connect.Request[v1.StartTrainingRequest]) (*connect.Response[v1.StartTrainingResponse], error)
 	FinishTraining(context.Context, *connect.Request[v1.FinishTrainingRequest]) (*connect.Response[v1.FinishTrainingResponse], error)
 	ListTrainings(context.Context, *connect.Request[v1.ListTrainingsRequest]) (*connect.Response[v1.ListTrainingsResponse], error)
 	DeleteTraining(context.Context, *connect.Request[v1.DeleteTrainingRequest]) (*connect.Response[v1.DeleteTrainingResponse], error)
-	// certs
+	// === CERTS
 	CreateCert(context.Context, *connect.Request[v1.CreateCertRequest]) (*connect.Response[v1.CreateCertResponse], error)
 	ListCerts(context.Context, *connect.Request[v1.ListCertsRequest]) (*connect.Response[v1.ListCertsResponse], error)
 	GetCert(context.Context, *connect.Request[v1.GetCertRequest]) (*connect.Response[v1.GetCertResponse], error)
 	UpdateCert(context.Context, *connect.Request[v1.UpdateCertRequest]) (*connect.Response[v1.UpdateCertResponse], error)
 	DeleteCert(context.Context, *connect.Request[v1.DeleteCertRequest]) (*connect.Response[v1.DeleteCertResponse], error)
-	// events
+	// === EVENTS
 	CreateEvent(context.Context, *connect.Request[v1.CreateEventRequest]) (*connect.Response[v1.CreateEventResponse], error)
 	ListEvents(context.Context, *connect.Request[v1.ListEventsRequest]) (*connect.Response[v1.ListEventsResponse], error)
 	UpdateEvent(context.Context, *connect.Request[v1.UpdateEventRequest]) (*connect.Response[v1.UpdateEventResponse], error)
 	DeleteEvent(context.Context, *connect.Request[v1.DeleteEventRequest]) (*connect.Response[v1.DeleteEventResponse], error)
-	// event volunteers
+	// === EVENT VOLUNTEERS
 	ListEventVolunteers(context.Context, *connect.Request[v1.ListEventVolunteersRequest]) (*connect.Response[v1.ListEventVolunteersResponse], error)
 	AddEventVolunteers(context.Context, *connect.Request[v1.AddEventVolunteersRequest]) (*connect.Response[v1.AddEventVolunteersResponse], error)
 	RemoveEventVolunteers(context.Context, *connect.Request[v1.RemoveEventVolunteersRequest]) (*connect.Response[v1.RemoveEventVolunteersResponse], error)

@@ -5,6 +5,7 @@ package ent
 import (
 	"github.com/google/uuid"
 	"github.com/tinkerrc/volunteer/ent/schema"
+	"github.com/tinkerrc/volunteer/ent/timelog"
 	"github.com/tinkerrc/volunteer/ent/user"
 	"github.com/tinkerrc/volunteer/ent/volunteer"
 )
@@ -13,6 +14,12 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	timelogFields := schema.TimeLog{}.Fields()
+	_ = timelogFields
+	// timelogDescID is the schema descriptor for id field.
+	timelogDescID := timelogFields[0].Descriptor()
+	// timelog.DefaultID holds the default value on creation for the id field.
+	timelog.DefaultID = timelogDescID.Default.(func() uuid.UUID)
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescID is the schema descriptor for id field.
