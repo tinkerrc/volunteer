@@ -4,6 +4,7 @@ package volunteer
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/google/uuid"
 	"github.com/tinkerrc/volunteer/ent/predicate"
 )
@@ -541,6 +542,29 @@ func NotesEqualFold(v string) predicate.Volunteer {
 // NotesContainsFold applies the ContainsFold predicate on the "notes" field.
 func NotesContainsFold(v string) predicate.Volunteer {
 	return predicate.Volunteer(sql.FieldContainsFold(FieldNotes, v))
+}
+
+// HasVolunteerRecords applies the HasEdge predicate on the "volunteer_records" edge.
+func HasVolunteerRecords() predicate.Volunteer {
+	return predicate.Volunteer(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, VolunteerRecordsTable, VolunteerRecordsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasVolunteerRecordsWith applies the HasEdge predicate on the "volunteer_records" edge with a given conditions (other predicates).
+func HasVolunteerRecordsWith(preds ...predicate.EventVolunteer) predicate.Volunteer {
+	return predicate.Volunteer(func(s *sql.Selector) {
+		step := newVolunteerRecordsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

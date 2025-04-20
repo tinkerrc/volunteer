@@ -3021,20 +3021,23 @@ func (m *UserMutation) ResetEdge(name string) error {
 // VolunteerMutation represents an operation that mutates the Volunteer nodes in the graph.
 type VolunteerMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *uuid.UUID
-	email         *string
-	first_name    *string
-	middle_name   *string
-	last_name     *string
-	phone         *string
-	address       *string
-	notes         *string
-	clearedFields map[string]struct{}
-	done          bool
-	oldValue      func(context.Context) (*Volunteer, error)
-	predicates    []predicate.Volunteer
+	op                       Op
+	typ                      string
+	id                       *uuid.UUID
+	email                    *string
+	first_name               *string
+	middle_name              *string
+	last_name                *string
+	phone                    *string
+	address                  *string
+	notes                    *string
+	clearedFields            map[string]struct{}
+	volunteer_records        map[uuid.UUID]struct{}
+	removedvolunteer_records map[uuid.UUID]struct{}
+	clearedvolunteer_records bool
+	done                     bool
+	oldValue                 func(context.Context) (*Volunteer, error)
+	predicates               []predicate.Volunteer
 }
 
 var _ ent.Mutation = (*VolunteerMutation)(nil)
@@ -3393,6 +3396,60 @@ func (m *VolunteerMutation) ResetNotes() {
 	m.notes = nil
 }
 
+// AddVolunteerRecordIDs adds the "volunteer_records" edge to the EventVolunteer entity by ids.
+func (m *VolunteerMutation) AddVolunteerRecordIDs(ids ...uuid.UUID) {
+	if m.volunteer_records == nil {
+		m.volunteer_records = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.volunteer_records[ids[i]] = struct{}{}
+	}
+}
+
+// ClearVolunteerRecords clears the "volunteer_records" edge to the EventVolunteer entity.
+func (m *VolunteerMutation) ClearVolunteerRecords() {
+	m.clearedvolunteer_records = true
+}
+
+// VolunteerRecordsCleared reports if the "volunteer_records" edge to the EventVolunteer entity was cleared.
+func (m *VolunteerMutation) VolunteerRecordsCleared() bool {
+	return m.clearedvolunteer_records
+}
+
+// RemoveVolunteerRecordIDs removes the "volunteer_records" edge to the EventVolunteer entity by IDs.
+func (m *VolunteerMutation) RemoveVolunteerRecordIDs(ids ...uuid.UUID) {
+	if m.removedvolunteer_records == nil {
+		m.removedvolunteer_records = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.volunteer_records, ids[i])
+		m.removedvolunteer_records[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedVolunteerRecords returns the removed IDs of the "volunteer_records" edge to the EventVolunteer entity.
+func (m *VolunteerMutation) RemovedVolunteerRecordsIDs() (ids []uuid.UUID) {
+	for id := range m.removedvolunteer_records {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// VolunteerRecordsIDs returns the "volunteer_records" edge IDs in the mutation.
+func (m *VolunteerMutation) VolunteerRecordsIDs() (ids []uuid.UUID) {
+	for id := range m.volunteer_records {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetVolunteerRecords resets all changes to the "volunteer_records" edge.
+func (m *VolunteerMutation) ResetVolunteerRecords() {
+	m.volunteer_records = nil
+	m.clearedvolunteer_records = false
+	m.removedvolunteer_records = nil
+}
+
 // Where appends a list predicates to the VolunteerMutation builder.
 func (m *VolunteerMutation) Where(ps ...predicate.Volunteer) {
 	m.predicates = append(m.predicates, ps...)
@@ -3628,48 +3685,84 @@ func (m *VolunteerMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *VolunteerMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.volunteer_records != nil {
+		edges = append(edges, volunteer.EdgeVolunteerRecords)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *VolunteerMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case volunteer.EdgeVolunteerRecords:
+		ids := make([]ent.Value, 0, len(m.volunteer_records))
+		for id := range m.volunteer_records {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *VolunteerMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.removedvolunteer_records != nil {
+		edges = append(edges, volunteer.EdgeVolunteerRecords)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *VolunteerMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case volunteer.EdgeVolunteerRecords:
+		ids := make([]ent.Value, 0, len(m.removedvolunteer_records))
+		for id := range m.removedvolunteer_records {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *VolunteerMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.clearedvolunteer_records {
+		edges = append(edges, volunteer.EdgeVolunteerRecords)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *VolunteerMutation) EdgeCleared(name string) bool {
+	switch name {
+	case volunteer.EdgeVolunteerRecords:
+		return m.clearedvolunteer_records
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *VolunteerMutation) ClearEdge(name string) error {
+	switch name {
+	}
 	return fmt.Errorf("unknown Volunteer unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *VolunteerMutation) ResetEdge(name string) error {
+	switch name {
+	case volunteer.EdgeVolunteerRecords:
+		m.ResetVolunteerRecords()
+		return nil
+	}
 	return fmt.Errorf("unknown Volunteer edge %s", name)
 }

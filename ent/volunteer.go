@@ -30,8 +30,29 @@ type Volunteer struct {
 	// Address holds the value of the "address" field.
 	Address string `json:"address,omitempty"`
 	// Notes holds the value of the "notes" field.
-	Notes        string `json:"notes,omitempty"`
+	Notes string `json:"notes,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the VolunteerQuery when eager-loading is set.
+	Edges        VolunteerEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// VolunteerEdges holds the relations/edges for other nodes in the graph.
+type VolunteerEdges struct {
+	// VolunteerRecords holds the value of the volunteer_records edge.
+	VolunteerRecords []*EventVolunteer `json:"volunteer_records,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// VolunteerRecordsOrErr returns the VolunteerRecords value or an error if the edge
+// was not loaded in eager-loading.
+func (e VolunteerEdges) VolunteerRecordsOrErr() ([]*EventVolunteer, error) {
+	if e.loadedTypes[0] {
+		return e.VolunteerRecords, nil
+	}
+	return nil, &NotLoadedError{edge: "volunteer_records"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -117,6 +138,11 @@ func (v *Volunteer) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (v *Volunteer) Value(name string) (ent.Value, error) {
 	return v.selectValues.Get(name)
+}
+
+// QueryVolunteerRecords queries the "volunteer_records" edge of the Volunteer entity.
+func (v *Volunteer) QueryVolunteerRecords() *EventVolunteerQuery {
+	return NewVolunteerClient(v.config).QueryVolunteerRecords(v)
 }
 
 // Update returns a builder for updating this Volunteer.
