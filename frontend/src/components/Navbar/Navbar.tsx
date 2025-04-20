@@ -10,7 +10,7 @@ import {
     IconUser
 } from '@tabler/icons-react';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import classes from './Navbar.module.css';
 
 interface NavbarLinkProps {
@@ -18,14 +18,17 @@ interface NavbarLinkProps {
     label: string;
     active?: boolean;
     onClick?: () => void;
+    to: string;
 }
 
-function NavbarLink({ icon: Icon, label, active, onClick }: NavbarLinkProps) {
+function NavbarLink({ icon: Icon, label, active, onClick, to }: NavbarLinkProps) {
     return (
         <Tooltip label={label} position="right" transitionProps={{ duration: 0 }}>
-            <UnstyledButton onClick={onClick} className={classes.link} data-active={active || undefined}>
-                <Icon size={20} stroke={1.5} />
-            </UnstyledButton>
+            <NavLink to={to}>
+                <UnstyledButton onClick={onClick} className={classes.link} data-active={active || undefined}>
+                    <Icon size={20} stroke={1.5} />
+                </UnstyledButton>
+            </NavLink>
         </Tooltip>
     );
 }
@@ -40,13 +43,12 @@ const navData = [
 export function Navbar() {
     const [active, setActive] = useState(0);
 
-    let navigate = useNavigate()
     const links = navData.map((link, index) => (
         <NavbarLink
             {...link}
             key={link.label}
             active={index === active}
-            onClick={() => { setActive(index); navigate(link.to) }}
+            onClick={() => { setActive(index) }}
         />
     ));
 
