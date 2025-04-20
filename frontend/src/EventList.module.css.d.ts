@@ -60,6 +60,7 @@ const volunteers: string;
 const coordinatorInfo: string;
 const navDash: string;
 const finalDash: string;
+const active: string;
 
 export {
 	finalDashChild,
@@ -115,7 +116,8 @@ export {
 	volunteers,
 	coordinatorInfo,
 	navDash,
-	finalDash
+	finalDash,
+	active
 };
 
 export default {
@@ -172,5 +174,6 @@ export default {
 	volunteers,
 	coordinatorInfo,
 	navDash,
-	finalDash
+	finalDash,
+	active
 };

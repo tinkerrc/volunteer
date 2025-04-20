@@ -6,8 +6,8 @@
  * https://npmjs.com/vite-css-modules
  */
 
-const finalVolPageChild: string;
-const finalVolPageItem: string;
+const volunteerPageChild: string;
+const volunteerPageItem: string;
 const name: string;
 const email: string;
 const phone: string;
@@ -41,6 +41,7 @@ const availableWrapper: string;
 const frameParent1: string;
 const cardAailable: string;
 const cardAailable1: string;
+const div9: string;
 const awaitingTrainingWrapper: string;
 const frameParent5: string;
 const cardAwaitingTraining: string;
@@ -49,11 +50,12 @@ const dashboard: string;
 const volunteers: string;
 const coordinatorInfo: string;
 const navDash: string;
-const finalVolPage: string;
+const volunteerPage: string;
+const active: string;
 
 export {
-	finalVolPageChild,
-	finalVolPageItem,
+	volunteerPageChild,
+	volunteerPageItem,
 	name,
 	email,
 	phone,
@@ -87,6 +89,7 @@ export {
 	frameParent1,
 	cardAailable,
 	cardAailable1,
+	div9,
 	awaitingTrainingWrapper,
 	frameParent5,
 	cardAwaitingTraining,
@@ -95,12 +98,13 @@ export {
 	volunteers,
 	coordinatorInfo,
 	navDash,
-	finalVolPage
+	volunteerPage,
+	active
 };
 
 export default {
-	finalVolPageChild,
-	finalVolPageItem,
+	volunteerPageChild,
+	volunteerPageItem,
 	name,
 	email,
 	phone,
@@ -134,6 +138,7 @@ export default {
 	frameParent1,
 	cardAailable,
 	cardAailable1,
+	div9,
 	awaitingTrainingWrapper,
 	frameParent5,
 	cardAwaitingTraining,
@@ -142,5 +147,6 @@ export default {
 	volunteers,
 	coordinatorInfo,
 	navDash,
-	finalVolPage
+	volunteerPage,
+	active
 };
