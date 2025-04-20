@@ -1,152 +1,278 @@
+.userManagementLoginChild {
+  position: absolute;
+  top: 1099px;
+  left: 369px;
+  background-color: #d9d9d9;
+  width: 999px;
+  height: 55px;
+}
+.userManagementLoginItem {
+  position: absolute;
+  top: 1172px;
+  left: 369px;
+  background-color: #d9d9d9;
+  width: 999px;
+  height: 54px;
+}
+.image7Icon {
+  position: absolute;
+  top: 55px;
+  left: 41px;
+  width: 232.9px;
+  height: 36px;
+  object-fit: cover;
+}
+.userManagementLoginInner {
+  position: absolute;
+  top: 112px;
+  left: -40px;
+  width: 1520px;
+  height: 326px;
+  object-fit: cover;
+}
+.rectangleDiv {
+  position: absolute;
+  top: 762px;
+  left: -40px;
+  background-color: #dbe7f2;
+  width: 1520px;
+  height: 144px;
+}
+.userManagementLoginChild1 {
+  position: absolute;
+  top: 642px;
+  left: 338px;
+  background-color: #dbe7f2;
+  width: 766px;
+  height: 2px;
+}
+.userManagementLoginChild2 {
+  position: absolute;
+  top: 222px;
+  left: 785px;
+  border-radius: 10px;
+  background-color: #fff;
+  width: 583px;
+  height: 113px;
+}
+.userManagementLoginChild3 {
+  position: absolute;
+  top: 496px;
+  left: 86px;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.11);
+  border-radius: 10px;
+  background-color: #fff;
+  width: 236px;
+  height: 93px;
+}
+.userManagementLoginChild4 {
+  position: absolute;
+  top: 496px;
+  left: 347px;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.11);
+  border-radius: 10px;
+  background-color: #fff;
+  width: 236px;
+  height: 93px;
+}
+.userManagementLoginChild5 {
+  position: absolute;
+  top: 496px;
+  left: 609px;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.11);
+  border-radius: 10px;
+  background-color: #fff;
+  width: 236px;
+  height: 93px;
+}
+.userManagementLoginChild6 {
+  position: absolute;
+  top: 496px;
+  left: 870px;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.11);
+  border-radius: 10px;
+  background-color: #fff;
+  width: 236px;
+  height: 93px;
+}
+.userManagementLoginChild7 {
+  position: absolute;
+  top: 496px;
+  left: 1132px;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.11);
+  border-radius: 10px;
+  background-color: #fff;
+  width: 236px;
+  height: 93px;
+}
+.empoweringMentalHealth {
+  position: absolute;
+  top: 231px;
+  left: 70px;
+  font-size: 40px;
+  display: inline-block;
+  color: #fff;
+  width: 462px;
+  height: 95px;
+  text-shadow: 0px 4px 4px #452e00;
+}
+.aboutNamiYolo {
+  position: absolute;
+  top: 697px;
+  left: 537px;
+  font-size: 32px;
+  color: #222;
+  display: inline-block;
+  width: 380px;
+  height: 38px;
+}
+.supportGroups {
+  position: absolute;
+  top: 528px;
+  left: 114px;
+}
+.inCrisis {
+  position: absolute;
+  top: 528px;
+  left: 420px;
+}
+.resources {
+  position: absolute;
+  top: 528px;
+  left: 660px;
+}
+.education {
+  position: absolute;
+  top: 528px;
+  left: 931px;
+}
+.advocate {
+  position: absolute;
+  top: 528px;
+  left: 1196px;
+}
+.namiYoloCounty {
+  position: absolute;
+  top: 798px;
+  left: calc(50% - 490px);
+  font-size: 20px;
+  display: inline-block;
+  text-align: center;
+  width: 981px;
+}
+.groupChild {
+  position: absolute;
+  top: 8px;
+  left: 243.25px;
+  border-radius: 10px;
+  background-color: rgba(0, 83, 160, 0.24);
+  width: 27px;
+  height: 1.3px;
+  transform:  rotate(90deg);
+  transform-origin: 0 0;
+}
+.coordinator {
+  position: relative;
+}
+.coordinatorWrapper {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  border-radius: 10px;
+  border: 2px solid #0053a0;
+  box-sizing: border-box;
+  width: 202.3px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+.volunteerWrapper {
+  position: absolute;
+  top: 0px;
+  left: 284.23px;
+  border-radius: 10px;
+  background-color: #0053a0;
+  width: 173.2px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  align-content: center;
+  padding: 10px 20px;
+  box-sizing: border-box;
+  cursor: pointer;
+  color: #fff;
+}
+.rectangleParent {
+  position: absolute;
+  top: 257px;
+  left: 843.17px;
+  width: 457.4px;
+  height: 44px;
+  font-size: 20px;
+}
+.donate {
+  position: absolute;
+  top: 10px;
+  left: 39px;
+  display: inline-block;
+  width: 75px;
+}
+.donateWrapper {
+  width: 134px;
+  position: absolute;
+  margin: 0 !important;
+  top: 0px;
+  left: 0px;
+  border-radius: 10px;
+  background-color: #0053a0;
+  height: 44px;
+  z-index: 0;
+}
+.tablerheartIcon {
+  width: 21px;
+  position: relative;
+  max-height: 100%;
+  overflow: hidden;
+  flex-shrink: 0;
+  z-index: 1;
+}
+.frameParent {
+  position: absolute;
+  top: 51px;
+  left: 1234px;
+  width: 134px;
+  height: 44px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 12px 9px;
+  box-sizing: border-box;
+  gap: 10px;
+  text-align: right;
+  font-size: 20px;
+  color: #fff;
+}
 .userManagementLogin {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 0;
-    margin: 0;
-    width: 100%;
-    text-align: center;
-    font-family: 'Helvetica Neue', sans-serif;
-  }
-  
-  /* Sunflower banner image */
-  .image7Icon {
-    width: 100%;
-    max-height: 300px;
-    object-fit: cover;
-  }
-  
-  /* Overlay content on image */
-  .rectangleParent {
-    position: absolute;
-    top: 200px;
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    background-color: white;
-    padding: 1rem 2rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
-  }
-  
-  /* Button styling (Coordinator / Volunteer) */
-  .coordinatorWrapper,
-  .volunteerWrapper {
-    cursor: pointer;
-    padding: 0.5rem 1.25rem;
-    border: 1px solid #003366;
-    border-radius: 6px;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    font-size: 0.95rem;
-  }
-  
-  .coordinatorWrapper {
-    color: #003366;
-    background-color: white;
-  }
-  
-  .volunteerWrapper {
-    color: white;
-    background-color: #003366;
-  }
-  
-  .coordinatorWrapper:hover,
-  .volunteerWrapper:hover {
-    background-color: #00509e;
-    color: white;
-  }
-  
-  /* Empowering Mental Health — Together */
-  .empoweringMentalHealth {
-    position: absolute;
-    top: 120px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 1.8rem;
-    font-weight: bold;
-    color: white;
-    text-shadow: 1px 1px 4px #000;
-  }
-  
-  /* Category buttons */
-  .supportGroups,
-  .inCrisis,
-  .resources,
-  .education,
-  .advocate {
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    margin: 1rem 0.5rem;
-    font-weight: 600;
-    font-size: 1rem;
-    color: #003366;
-    background-color: #ffffff;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-    min-width: 130px;
-  }
-  
-  /* Grid layout for sections like Support Groups, etc. */
-  .sectionButtons {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-top: 2rem;
-  }
-  
-  /* About text section */
-  .aboutNamiYolo {
-    font-size: 1.3rem;
-    font-weight: 600;
-    margin-top: 3rem;
-  }
-  
-  .namiYoloCounty {
-    max-width: 900px;
-    margin: 1rem auto;
-    padding: 1.5rem;
-    background-color: #e6f0fa;
-    border-radius: 8px;
-    font-weight: 500;
-    font-size: 1rem;
-    color: #003366;
-  }
-  
-  /* Donate area */
-  .frameParent {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    width: 100%;
-    padding: 1rem 2rem;
-  }
-  
-  .donateWrapper {
-    background-color: #003366;
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    font-weight: 500;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: background-color 0.2s ease;
-  }
-  
-  .donateWrapper:hover {
-    background-color: #00509e;
-  }
-  
-  .tablerheartIcon {
-    width: 20px;
-    margin-left: 0.5rem;
-  }
-  
-  /* Optional login welcome message */
-  .userStatus {
-    margin-top: 1rem;
-    font-size: 1rem;
-    color: green;
-    font-weight: 500;
-  }
-  
+  width: 100%;
+  position: relative;
+  background-color: #fff;
+  height: 1024px;
+  width: 1500px;
+  overflow: hidden;
+  text-align: left;
+  font-size: 24px;
+  color: #0053a0;
+  font-family: Inter;
+}
+.userC {
+  display: flex
+  ;
+      align-items: center;
+      justify-content: center;
+}
