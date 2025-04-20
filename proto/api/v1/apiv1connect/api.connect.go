@@ -219,6 +219,7 @@ type VolunteerServiceClient interface {
 	ListEventVolunteers(context.Context, *connect.Request[v1.ListEventVolunteersRequest]) (*connect.Response[v1.ListEventVolunteersResponse], error)
 	// Requires user
 	CreateEventVolunteer(context.Context, *connect.Request[v1.CreateEventVolunteerRequest]) (*connect.Response[v1.CreateEventVolunteerResponse], error)
+	// Requires user
 	RemoveEventVolunteer(context.Context, *connect.Request[v1.RemoveEventVolunteerRequest]) (*connect.Response[v1.RemoveEventVolunteerResponse], error)
 }
 
@@ -642,6 +643,7 @@ type VolunteerServiceHandler interface {
 	ListEventVolunteers(context.Context, *connect.Request[v1.ListEventVolunteersRequest]) (*connect.Response[v1.ListEventVolunteersResponse], error)
 	// Requires user
 	CreateEventVolunteer(context.Context, *connect.Request[v1.CreateEventVolunteerRequest]) (*connect.Response[v1.CreateEventVolunteerResponse], error)
+	// Requires user
 	RemoveEventVolunteer(context.Context, *connect.Request[v1.RemoveEventVolunteerRequest]) (*connect.Response[v1.RemoveEventVolunteerResponse], error)
 }
 
