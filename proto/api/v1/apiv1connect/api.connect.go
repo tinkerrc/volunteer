@@ -180,6 +180,7 @@ type VolunteerServiceClient interface {
 	FinishTraining(context.Context, *connect.Request[v1.FinishTrainingRequest]) (*connect.Response[v1.FinishTrainingResponse], error)
 	// Requires user
 	ListTrainings(context.Context, *connect.Request[v1.ListTrainingsRequest]) (*connect.Response[v1.ListTrainingsResponse], error)
+	// Requires user
 	DeleteTraining(context.Context, *connect.Request[v1.DeleteTrainingRequest]) (*connect.Response[v1.DeleteTrainingResponse], error)
 	// === CERTS
 	CreateCert(context.Context, *connect.Request[v1.CreateCertRequest]) (*connect.Response[v1.CreateCertResponse], error)
@@ -563,6 +564,7 @@ type VolunteerServiceHandler interface {
 	FinishTraining(context.Context, *connect.Request[v1.FinishTrainingRequest]) (*connect.Response[v1.FinishTrainingResponse], error)
 	// Requires user
 	ListTrainings(context.Context, *connect.Request[v1.ListTrainingsRequest]) (*connect.Response[v1.ListTrainingsResponse], error)
+	// Requires user
 	DeleteTraining(context.Context, *connect.Request[v1.DeleteTrainingRequest]) (*connect.Response[v1.DeleteTrainingResponse], error)
 	// === CERTS
 	CreateCert(context.Context, *connect.Request[v1.CreateCertRequest]) (*connect.Response[v1.CreateCertResponse], error)

@@ -42,6 +42,7 @@ service VolunteerService {
   rpc FinishTraining(FinishTrainingRequest) returns (FinishTrainingResponse);
   // Requires user
   rpc ListTrainings(ListTrainingsRequest) returns (ListTrainingsResponse);
+  // Requires user
   rpc DeleteTraining(DeleteTrainingRequest) returns (DeleteTrainingResponse);
   // === CERTS
   rpc CreateCert(CreateCertRequest) returns (CreateCertResponse);
@@ -304,7 +305,7 @@ message ListTrainingsResponse {
 }
 
 message DeleteTrainingRequest {
-  string training_id = 1;
+  string id = 1;
 }
 
 message DeleteTrainingResponse {}
