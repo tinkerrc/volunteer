@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
 	"github.com/tinkerrc/volunteer/ent/eventvolunteer"
+	"github.com/tinkerrc/volunteer/ent/training"
 	"github.com/tinkerrc/volunteer/ent/volunteer"
 )
 
@@ -90,6 +91,21 @@ func (vc *VolunteerCreate) AddVolunteerRecords(e ...*EventVolunteer) *VolunteerC
 		ids[i] = e[i].ID
 	}
 	return vc.AddVolunteerRecordIDs(ids...)
+}
+
+// AddTrainingIDs adds the "trainings" edge to the Training entity by IDs.
+func (vc *VolunteerCreate) AddTrainingIDs(ids ...uuid.UUID) *VolunteerCreate {
+	vc.mutation.AddTrainingIDs(ids...)
+	return vc
+}
+
+// AddTrainings adds the "trainings" edges to the Training entity.
+func (vc *VolunteerCreate) AddTrainings(t ...*Training) *VolunteerCreate {
+	ids := make([]uuid.UUID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return vc.AddTrainingIDs(ids...)
 }
 
 // Mutation returns the VolunteerMutation object of the builder.
@@ -228,6 +244,22 @@ func (vc *VolunteerCreate) createSpec() (*Volunteer, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(eventvolunteer.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := vc.mutation.TrainingsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   volunteer.TrainingsTable,
+			Columns: []string{volunteer.TrainingsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(training.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

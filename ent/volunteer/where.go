@@ -567,6 +567,29 @@ func HasVolunteerRecordsWith(preds ...predicate.EventVolunteer) predicate.Volunt
 	})
 }
 
+// HasTrainings applies the HasEdge predicate on the "trainings" edge.
+func HasTrainings() predicate.Volunteer {
+	return predicate.Volunteer(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, TrainingsTable, TrainingsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasTrainingsWith applies the HasEdge predicate on the "trainings" edge with a given conditions (other predicates).
+func HasTrainingsWith(preds ...predicate.Training) predicate.Volunteer {
+	return predicate.Volunteer(func(s *sql.Selector) {
+		step := newTrainingsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Volunteer) predicate.Volunteer {
 	return predicate.Volunteer(sql.AndPredicates(predicates...))

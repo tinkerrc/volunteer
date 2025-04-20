@@ -1288,6 +1288,22 @@ func (c *VolunteerClient) QueryVolunteerRecords(v *Volunteer) *EventVolunteerQue
 	return query
 }
 
+// QueryTrainings queries the trainings edge of a Volunteer.
+func (c *VolunteerClient) QueryTrainings(v *Volunteer) *TrainingQuery {
+	query := (&TrainingClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := v.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(volunteer.Table, volunteer.FieldID, id),
+			sqlgraph.To(training.Table, training.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, volunteer.TrainingsTable, volunteer.TrainingsColumn),
+		)
+		fromV = sqlgraph.Neighbors(v.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *VolunteerClient) Hooks() []Hook {
 	return c.hooks.Volunteer

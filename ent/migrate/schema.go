@@ -68,6 +68,13 @@ var (
 				OnDelete:   schema.NoAction,
 			},
 		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "eventvolunteer_event_volunteer_event_event_volunteer_volunteer",
+				Unique:  true,
+				Columns: []*schema.Column{EventVolunteersColumns[1], EventVolunteersColumns[2]},
+			},
+		},
 	}
 	// TimeLogsColumns holds the columns for the "time_logs" table.
 	TimeLogsColumns = []*schema.Column{

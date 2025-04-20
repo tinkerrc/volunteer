@@ -4,6 +4,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 	"github.com/google/uuid"
 )
 
@@ -24,5 +25,11 @@ func (EventVolunteer) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("event", Event.Type).Unique().Required(),
 		edge.To("volunteer", Volunteer.Type).Unique().Required(),
+	}
+}
+
+func (EventVolunteer) Indexes() []ent.Index {
+	return []ent.Index{
+		index.Edges("event", "volunteer").Unique(),
 	}
 }

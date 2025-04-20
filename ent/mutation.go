@@ -3035,6 +3035,9 @@ type VolunteerMutation struct {
 	volunteer_records        map[uuid.UUID]struct{}
 	removedvolunteer_records map[uuid.UUID]struct{}
 	clearedvolunteer_records bool
+	trainings                map[uuid.UUID]struct{}
+	removedtrainings         map[uuid.UUID]struct{}
+	clearedtrainings         bool
 	done                     bool
 	oldValue                 func(context.Context) (*Volunteer, error)
 	predicates               []predicate.Volunteer
@@ -3450,6 +3453,60 @@ func (m *VolunteerMutation) ResetVolunteerRecords() {
 	m.removedvolunteer_records = nil
 }
 
+// AddTrainingIDs adds the "trainings" edge to the Training entity by ids.
+func (m *VolunteerMutation) AddTrainingIDs(ids ...uuid.UUID) {
+	if m.trainings == nil {
+		m.trainings = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.trainings[ids[i]] = struct{}{}
+	}
+}
+
+// ClearTrainings clears the "trainings" edge to the Training entity.
+func (m *VolunteerMutation) ClearTrainings() {
+	m.clearedtrainings = true
+}
+
+// TrainingsCleared reports if the "trainings" edge to the Training entity was cleared.
+func (m *VolunteerMutation) TrainingsCleared() bool {
+	return m.clearedtrainings
+}
+
+// RemoveTrainingIDs removes the "trainings" edge to the Training entity by IDs.
+func (m *VolunteerMutation) RemoveTrainingIDs(ids ...uuid.UUID) {
+	if m.removedtrainings == nil {
+		m.removedtrainings = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.trainings, ids[i])
+		m.removedtrainings[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedTrainings returns the removed IDs of the "trainings" edge to the Training entity.
+func (m *VolunteerMutation) RemovedTrainingsIDs() (ids []uuid.UUID) {
+	for id := range m.removedtrainings {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// TrainingsIDs returns the "trainings" edge IDs in the mutation.
+func (m *VolunteerMutation) TrainingsIDs() (ids []uuid.UUID) {
+	for id := range m.trainings {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetTrainings resets all changes to the "trainings" edge.
+func (m *VolunteerMutation) ResetTrainings() {
+	m.trainings = nil
+	m.clearedtrainings = false
+	m.removedtrainings = nil
+}
+
 // Where appends a list predicates to the VolunteerMutation builder.
 func (m *VolunteerMutation) Where(ps ...predicate.Volunteer) {
 	m.predicates = append(m.predicates, ps...)
@@ -3685,9 +3742,12 @@ func (m *VolunteerMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *VolunteerMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.volunteer_records != nil {
 		edges = append(edges, volunteer.EdgeVolunteerRecords)
+	}
+	if m.trainings != nil {
+		edges = append(edges, volunteer.EdgeTrainings)
 	}
 	return edges
 }
@@ -3702,15 +3762,24 @@ func (m *VolunteerMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case volunteer.EdgeTrainings:
+		ids := make([]ent.Value, 0, len(m.trainings))
+		for id := range m.trainings {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *VolunteerMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.removedvolunteer_records != nil {
 		edges = append(edges, volunteer.EdgeVolunteerRecords)
+	}
+	if m.removedtrainings != nil {
+		edges = append(edges, volunteer.EdgeTrainings)
 	}
 	return edges
 }
@@ -3725,15 +3794,24 @@ func (m *VolunteerMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case volunteer.EdgeTrainings:
+		ids := make([]ent.Value, 0, len(m.removedtrainings))
+		for id := range m.removedtrainings {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *VolunteerMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.clearedvolunteer_records {
 		edges = append(edges, volunteer.EdgeVolunteerRecords)
+	}
+	if m.clearedtrainings {
+		edges = append(edges, volunteer.EdgeTrainings)
 	}
 	return edges
 }
@@ -3744,6 +3822,8 @@ func (m *VolunteerMutation) EdgeCleared(name string) bool {
 	switch name {
 	case volunteer.EdgeVolunteerRecords:
 		return m.clearedvolunteer_records
+	case volunteer.EdgeTrainings:
+		return m.clearedtrainings
 	}
 	return false
 }
@@ -3762,6 +3842,9 @@ func (m *VolunteerMutation) ResetEdge(name string) error {
 	switch name {
 	case volunteer.EdgeVolunteerRecords:
 		m.ResetVolunteerRecords()
+		return nil
+	case volunteer.EdgeTrainings:
+		m.ResetTrainings()
 		return nil
 	}
 	return fmt.Errorf("unknown Volunteer edge %s", name)

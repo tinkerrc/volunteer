@@ -13,6 +13,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/tinkerrc/volunteer/ent/eventvolunteer"
 	"github.com/tinkerrc/volunteer/ent/predicate"
+	"github.com/tinkerrc/volunteer/ent/training"
 	"github.com/tinkerrc/volunteer/ent/volunteer"
 )
 
@@ -142,6 +143,21 @@ func (vu *VolunteerUpdate) AddVolunteerRecords(e ...*EventVolunteer) *VolunteerU
 	return vu.AddVolunteerRecordIDs(ids...)
 }
 
+// AddTrainingIDs adds the "trainings" edge to the Training entity by IDs.
+func (vu *VolunteerUpdate) AddTrainingIDs(ids ...uuid.UUID) *VolunteerUpdate {
+	vu.mutation.AddTrainingIDs(ids...)
+	return vu
+}
+
+// AddTrainings adds the "trainings" edges to the Training entity.
+func (vu *VolunteerUpdate) AddTrainings(t ...*Training) *VolunteerUpdate {
+	ids := make([]uuid.UUID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return vu.AddTrainingIDs(ids...)
+}
+
 // Mutation returns the VolunteerMutation object of the builder.
 func (vu *VolunteerUpdate) Mutation() *VolunteerMutation {
 	return vu.mutation
@@ -166,6 +182,27 @@ func (vu *VolunteerUpdate) RemoveVolunteerRecords(e ...*EventVolunteer) *Volunte
 		ids[i] = e[i].ID
 	}
 	return vu.RemoveVolunteerRecordIDs(ids...)
+}
+
+// ClearTrainings clears all "trainings" edges to the Training entity.
+func (vu *VolunteerUpdate) ClearTrainings() *VolunteerUpdate {
+	vu.mutation.ClearTrainings()
+	return vu
+}
+
+// RemoveTrainingIDs removes the "trainings" edge to Training entities by IDs.
+func (vu *VolunteerUpdate) RemoveTrainingIDs(ids ...uuid.UUID) *VolunteerUpdate {
+	vu.mutation.RemoveTrainingIDs(ids...)
+	return vu
+}
+
+// RemoveTrainings removes "trainings" edges to Training entities.
+func (vu *VolunteerUpdate) RemoveTrainings(t ...*Training) *VolunteerUpdate {
+	ids := make([]uuid.UUID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return vu.RemoveTrainingIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -263,6 +300,51 @@ func (vu *VolunteerUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(eventvolunteer.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if vu.mutation.TrainingsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   volunteer.TrainingsTable,
+			Columns: []string{volunteer.TrainingsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(training.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := vu.mutation.RemovedTrainingsIDs(); len(nodes) > 0 && !vu.mutation.TrainingsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   volunteer.TrainingsTable,
+			Columns: []string{volunteer.TrainingsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(training.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := vu.mutation.TrainingsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   volunteer.TrainingsTable,
+			Columns: []string{volunteer.TrainingsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(training.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -403,6 +485,21 @@ func (vuo *VolunteerUpdateOne) AddVolunteerRecords(e ...*EventVolunteer) *Volunt
 	return vuo.AddVolunteerRecordIDs(ids...)
 }
 
+// AddTrainingIDs adds the "trainings" edge to the Training entity by IDs.
+func (vuo *VolunteerUpdateOne) AddTrainingIDs(ids ...uuid.UUID) *VolunteerUpdateOne {
+	vuo.mutation.AddTrainingIDs(ids...)
+	return vuo
+}
+
+// AddTrainings adds the "trainings" edges to the Training entity.
+func (vuo *VolunteerUpdateOne) AddTrainings(t ...*Training) *VolunteerUpdateOne {
+	ids := make([]uuid.UUID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return vuo.AddTrainingIDs(ids...)
+}
+
 // Mutation returns the VolunteerMutation object of the builder.
 func (vuo *VolunteerUpdateOne) Mutation() *VolunteerMutation {
 	return vuo.mutation
@@ -427,6 +524,27 @@ func (vuo *VolunteerUpdateOne) RemoveVolunteerRecords(e ...*EventVolunteer) *Vol
 		ids[i] = e[i].ID
 	}
 	return vuo.RemoveVolunteerRecordIDs(ids...)
+}
+
+// ClearTrainings clears all "trainings" edges to the Training entity.
+func (vuo *VolunteerUpdateOne) ClearTrainings() *VolunteerUpdateOne {
+	vuo.mutation.ClearTrainings()
+	return vuo
+}
+
+// RemoveTrainingIDs removes the "trainings" edge to Training entities by IDs.
+func (vuo *VolunteerUpdateOne) RemoveTrainingIDs(ids ...uuid.UUID) *VolunteerUpdateOne {
+	vuo.mutation.RemoveTrainingIDs(ids...)
+	return vuo
+}
+
+// RemoveTrainings removes "trainings" edges to Training entities.
+func (vuo *VolunteerUpdateOne) RemoveTrainings(t ...*Training) *VolunteerUpdateOne {
+	ids := make([]uuid.UUID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return vuo.RemoveTrainingIDs(ids...)
 }
 
 // Where appends a list predicates to the VolunteerUpdate builder.
@@ -554,6 +672,51 @@ func (vuo *VolunteerUpdateOne) sqlSave(ctx context.Context) (_node *Volunteer, e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(eventvolunteer.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if vuo.mutation.TrainingsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   volunteer.TrainingsTable,
+			Columns: []string{volunteer.TrainingsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(training.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := vuo.mutation.RemovedTrainingsIDs(); len(nodes) > 0 && !vuo.mutation.TrainingsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   volunteer.TrainingsTable,
+			Columns: []string{volunteer.TrainingsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(training.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := vuo.mutation.TrainingsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   volunteer.TrainingsTable,
+			Columns: []string{volunteer.TrainingsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(training.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

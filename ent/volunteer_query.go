@@ -15,6 +15,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/tinkerrc/volunteer/ent/eventvolunteer"
 	"github.com/tinkerrc/volunteer/ent/predicate"
+	"github.com/tinkerrc/volunteer/ent/training"
 	"github.com/tinkerrc/volunteer/ent/volunteer"
 )
 
@@ -26,6 +27,7 @@ type VolunteerQuery struct {
 	inters               []Interceptor
 	predicates           []predicate.Volunteer
 	withVolunteerRecords *EventVolunteerQuery
+	withTrainings        *TrainingQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -77,6 +79,28 @@ func (vq *VolunteerQuery) QueryVolunteerRecords() *EventVolunteerQuery {
 			sqlgraph.From(volunteer.Table, volunteer.FieldID, selector),
 			sqlgraph.To(eventvolunteer.Table, eventvolunteer.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, true, volunteer.VolunteerRecordsTable, volunteer.VolunteerRecordsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(vq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryTrainings chains the current query on the "trainings" edge.
+func (vq *VolunteerQuery) QueryTrainings() *TrainingQuery {
+	query := (&TrainingClient{config: vq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := vq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := vq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(volunteer.Table, volunteer.FieldID, selector),
+			sqlgraph.To(training.Table, training.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, volunteer.TrainingsTable, volunteer.TrainingsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(vq.driver.Dialect(), step)
 		return fromU, nil
@@ -277,6 +301,7 @@ func (vq *VolunteerQuery) Clone() *VolunteerQuery {
 		inters:               append([]Interceptor{}, vq.inters...),
 		predicates:           append([]predicate.Volunteer{}, vq.predicates...),
 		withVolunteerRecords: vq.withVolunteerRecords.Clone(),
+		withTrainings:        vq.withTrainings.Clone(),
 		// clone intermediate query.
 		sql:  vq.sql.Clone(),
 		path: vq.path,
@@ -291,6 +316,17 @@ func (vq *VolunteerQuery) WithVolunteerRecords(opts ...func(*EventVolunteerQuery
 		opt(query)
 	}
 	vq.withVolunteerRecords = query
+	return vq
+}
+
+// WithTrainings tells the query-builder to eager-load the nodes that are connected to
+// the "trainings" edge. The optional arguments are used to configure the query builder of the edge.
+func (vq *VolunteerQuery) WithTrainings(opts ...func(*TrainingQuery)) *VolunteerQuery {
+	query := (&TrainingClient{config: vq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	vq.withTrainings = query
 	return vq
 }
 
@@ -372,8 +408,9 @@ func (vq *VolunteerQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Vo
 	var (
 		nodes       = []*Volunteer{}
 		_spec       = vq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			vq.withVolunteerRecords != nil,
+			vq.withTrainings != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -398,6 +435,13 @@ func (vq *VolunteerQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Vo
 		if err := vq.loadVolunteerRecords(ctx, query, nodes,
 			func(n *Volunteer) { n.Edges.VolunteerRecords = []*EventVolunteer{} },
 			func(n *Volunteer, e *EventVolunteer) { n.Edges.VolunteerRecords = append(n.Edges.VolunteerRecords, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := vq.withTrainings; query != nil {
+		if err := vq.loadTrainings(ctx, query, nodes,
+			func(n *Volunteer) { n.Edges.Trainings = []*Training{} },
+			func(n *Volunteer, e *Training) { n.Edges.Trainings = append(n.Edges.Trainings, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -430,6 +474,37 @@ func (vq *VolunteerQuery) loadVolunteerRecords(ctx context.Context, query *Event
 		node, ok := nodeids[*fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "event_volunteer_volunteer" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (vq *VolunteerQuery) loadTrainings(ctx context.Context, query *TrainingQuery, nodes []*Volunteer, init func(*Volunteer), assign func(*Volunteer, *Training)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*Volunteer)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.Training(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(volunteer.TrainingsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.training_volunteer
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "training_volunteer" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "training_volunteer" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
