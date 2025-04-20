@@ -13,3 +13,4 @@ ReactDOM.createRoot(document.getElementById('root')!).render(<Auth0Provider
 >
   <App />
 </Auth0Provider>,);
+
