@@ -20,13 +20,39 @@ var (
 	}
 	// EventsColumns holds the columns for the "events" table.
 	EventsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "id", Type: field.TypeUUID, Unique: true},
 	}
 	// EventsTable holds the schema information for the "events" table.
 	EventsTable = &schema.Table{
 		Name:       "events",
 		Columns:    EventsColumns,
 		PrimaryKey: []*schema.Column{EventsColumns[0]},
+	}
+	// EventVolunteersColumns holds the columns for the "event_volunteers" table.
+	EventVolunteersColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "event_volunteer_event", Type: field.TypeUUID},
+		{Name: "event_volunteer_volunteer", Type: field.TypeUUID},
+	}
+	// EventVolunteersTable holds the schema information for the "event_volunteers" table.
+	EventVolunteersTable = &schema.Table{
+		Name:       "event_volunteers",
+		Columns:    EventVolunteersColumns,
+		PrimaryKey: []*schema.Column{EventVolunteersColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "event_volunteers_events_event",
+				Columns:    []*schema.Column{EventVolunteersColumns[1]},
+				RefColumns: []*schema.Column{EventsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "event_volunteers_volunteers_volunteer",
+				Columns:    []*schema.Column{EventVolunteersColumns[2]},
+				RefColumns: []*schema.Column{VolunteersColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
 	}
 	// TimeLogsColumns holds the columns for the "time_logs" table.
 	TimeLogsColumns = []*schema.Column{
@@ -35,7 +61,7 @@ var (
 		{Name: "minutes", Type: field.TypeInt},
 		{Name: "date", Type: field.TypeTime},
 		{Name: "time_log_volunteer", Type: field.TypeUUID},
-		{Name: "time_log_event", Type: field.TypeInt, Nullable: true},
+		{Name: "time_log_event", Type: field.TypeUUID, Nullable: true},
 	}
 	// TimeLogsTable holds the schema information for the "time_logs" table.
 	TimeLogsTable = &schema.Table{
@@ -96,6 +122,7 @@ var (
 	Tables = []*schema.Table{
 		CertificationsTable,
 		EventsTable,
+		EventVolunteersTable,
 		TimeLogsTable,
 		UsersTable,
 		VolunteersTable,
@@ -103,6 +130,8 @@ var (
 )
 
 func init() {
+	EventVolunteersTable.ForeignKeys[0].RefTable = EventsTable
+	EventVolunteersTable.ForeignKeys[1].RefTable = VolunteersTable
 	TimeLogsTable.ForeignKeys[0].RefTable = VolunteersTable
 	TimeLogsTable.ForeignKeys[1].RefTable = EventsTable
 }

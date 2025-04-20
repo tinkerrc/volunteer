@@ -12,6 +12,9 @@ type Certification func(*sql.Selector)
 // Event is the predicate function for event builders.
 type Event func(*sql.Selector)
 
+// EventVolunteer is the predicate function for eventvolunteer builders.
+type EventVolunteer func(*sql.Selector)
+
 // TimeLog is the predicate function for timelog builders.
 type TimeLog func(*sql.Selector)
 

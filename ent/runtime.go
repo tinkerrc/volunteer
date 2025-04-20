@@ -4,6 +4,8 @@ package ent
 
 import (
 	"github.com/google/uuid"
+	"github.com/tinkerrc/volunteer/ent/event"
+	"github.com/tinkerrc/volunteer/ent/eventvolunteer"
 	"github.com/tinkerrc/volunteer/ent/schema"
 	"github.com/tinkerrc/volunteer/ent/timelog"
 	"github.com/tinkerrc/volunteer/ent/user"
@@ -14,6 +16,18 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	eventFields := schema.Event{}.Fields()
+	_ = eventFields
+	// eventDescID is the schema descriptor for id field.
+	eventDescID := eventFields[0].Descriptor()
+	// event.DefaultID holds the default value on creation for the id field.
+	event.DefaultID = eventDescID.Default.(func() uuid.UUID)
+	eventvolunteerFields := schema.EventVolunteer{}.Fields()
+	_ = eventvolunteerFields
+	// eventvolunteerDescID is the schema descriptor for id field.
+	eventvolunteerDescID := eventvolunteerFields[0].Descriptor()
+	// eventvolunteer.DefaultID holds the default value on creation for the id field.
+	eventvolunteer.DefaultID = eventvolunteerDescID.Default.(func() uuid.UUID)
 	timelogFields := schema.TimeLog{}.Fields()
 	_ = timelogFields
 	// timelogDescID is the schema descriptor for id field.

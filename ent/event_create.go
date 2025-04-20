@@ -8,6 +8,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/tinkerrc/volunteer/ent/event"
 )
 
@@ -18,6 +19,20 @@ type EventCreate struct {
 	hooks    []Hook
 }
 
+// SetID sets the "id" field.
+func (ec *EventCreate) SetID(u uuid.UUID) *EventCreate {
+	ec.mutation.SetID(u)
+	return ec
+}
+
+// SetNillableID sets the "id" field if the given value is not nil.
+func (ec *EventCreate) SetNillableID(u *uuid.UUID) *EventCreate {
+	if u != nil {
+		ec.SetID(*u)
+	}
+	return ec
+}
+
 // Mutation returns the EventMutation object of the builder.
 func (ec *EventCreate) Mutation() *EventMutation {
 	return ec.mutation
@@ -25,6 +40,7 @@ func (ec *EventCreate) Mutation() *EventMutation {
 
 // Save creates the Event in the database.
 func (ec *EventCreate) Save(ctx context.Context) (*Event, error) {
+	ec.defaults()
 	return withHooks(ctx, ec.sqlSave, ec.mutation, ec.hooks)
 }
 
@@ -50,6 +66,14 @@ func (ec *EventCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (ec *EventCreate) defaults() {
+	if _, ok := ec.mutation.ID(); !ok {
+		v := event.DefaultID()
+		ec.mutation.SetID(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (ec *EventCreate) check() error {
 	return nil
@@ -66,8 +90,13 @@ func (ec *EventCreate) sqlSave(ctx context.Context) (*Event, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != nil {
+		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
+			_node.ID = *id
+		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
+			return nil, err
+		}
+	}
 	ec.mutation.id = &_node.ID
 	ec.mutation.done = true
 	return _node, nil
@@ -76,8 +105,12 @@ func (ec *EventCreate) sqlSave(ctx context.Context) (*Event, error) {
 func (ec *EventCreate) createSpec() (*Event, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Event{config: ec.config}
-		_spec = sqlgraph.NewCreateSpec(event.Table, sqlgraph.NewFieldSpec(event.FieldID, field.TypeInt))
+		_spec = sqlgraph.NewCreateSpec(event.Table, sqlgraph.NewFieldSpec(event.FieldID, field.TypeUUID))
 	)
+	if id, ok := ec.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = &id
+	}
 	return _node, _spec
 }
 
@@ -99,6 +132,7 @@ func (ecb *EventCreateBulk) Save(ctx context.Context) ([]*Event, error) {
 	for i := range ecb.builders {
 		func(i int, root context.Context) {
 			builder := ecb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*EventMutation)
 				if !ok {
@@ -125,10 +159,6 @@ func (ecb *EventCreateBulk) Save(ctx context.Context) ([]*Event, error) {
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
-				if specs[i].ID.Value != nil {
-					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
-				}
 				mutation.done = true
 				return nodes[i], nil
 			})

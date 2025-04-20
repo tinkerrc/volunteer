@@ -33,6 +33,18 @@ func (f EventFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.EventMutation", m)
 }
 
+// The EventVolunteerFunc type is an adapter to allow the use of ordinary
+// function as EventVolunteer mutator.
+type EventVolunteerFunc func(context.Context, *ent.EventVolunteerMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f EventVolunteerFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.EventVolunteerMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.EventVolunteerMutation", m)
+}
+
 // The TimeLogFunc type is an adapter to allow the use of ordinary
 // function as TimeLog mutator.
 type TimeLogFunc func(context.Context, *ent.TimeLogMutation) (ent.Value, error)

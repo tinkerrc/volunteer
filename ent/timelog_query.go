@@ -486,8 +486,8 @@ func (tlq *TimeLogQuery) loadVolunteer(ctx context.Context, query *VolunteerQuer
 	return nil
 }
 func (tlq *TimeLogQuery) loadEvent(ctx context.Context, query *EventQuery, nodes []*TimeLog, init func(*TimeLog), assign func(*TimeLog, *Event)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*TimeLog)
+	ids := make([]uuid.UUID, 0, len(nodes))
+	nodeids := make(map[uuid.UUID][]*TimeLog)
 	for i := range nodes {
 		if nodes[i].time_log_event == nil {
 			continue
