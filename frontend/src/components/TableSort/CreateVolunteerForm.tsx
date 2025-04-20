@@ -10,9 +10,10 @@ import { useNavigate } from 'react-router-dom';
 interface CreateVolunteerData {
     email: string;
     firstName: string;
-    middleName?: string;
+    middleName: string;
     lastName: string;
     phone: string;
+    address: string;
 }
 
 export const CreateVolunteerForm = () => {
@@ -25,9 +26,10 @@ export const CreateVolunteerForm = () => {
         initialValues: {
             email: "",
             firstName: "",
-            middleName: undefined,
+            middleName: "",
             lastName: "",
             phone: "",
+            address: "",
         },
         validate: {
             email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
