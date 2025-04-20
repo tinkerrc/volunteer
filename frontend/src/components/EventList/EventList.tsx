@@ -8,10 +8,10 @@ import { useEffect, useState } from 'react';
 import classes from './EventList.module.css';
 
 export function EventList() {
-    const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
     const [events, setEvents] = useState<Event[]>([])
     let initState: string[] = [];
     const [selection, setSelection] = useState(initState);
+    const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
     useEffect(() => {
         const getEvents = async () => {
             try {
