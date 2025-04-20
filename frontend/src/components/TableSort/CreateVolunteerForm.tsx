@@ -53,9 +53,8 @@ export const CreateVolunteerForm = () => {
     }
 
     return (
-        <Center maw="600" mb="70" mt="70" bg="var(--mantine-color-gray-light)">
+        <Center maw="400" mb="70" mt="70" bg="var(--mantine-color-gray-light)">
             <form onSubmit={form.onSubmit(submitForm)}>
-
                 <TextInput withAsterisk label="Email" placeholder='your@email.com' key={form.key('email')} {...form.getInputProps('email')} />
                 <TextInput withAsterisk label="First Name" placeholder='Jane' key={form.key('firstName')} {...form.getInputProps('firstName')} />
                 <TextInput label="Middle Name" placeholder='Jane' key={form.key('middleName')} {...form.getInputProps('middleName')} />
