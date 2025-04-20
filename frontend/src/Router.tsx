@@ -1,5 +1,5 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { EventList } from './components/EventList/EventList';
+import { EventsPage } from './pages/Events.page';
 import { HomePage } from './pages/Home.page';
 
 const router = createBrowserRouter([
@@ -9,7 +9,7 @@ const router = createBrowserRouter([
   },
   {
     path: '/events',
-    element: <EventList />,
+    element: <EventsPage />,
   },
 ]);
 

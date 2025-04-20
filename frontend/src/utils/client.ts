@@ -4,7 +4,8 @@ import { createConnectTransport } from "@connectrpc/connect-web";
 import { useMemo } from "react";
 
 const transport = createConnectTransport({
-    baseUrl: "https://api.yolovms.org",
+    // baseUrl: "https://api.yolovms.org",
+    baseUrl: "http://localhost:443",
 });
 
 export function useClient() {
