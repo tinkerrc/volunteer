@@ -41,6 +41,12 @@ func (tlc *TimeLogCreate) SetDate(t time.Time) *TimeLogCreate {
 	return tlc
 }
 
+// SetVolunteerID sets the "volunteer_id" field.
+func (tlc *TimeLogCreate) SetVolunteerID(u uuid.UUID) *TimeLogCreate {
+	tlc.mutation.SetVolunteerID(u)
+	return tlc
+}
+
 // SetID sets the "id" field.
 func (tlc *TimeLogCreate) SetID(u uuid.UUID) *TimeLogCreate {
 	tlc.mutation.SetID(u)
@@ -137,6 +143,9 @@ func (tlc *TimeLogCreate) check() error {
 	if _, ok := tlc.mutation.Date(); !ok {
 		return &ValidationError{Name: "date", err: errors.New(`ent: missing required field "TimeLog.date"`)}
 	}
+	if _, ok := tlc.mutation.VolunteerID(); !ok {
+		return &ValidationError{Name: "volunteer_id", err: errors.New(`ent: missing required field "TimeLog.volunteer_id"`)}
+	}
 	if len(tlc.mutation.VolunteerIDs()) == 0 {
 		return &ValidationError{Name: "volunteer", err: errors.New(`ent: missing required edge "TimeLog.volunteer"`)}
 	}
@@ -186,6 +195,10 @@ func (tlc *TimeLogCreate) createSpec() (*TimeLog, *sqlgraph.CreateSpec) {
 	if value, ok := tlc.mutation.Date(); ok {
 		_spec.SetField(timelog.FieldDate, field.TypeTime, value)
 		_node.Date = value
+	}
+	if value, ok := tlc.mutation.VolunteerID(); ok {
+		_spec.SetField(timelog.FieldVolunteerID, field.TypeUUID, value)
+		_node.VolunteerID = value
 	}
 	if nodes := tlc.mutation.VolunteerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

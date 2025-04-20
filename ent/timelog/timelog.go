@@ -19,6 +19,8 @@ const (
 	FieldMinutes = "minutes"
 	// FieldDate holds the string denoting the date field in the database.
 	FieldDate = "date"
+	// FieldVolunteerID holds the string denoting the volunteer_id field in the database.
+	FieldVolunteerID = "volunteer_id"
 	// EdgeVolunteer holds the string denoting the volunteer edge name in mutations.
 	EdgeVolunteer = "volunteer"
 	// EdgeEvent holds the string denoting the event edge name in mutations.
@@ -47,6 +49,7 @@ var Columns = []string{
 	FieldHours,
 	FieldMinutes,
 	FieldDate,
+	FieldVolunteerID,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "time_logs"
@@ -97,6 +100,11 @@ func ByMinutes(opts ...sql.OrderTermOption) OrderOption {
 // ByDate orders the results by the date field.
 func ByDate(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDate, opts...).ToFunc()
+}
+
+// ByVolunteerID orders the results by the volunteer_id field.
+func ByVolunteerID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldVolunteerID, opts...).ToFunc()
 }
 
 // ByVolunteerField orders the results by volunteer field.

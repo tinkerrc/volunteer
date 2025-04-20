@@ -87,6 +87,20 @@ func (tlu *TimeLogUpdate) SetNillableDate(t *time.Time) *TimeLogUpdate {
 	return tlu
 }
 
+// SetVolunteerID sets the "volunteer_id" field.
+func (tlu *TimeLogUpdate) SetVolunteerID(u uuid.UUID) *TimeLogUpdate {
+	tlu.mutation.SetVolunteerID(u)
+	return tlu
+}
+
+// SetNillableVolunteerID sets the "volunteer_id" field if the given value is not nil.
+func (tlu *TimeLogUpdate) SetNillableVolunteerID(u *uuid.UUID) *TimeLogUpdate {
+	if u != nil {
+		tlu.SetVolunteerID(*u)
+	}
+	return tlu
+}
+
 // SetVolunteerID sets the "volunteer" edge to the Volunteer entity by ID.
 func (tlu *TimeLogUpdate) SetVolunteerID(id uuid.UUID) *TimeLogUpdate {
 	tlu.mutation.SetVolunteerID(id)
@@ -195,6 +209,9 @@ func (tlu *TimeLogUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := tlu.mutation.Date(); ok {
 		_spec.SetField(timelog.FieldDate, field.TypeTime, value)
+	}
+	if value, ok := tlu.mutation.VolunteerID(); ok {
+		_spec.SetField(timelog.FieldVolunteerID, field.TypeUUID, value)
 	}
 	if tlu.mutation.VolunteerCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -326,6 +343,20 @@ func (tluo *TimeLogUpdateOne) SetDate(t time.Time) *TimeLogUpdateOne {
 func (tluo *TimeLogUpdateOne) SetNillableDate(t *time.Time) *TimeLogUpdateOne {
 	if t != nil {
 		tluo.SetDate(*t)
+	}
+	return tluo
+}
+
+// SetVolunteerID sets the "volunteer_id" field.
+func (tluo *TimeLogUpdateOne) SetVolunteerID(u uuid.UUID) *TimeLogUpdateOne {
+	tluo.mutation.SetVolunteerID(u)
+	return tluo
+}
+
+// SetNillableVolunteerID sets the "volunteer_id" field if the given value is not nil.
+func (tluo *TimeLogUpdateOne) SetNillableVolunteerID(u *uuid.UUID) *TimeLogUpdateOne {
+	if u != nil {
+		tluo.SetVolunteerID(*u)
 	}
 	return tluo
 }
@@ -468,6 +499,9 @@ func (tluo *TimeLogUpdateOne) sqlSave(ctx context.Context) (_node *TimeLog, err 
 	}
 	if value, ok := tluo.mutation.Date(); ok {
 		_spec.SetField(timelog.FieldDate, field.TypeTime, value)
+	}
+	if value, ok := tluo.mutation.VolunteerID(); ok {
+		_spec.SetField(timelog.FieldVolunteerID, field.TypeUUID, value)
 	}
 	if tluo.mutation.VolunteerCleared() {
 		edge := &sqlgraph.EdgeSpec{

@@ -27,7 +27,9 @@ service VolunteerService {
   // Requires volunteer
   rpc UpdateVolunteerProfile(UpdateVolunteerProfileRequest) returns (UpdateVolunteerProfileResponse);
   // === TIME LOGS
+  // Requires volunteer
   rpc CreateTimeLog(CreateTimeLogRequest) returns (CreateTimeLogResponse);
+  // Requires user
   rpc ListTimeLogs(ListTimeLogsRequest) returns (ListTimeLogsResponse);
   rpc UpdateTimeLog(UpdateTimeLogRequest) returns (UpdateTimeLogResponse);
   rpc DeleteTimeLog(DeleteTimeLogRequest) returns (DeleteTimeLogResponse);
