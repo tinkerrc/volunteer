@@ -66,6 +66,7 @@ service VolunteerService {
   rpc AddEventCerts(AddEventCertsRequest) returns (AddEventCertsResponse);
   // Requires user
   rpc RemoveEventCerts(RemoveEventCertsRequest) returns (RemoveEventCertsResponse);
+  // Requires user
   rpc DeleteEvent(DeleteEventRequest) returns (DeleteEventResponse);
   // === EVENT VOLUNTEERS
   rpc ListEventVolunteers(ListEventVolunteersRequest) returns (ListEventVolunteersResponse);
@@ -384,7 +385,7 @@ message RemoveEventCertsRequest {
 message RemoveEventCertsResponse {}
 
 message DeleteEventRequest {
-  string event_id = 1;
+  string id = 1;
 }
 
 message DeleteEventResponse {}
