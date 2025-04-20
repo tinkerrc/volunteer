@@ -1,14 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import Dashboard from './Dashboard.jsx';
+import EventList from './EventList.jsx';
 import './index.css'; // optional global styles
 import VolunteerPage from './VolunteerPage.jsx';
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <Dashboard />,
+    element: <EventList />,
   },
   {
     path: '/volunteer',

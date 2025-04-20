@@ -61,6 +61,8 @@ service VolunteerService {
   // Requires user
   rpc ListEvents(ListEventsRequest) returns (ListEventsResponse);
   // Requires user
+  rpc GetEvent(GetEventRequest) returns (GetEventResponse);
+  // Requires user
   rpc UpdateEvent(UpdateEventRequest) returns (UpdateEventResponse);
   // Requires user
   rpc AddEventCerts(AddEventCertsRequest) returns (AddEventCertsResponse);
@@ -362,6 +364,14 @@ message ListEventsRequest {
 
 message ListEventsResponse {
   repeated Event events = 1;
+}
+
+message GetEventRequest {
+  string id = 1;
+}
+
+message GetEventResponse {
+  Event event = 1;
 }
 
 message UpdateEventRequest {

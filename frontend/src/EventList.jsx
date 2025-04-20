@@ -1,6 +1,6 @@
 import React from 'react';
-import styles from './Dashboard.module.css';
 import { NavLink } from 'react-router-dom';
+import styles from './EventList.module.css';
 
 const Event = ({ date, day, title, time, slots, onClick }) => {
   return (
@@ -33,7 +33,7 @@ const Event = ({ date, day, title, time, slots, onClick }) => {
   );
 };
 
-const Dashboard = () => {
+const EventList = ({ goto }) => {
   return (
     <div className={styles.finalDash}>
       <div className={styles.finalDashChild} />
@@ -95,7 +95,7 @@ const Dashboard = () => {
           <div className={styles.next6Months}>Next 6 Months</div>
         </div>
         <div className={styles.cardParent}>
-          <Event day="TUES" date="May 13" title="Peer Support Group" time="2pm – 3pm" slots="1/2 Filled Slots" onClick={() => {}} />
+          <Event day="TUES" date="May 13" title="Peer Support Group" time="2pm – 3pm" slots="1/2 Filled Slots" onClick={() => { }} />
           <Event day="MON" date="May 19" title="Peer Support Group" time="12pm – 2pm" slots="0/2 Filled Slots" />
         </div>
       </div>
@@ -131,4 +131,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default EventList;

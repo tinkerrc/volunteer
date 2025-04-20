@@ -96,6 +96,9 @@ const (
 	// VolunteerServiceListEventsProcedure is the fully-qualified name of the VolunteerService's
 	// ListEvents RPC.
 	VolunteerServiceListEventsProcedure = "/api.v1.VolunteerService/ListEvents"
+	// VolunteerServiceGetEventProcedure is the fully-qualified name of the VolunteerService's GetEvent
+	// RPC.
+	VolunteerServiceGetEventProcedure = "/api.v1.VolunteerService/GetEvent"
 	// VolunteerServiceUpdateEventProcedure is the fully-qualified name of the VolunteerService's
 	// UpdateEvent RPC.
 	VolunteerServiceUpdateEventProcedure = "/api.v1.VolunteerService/UpdateEvent"
@@ -143,6 +146,7 @@ var (
 	volunteerServiceDeleteCertMethodDescriptor             = volunteerServiceServiceDescriptor.Methods().ByName("DeleteCert")
 	volunteerServiceCreateEventMethodDescriptor            = volunteerServiceServiceDescriptor.Methods().ByName("CreateEvent")
 	volunteerServiceListEventsMethodDescriptor             = volunteerServiceServiceDescriptor.Methods().ByName("ListEvents")
+	volunteerServiceGetEventMethodDescriptor               = volunteerServiceServiceDescriptor.Methods().ByName("GetEvent")
 	volunteerServiceUpdateEventMethodDescriptor            = volunteerServiceServiceDescriptor.Methods().ByName("UpdateEvent")
 	volunteerServiceAddEventCertsMethodDescriptor          = volunteerServiceServiceDescriptor.Methods().ByName("AddEventCerts")
 	volunteerServiceRemoveEventCertsMethodDescriptor       = volunteerServiceServiceDescriptor.Methods().ByName("RemoveEventCerts")
@@ -206,6 +210,8 @@ type VolunteerServiceClient interface {
 	CreateEvent(context.Context, *connect.Request[v1.CreateEventRequest]) (*connect.Response[v1.CreateEventResponse], error)
 	// Requires user
 	ListEvents(context.Context, *connect.Request[v1.ListEventsRequest]) (*connect.Response[v1.ListEventsResponse], error)
+	// Requires user
+	GetEvent(context.Context, *connect.Request[v1.GetEventRequest]) (*connect.Response[v1.GetEventResponse], error)
 	// Requires user
 	UpdateEvent(context.Context, *connect.Request[v1.UpdateEventRequest]) (*connect.Response[v1.UpdateEventResponse], error)
 	// Requires user
@@ -359,6 +365,12 @@ func NewVolunteerServiceClient(httpClient connect.HTTPClient, baseURL string, op
 			connect.WithSchema(volunteerServiceListEventsMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		getEvent: connect.NewClient[v1.GetEventRequest, v1.GetEventResponse](
+			httpClient,
+			baseURL+VolunteerServiceGetEventProcedure,
+			connect.WithSchema(volunteerServiceGetEventMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 		updateEvent: connect.NewClient[v1.UpdateEventRequest, v1.UpdateEventResponse](
 			httpClient,
 			baseURL+VolunteerServiceUpdateEventProcedure,
@@ -427,6 +439,7 @@ type volunteerServiceClient struct {
 	deleteCert             *connect.Client[v1.DeleteCertRequest, v1.DeleteCertResponse]
 	createEvent            *connect.Client[v1.CreateEventRequest, v1.CreateEventResponse]
 	listEvents             *connect.Client[v1.ListEventsRequest, v1.ListEventsResponse]
+	getEvent               *connect.Client[v1.GetEventRequest, v1.GetEventResponse]
 	updateEvent            *connect.Client[v1.UpdateEventRequest, v1.UpdateEventResponse]
 	addEventCerts          *connect.Client[v1.AddEventCertsRequest, v1.AddEventCertsResponse]
 	removeEventCerts       *connect.Client[v1.RemoveEventCertsRequest, v1.RemoveEventCertsResponse]
@@ -541,6 +554,11 @@ func (c *volunteerServiceClient) ListEvents(ctx context.Context, req *connect.Re
 	return c.listEvents.CallUnary(ctx, req)
 }
 
+// GetEvent calls api.v1.VolunteerService.GetEvent.
+func (c *volunteerServiceClient) GetEvent(ctx context.Context, req *connect.Request[v1.GetEventRequest]) (*connect.Response[v1.GetEventResponse], error) {
+	return c.getEvent.CallUnary(ctx, req)
+}
+
 // UpdateEvent calls api.v1.VolunteerService.UpdateEvent.
 func (c *volunteerServiceClient) UpdateEvent(ctx context.Context, req *connect.Request[v1.UpdateEventRequest]) (*connect.Response[v1.UpdateEventResponse], error) {
 	return c.updateEvent.CallUnary(ctx, req)
@@ -630,6 +648,8 @@ type VolunteerServiceHandler interface {
 	CreateEvent(context.Context, *connect.Request[v1.CreateEventRequest]) (*connect.Response[v1.CreateEventResponse], error)
 	// Requires user
 	ListEvents(context.Context, *connect.Request[v1.ListEventsRequest]) (*connect.Response[v1.ListEventsResponse], error)
+	// Requires user
+	GetEvent(context.Context, *connect.Request[v1.GetEventRequest]) (*connect.Response[v1.GetEventResponse], error)
 	// Requires user
 	UpdateEvent(context.Context, *connect.Request[v1.UpdateEventRequest]) (*connect.Response[v1.UpdateEventResponse], error)
 	// Requires user
@@ -779,6 +799,12 @@ func NewVolunteerServiceHandler(svc VolunteerServiceHandler, opts ...connect.Han
 		connect.WithSchema(volunteerServiceListEventsMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	volunteerServiceGetEventHandler := connect.NewUnaryHandler(
+		VolunteerServiceGetEventProcedure,
+		svc.GetEvent,
+		connect.WithSchema(volunteerServiceGetEventMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	volunteerServiceUpdateEventHandler := connect.NewUnaryHandler(
 		VolunteerServiceUpdateEventProcedure,
 		svc.UpdateEvent,
@@ -865,6 +891,8 @@ func NewVolunteerServiceHandler(svc VolunteerServiceHandler, opts ...connect.Han
 			volunteerServiceCreateEventHandler.ServeHTTP(w, r)
 		case VolunteerServiceListEventsProcedure:
 			volunteerServiceListEventsHandler.ServeHTTP(w, r)
+		case VolunteerServiceGetEventProcedure:
+			volunteerServiceGetEventHandler.ServeHTTP(w, r)
 		case VolunteerServiceUpdateEventProcedure:
 			volunteerServiceUpdateEventHandler.ServeHTTP(w, r)
 		case VolunteerServiceAddEventCertsProcedure:
@@ -970,6 +998,10 @@ func (UnimplementedVolunteerServiceHandler) CreateEvent(context.Context, *connec
 
 func (UnimplementedVolunteerServiceHandler) ListEvents(context.Context, *connect.Request[v1.ListEventsRequest]) (*connect.Response[v1.ListEventsResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.VolunteerService.ListEvents is not implemented"))
+}
+
+func (UnimplementedVolunteerServiceHandler) GetEvent(context.Context, *connect.Request[v1.GetEventRequest]) (*connect.Response[v1.GetEventResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.VolunteerService.GetEvent is not implemented"))
 }
 
 func (UnimplementedVolunteerServiceHandler) UpdateEvent(context.Context, *connect.Request[v1.UpdateEventRequest]) (*connect.Response[v1.UpdateEventResponse], error) {
