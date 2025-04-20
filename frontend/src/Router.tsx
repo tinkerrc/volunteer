@@ -2,6 +2,7 @@ import { AppShell, AppShellMain, AppShellNavbar, Table } from '@mantine/core';
 import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom';
 import { Nav } from './components/Nav/Nav';
 import { CertsPage } from './pages/Certs.page';
+import { CreateVolunteerPage } from './pages/CreateVolunteer.page';
 import { EventsPage } from './pages/Events.page';
 import { HomePage } from './pages/Home.page';
 
@@ -34,8 +35,8 @@ const router = createBrowserRouter([
         element: <Table />,
       },
       {
-        path: '/volunteers/add',
-        element: <Add />,
+        path: '/volunteers/create',
+        element: <CreateVolunteerPage />,
       },
     ],
   },

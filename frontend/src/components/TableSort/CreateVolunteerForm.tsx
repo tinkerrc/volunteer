@@ -1,0 +1,67 @@
+import { VolunteerService } from '@/proto/api/v1/api_pb';
+import { transport } from '@/utils/client';
+import { useAuth0 } from '@auth0/auth0-react';
+import { createClient } from '@connectrpc/connect';
+import { Button, Group, TextInput } from '@mantine/core';
+import { useForm } from '@mantine/form';
+import { useMemo } from 'react';
+
+interface CreateVolunteerData {
+    email: string;
+    firstName: string;
+    middleName?: string;
+    lastName: string;
+    phone: string;
+}
+
+export const CreateVolunteerForm = async () => {
+    const { isAuthenticated, getAccessTokenSilently } = useAuth0();
+
+    const client = useMemo(() => createClient(VolunteerService, transport), [VolunteerService]);
+    const form = useForm({
+        mode: "uncontrolled",
+        initialValues: {
+            email: "",
+            firstName: "",
+            middleName: undefined,
+            lastName: "",
+            phone: "",
+        },
+        validate: {
+            email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
+            phone: (value) => (/^[\d]{9}$/.test(value) ? null : 'Invalid phone'),
+        }
+    })
+
+    const submitForm = async (values: CreateVolunteerData) => {
+        try {
+            if (!isAuthenticated) {
+                return
+            }
+            const accessToken = await getAccessTokenSilently({
+                authorizationParams: {
+                    audience: "https://api.yolovms.org",
+                    scope: "read:current_user",
+                },
+            });
+            const headers = new Headers();
+            headers.set("Authorization", `Bearer ${accessToken}`)
+            const res = await client.createVolunteer({ ...values });
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+    return (
+        <form onSubmit={form.onSubmit(submitForm)}>
+            <TextInput withAsterisk label="Email" placeholder='your@email.com' key={form.key('email')} {...form.getInputProps('email')} />
+            <TextInput withAsterisk label="First Name" placeholder='Jane' key={form.key('firstName')} {...form.getInputProps('firstName')} />
+            <TextInput label="Middle Name" placeholder='Jane' key={form.key('middleName')} {...form.getInputProps('middleName')} />
+            <TextInput withAsterisk label="Last Name" placeholder='Doe' key={form.key('lastName')} {...form.getInputProps('lastName')} />
+            <TextInput withAsterisk label="Phone Number" placeholder='5556667788' key={form.key('phone')} {...form.getInputProps('phone')} />
+            <Group justify="flex-end" mt="md">
+                <Button type="submit">Create</Button>
+            </Group>
+        </form>
+    )
+};
