@@ -82,7 +82,6 @@ var (
 		{Name: "hours", Type: field.TypeInt},
 		{Name: "minutes", Type: field.TypeInt},
 		{Name: "date", Type: field.TypeTime},
-		{Name: "volunteer_id", Type: field.TypeUUID},
 		{Name: "time_log_volunteer", Type: field.TypeUUID},
 		{Name: "time_log_event", Type: field.TypeUUID, Nullable: true},
 	}
@@ -94,13 +93,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "time_logs_volunteers_volunteer",
-				Columns:    []*schema.Column{TimeLogsColumns[5]},
+				Columns:    []*schema.Column{TimeLogsColumns[4]},
 				RefColumns: []*schema.Column{VolunteersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "time_logs_events_event",
-				Columns:    []*schema.Column{TimeLogsColumns[6]},
+				Columns:    []*schema.Column{TimeLogsColumns[5]},
 				RefColumns: []*schema.Column{EventsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -109,7 +108,7 @@ var (
 			{
 				Name:    "timelog_time_log_volunteer",
 				Unique:  false,
-				Columns: []*schema.Column{TimeLogsColumns[5]},
+				Columns: []*schema.Column{TimeLogsColumns[4]},
 			},
 			{
 				Name:    "timelog_date",
