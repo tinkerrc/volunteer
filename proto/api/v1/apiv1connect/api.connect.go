@@ -189,6 +189,7 @@ type VolunteerServiceClient interface {
 	ListCerts(context.Context, *connect.Request[v1.ListCertsRequest]) (*connect.Response[v1.ListCertsResponse], error)
 	// Requires user
 	GetCert(context.Context, *connect.Request[v1.GetCertRequest]) (*connect.Response[v1.GetCertResponse], error)
+	// Requires user
 	UpdateCert(context.Context, *connect.Request[v1.UpdateCertRequest]) (*connect.Response[v1.UpdateCertResponse], error)
 	DeleteCert(context.Context, *connect.Request[v1.DeleteCertRequest]) (*connect.Response[v1.DeleteCertResponse], error)
 	// === EVENTS
@@ -576,6 +577,7 @@ type VolunteerServiceHandler interface {
 	ListCerts(context.Context, *connect.Request[v1.ListCertsRequest]) (*connect.Response[v1.ListCertsResponse], error)
 	// Requires user
 	GetCert(context.Context, *connect.Request[v1.GetCertRequest]) (*connect.Response[v1.GetCertResponse], error)
+	// Requires user
 	UpdateCert(context.Context, *connect.Request[v1.UpdateCertRequest]) (*connect.Response[v1.UpdateCertResponse], error)
 	DeleteCert(context.Context, *connect.Request[v1.DeleteCertRequest]) (*connect.Response[v1.DeleteCertResponse], error)
 	// === EVENTS

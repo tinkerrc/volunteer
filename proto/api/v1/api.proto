@@ -51,6 +51,7 @@ service VolunteerService {
   rpc ListCerts(ListCertsRequest) returns (ListCertsResponse);
   // Requires user
   rpc GetCert(GetCertRequest) returns (GetCertResponse);
+  // Requires user
   rpc UpdateCert(UpdateCertRequest) returns (UpdateCertResponse);
   rpc DeleteCert(DeleteCertRequest) returns (DeleteCertResponse);
   // === EVENTS
