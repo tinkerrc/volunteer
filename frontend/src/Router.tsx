@@ -7,7 +7,7 @@ import { HomePage } from './pages/Home.page';
 
 const AppLayout = () => (
   <>
-    <AppShell>
+    <AppShell navbar={{ width: 80, breakpoint: "sm" }}>
       <AppShellNavbar><Nav></Nav></AppShellNavbar>
       <AppShellMain><Outlet /></AppShellMain>
     </AppShell>
