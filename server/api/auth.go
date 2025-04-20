@@ -20,6 +20,7 @@ import (
 // CustomClaims contains custom data we want from the token.
 type CustomClaims struct {
 	Scope string `json:"scope"`
+	Email string `json:"email"`
 }
 
 // Validate does nothing for this example, but we need
@@ -40,7 +41,6 @@ func Authenticate(db *ent.Client) func(context.Context, *http.Request) (any, err
 		provider.KeyFunc,
 		validator.RS256,
 		issuerURL.String(),
-		//[]string{os.Getenv("AUTH0_AUDIENCE")},
 		[]string{"https://dev-v8cbdhmtmu4lj338.us.auth0.com/api/v2/"},
 		validator.WithCustomClaims(
 			func() validator.CustomClaims {
@@ -68,8 +68,12 @@ func Authenticate(db *ent.Client) func(context.Context, *http.Request) (any, err
 		if !ok {
 			return nil, authn.Errorf("invalid token")
 		}
+		customClaims, ok := claims.CustomClaims.(CustomClaims)
+		if !ok {
+			return nil, authn.Errorf("missing email claim")
+		}
 
-		return claims.RegisteredClaims.Subject, nil
+		return customClaims.Email, nil
 	}
 }
 
