@@ -40,7 +40,7 @@ func (tld *TimeLogDelete) ExecX(ctx context.Context) int {
 }
 
 func (tld *TimeLogDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := sqlgraph.NewDeleteSpec(timelog.Table, sqlgraph.NewFieldSpec(timelog.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewDeleteSpec(timelog.Table, sqlgraph.NewFieldSpec(timelog.FieldID, field.TypeUUID))
 	if ps := tld.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {

@@ -3,53 +3,238 @@
 package timelog
 
 import (
+	"time"
+
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/google/uuid"
 	"github.com/tinkerrc/volunteer/ent/predicate"
 )
 
 // ID filters vertices based on their ID field.
-func ID(id int) predicate.TimeLog {
+func ID(id uuid.UUID) predicate.TimeLog {
 	return predicate.TimeLog(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id int) predicate.TimeLog {
+func IDEQ(id uuid.UUID) predicate.TimeLog {
 	return predicate.TimeLog(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id int) predicate.TimeLog {
+func IDNEQ(id uuid.UUID) predicate.TimeLog {
 	return predicate.TimeLog(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...int) predicate.TimeLog {
+func IDIn(ids ...uuid.UUID) predicate.TimeLog {
 	return predicate.TimeLog(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...int) predicate.TimeLog {
+func IDNotIn(ids ...uuid.UUID) predicate.TimeLog {
 	return predicate.TimeLog(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id int) predicate.TimeLog {
+func IDGT(id uuid.UUID) predicate.TimeLog {
 	return predicate.TimeLog(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id int) predicate.TimeLog {
+func IDGTE(id uuid.UUID) predicate.TimeLog {
 	return predicate.TimeLog(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id int) predicate.TimeLog {
+func IDLT(id uuid.UUID) predicate.TimeLog {
 	return predicate.TimeLog(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id int) predicate.TimeLog {
+func IDLTE(id uuid.UUID) predicate.TimeLog {
 	return predicate.TimeLog(sql.FieldLTE(FieldID, id))
+}
+
+// Hours applies equality check predicate on the "hours" field. It's identical to HoursEQ.
+func Hours(v int) predicate.TimeLog {
+	return predicate.TimeLog(sql.FieldEQ(FieldHours, v))
+}
+
+// Minutes applies equality check predicate on the "minutes" field. It's identical to MinutesEQ.
+func Minutes(v int) predicate.TimeLog {
+	return predicate.TimeLog(sql.FieldEQ(FieldMinutes, v))
+}
+
+// Date applies equality check predicate on the "date" field. It's identical to DateEQ.
+func Date(v time.Time) predicate.TimeLog {
+	return predicate.TimeLog(sql.FieldEQ(FieldDate, v))
+}
+
+// HoursEQ applies the EQ predicate on the "hours" field.
+func HoursEQ(v int) predicate.TimeLog {
+	return predicate.TimeLog(sql.FieldEQ(FieldHours, v))
+}
+
+// HoursNEQ applies the NEQ predicate on the "hours" field.
+func HoursNEQ(v int) predicate.TimeLog {
+	return predicate.TimeLog(sql.FieldNEQ(FieldHours, v))
+}
+
+// HoursIn applies the In predicate on the "hours" field.
+func HoursIn(vs ...int) predicate.TimeLog {
+	return predicate.TimeLog(sql.FieldIn(FieldHours, vs...))
+}
+
+// HoursNotIn applies the NotIn predicate on the "hours" field.
+func HoursNotIn(vs ...int) predicate.TimeLog {
+	return predicate.TimeLog(sql.FieldNotIn(FieldHours, vs...))
+}
+
+// HoursGT applies the GT predicate on the "hours" field.
+func HoursGT(v int) predicate.TimeLog {
+	return predicate.TimeLog(sql.FieldGT(FieldHours, v))
+}
+
+// HoursGTE applies the GTE predicate on the "hours" field.
+func HoursGTE(v int) predicate.TimeLog {
+	return predicate.TimeLog(sql.FieldGTE(FieldHours, v))
+}
+
+// HoursLT applies the LT predicate on the "hours" field.
+func HoursLT(v int) predicate.TimeLog {
+	return predicate.TimeLog(sql.FieldLT(FieldHours, v))
+}
+
+// HoursLTE applies the LTE predicate on the "hours" field.
+func HoursLTE(v int) predicate.TimeLog {
+	return predicate.TimeLog(sql.FieldLTE(FieldHours, v))
+}
+
+// MinutesEQ applies the EQ predicate on the "minutes" field.
+func MinutesEQ(v int) predicate.TimeLog {
+	return predicate.TimeLog(sql.FieldEQ(FieldMinutes, v))
+}
+
+// MinutesNEQ applies the NEQ predicate on the "minutes" field.
+func MinutesNEQ(v int) predicate.TimeLog {
+	return predicate.TimeLog(sql.FieldNEQ(FieldMinutes, v))
+}
+
+// MinutesIn applies the In predicate on the "minutes" field.
+func MinutesIn(vs ...int) predicate.TimeLog {
+	return predicate.TimeLog(sql.FieldIn(FieldMinutes, vs...))
+}
+
+// MinutesNotIn applies the NotIn predicate on the "minutes" field.
+func MinutesNotIn(vs ...int) predicate.TimeLog {
+	return predicate.TimeLog(sql.FieldNotIn(FieldMinutes, vs...))
+}
+
+// MinutesGT applies the GT predicate on the "minutes" field.
+func MinutesGT(v int) predicate.TimeLog {
+	return predicate.TimeLog(sql.FieldGT(FieldMinutes, v))
+}
+
+// MinutesGTE applies the GTE predicate on the "minutes" field.
+func MinutesGTE(v int) predicate.TimeLog {
+	return predicate.TimeLog(sql.FieldGTE(FieldMinutes, v))
+}
+
+// MinutesLT applies the LT predicate on the "minutes" field.
+func MinutesLT(v int) predicate.TimeLog {
+	return predicate.TimeLog(sql.FieldLT(FieldMinutes, v))
+}
+
+// MinutesLTE applies the LTE predicate on the "minutes" field.
+func MinutesLTE(v int) predicate.TimeLog {
+	return predicate.TimeLog(sql.FieldLTE(FieldMinutes, v))
+}
+
+// DateEQ applies the EQ predicate on the "date" field.
+func DateEQ(v time.Time) predicate.TimeLog {
+	return predicate.TimeLog(sql.FieldEQ(FieldDate, v))
+}
+
+// DateNEQ applies the NEQ predicate on the "date" field.
+func DateNEQ(v time.Time) predicate.TimeLog {
+	return predicate.TimeLog(sql.FieldNEQ(FieldDate, v))
+}
+
+// DateIn applies the In predicate on the "date" field.
+func DateIn(vs ...time.Time) predicate.TimeLog {
+	return predicate.TimeLog(sql.FieldIn(FieldDate, vs...))
+}
+
+// DateNotIn applies the NotIn predicate on the "date" field.
+func DateNotIn(vs ...time.Time) predicate.TimeLog {
+	return predicate.TimeLog(sql.FieldNotIn(FieldDate, vs...))
+}
+
+// DateGT applies the GT predicate on the "date" field.
+func DateGT(v time.Time) predicate.TimeLog {
+	return predicate.TimeLog(sql.FieldGT(FieldDate, v))
+}
+
+// DateGTE applies the GTE predicate on the "date" field.
+func DateGTE(v time.Time) predicate.TimeLog {
+	return predicate.TimeLog(sql.FieldGTE(FieldDate, v))
+}
+
+// DateLT applies the LT predicate on the "date" field.
+func DateLT(v time.Time) predicate.TimeLog {
+	return predicate.TimeLog(sql.FieldLT(FieldDate, v))
+}
+
+// DateLTE applies the LTE predicate on the "date" field.
+func DateLTE(v time.Time) predicate.TimeLog {
+	return predicate.TimeLog(sql.FieldLTE(FieldDate, v))
+}
+
+// HasVolunteer applies the HasEdge predicate on the "volunteer" edge.
+func HasVolunteer() predicate.TimeLog {
+	return predicate.TimeLog(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, VolunteerTable, VolunteerColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasVolunteerWith applies the HasEdge predicate on the "volunteer" edge with a given conditions (other predicates).
+func HasVolunteerWith(preds ...predicate.Volunteer) predicate.TimeLog {
+	return predicate.TimeLog(func(s *sql.Selector) {
+		step := newVolunteerStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasEvent applies the HasEdge predicate on the "event" edge.
+func HasEvent() predicate.TimeLog {
+	return predicate.TimeLog(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, EventTable, EventColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasEventWith applies the HasEdge predicate on the "event" edge with a given conditions (other predicates).
+func HasEventWith(preds ...predicate.Event) predicate.TimeLog {
+	return predicate.TimeLog(func(s *sql.Selector) {
+		step := newEventStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

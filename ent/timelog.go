@@ -5,18 +5,66 @@ package ent
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/google/uuid"
+	"github.com/tinkerrc/volunteer/ent/event"
 	"github.com/tinkerrc/volunteer/ent/timelog"
+	"github.com/tinkerrc/volunteer/ent/volunteer"
 )
 
 // TimeLog is the model entity for the TimeLog schema.
 type TimeLog struct {
-	config
+	config `json:"-"`
 	// ID of the ent.
-	ID           int `json:"id,omitempty"`
-	selectValues sql.SelectValues
+	ID uuid.UUID `json:"id,omitempty"`
+	// Hours holds the value of the "hours" field.
+	Hours int `json:"hours,omitempty"`
+	// Minutes holds the value of the "minutes" field.
+	Minutes int `json:"minutes,omitempty"`
+	// Date holds the value of the "date" field.
+	Date time.Time `json:"date,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the TimeLogQuery when eager-loading is set.
+	Edges              TimeLogEdges `json:"edges"`
+	time_log_volunteer *uuid.UUID
+	time_log_event     *int
+	selectValues       sql.SelectValues
+}
+
+// TimeLogEdges holds the relations/edges for other nodes in the graph.
+type TimeLogEdges struct {
+	// Volunteer holds the value of the volunteer edge.
+	Volunteer *Volunteer `json:"volunteer,omitempty"`
+	// Event holds the value of the event edge.
+	Event *Event `json:"event,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [2]bool
+}
+
+// VolunteerOrErr returns the Volunteer value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e TimeLogEdges) VolunteerOrErr() (*Volunteer, error) {
+	if e.Volunteer != nil {
+		return e.Volunteer, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: volunteer.Label}
+	}
+	return nil, &NotLoadedError{edge: "volunteer"}
+}
+
+// EventOrErr returns the Event value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e TimeLogEdges) EventOrErr() (*Event, error) {
+	if e.Event != nil {
+		return e.Event, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: event.Label}
+	}
+	return nil, &NotLoadedError{edge: "event"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -24,7 +72,15 @@ func (*TimeLog) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case timelog.FieldHours, timelog.FieldMinutes:
+			values[i] = new(sql.NullInt64)
+		case timelog.FieldDate:
+			values[i] = new(sql.NullTime)
 		case timelog.FieldID:
+			values[i] = new(uuid.UUID)
+		case timelog.ForeignKeys[0]: // time_log_volunteer
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
+		case timelog.ForeignKeys[1]: // time_log_event
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -42,11 +98,43 @@ func (tl *TimeLog) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case timelog.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
-			if !ok {
-				return fmt.Errorf("unexpected type %T for field id", value)
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field id", values[i])
+			} else if value != nil {
+				tl.ID = *value
 			}
-			tl.ID = int(value.Int64)
+		case timelog.FieldHours:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field hours", values[i])
+			} else if value.Valid {
+				tl.Hours = int(value.Int64)
+			}
+		case timelog.FieldMinutes:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field minutes", values[i])
+			} else if value.Valid {
+				tl.Minutes = int(value.Int64)
+			}
+		case timelog.FieldDate:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field date", values[i])
+			} else if value.Valid {
+				tl.Date = value.Time
+			}
+		case timelog.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field time_log_volunteer", values[i])
+			} else if value.Valid {
+				tl.time_log_volunteer = new(uuid.UUID)
+				*tl.time_log_volunteer = *value.S.(*uuid.UUID)
+			}
+		case timelog.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field time_log_event", value)
+			} else if value.Valid {
+				tl.time_log_event = new(int)
+				*tl.time_log_event = int(value.Int64)
+			}
 		default:
 			tl.selectValues.Set(columns[i], values[i])
 		}
@@ -58,6 +146,16 @@ func (tl *TimeLog) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (tl *TimeLog) Value(name string) (ent.Value, error) {
 	return tl.selectValues.Get(name)
+}
+
+// QueryVolunteer queries the "volunteer" edge of the TimeLog entity.
+func (tl *TimeLog) QueryVolunteer() *VolunteerQuery {
+	return NewTimeLogClient(tl.config).QueryVolunteer(tl)
+}
+
+// QueryEvent queries the "event" edge of the TimeLog entity.
+func (tl *TimeLog) QueryEvent() *EventQuery {
+	return NewTimeLogClient(tl.config).QueryEvent(tl)
 }
 
 // Update returns a builder for updating this TimeLog.
@@ -82,7 +180,15 @@ func (tl *TimeLog) Unwrap() *TimeLog {
 func (tl *TimeLog) String() string {
 	var builder strings.Builder
 	builder.WriteString("TimeLog(")
-	builder.WriteString(fmt.Sprintf("id=%v", tl.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", tl.ID))
+	builder.WriteString("hours=")
+	builder.WriteString(fmt.Sprintf("%v", tl.Hours))
+	builder.WriteString(", ")
+	builder.WriteString("minutes=")
+	builder.WriteString(fmt.Sprintf("%v", tl.Minutes))
+	builder.WriteString(", ")
+	builder.WriteString("date=")
+	builder.WriteString(tl.Date.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -15,6 +15,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/tinkerrc/volunteer/ent/certification"
 	"github.com/tinkerrc/volunteer/ent/event"
 	"github.com/tinkerrc/volunteer/ent/timelog"
@@ -564,7 +565,7 @@ func (c *TimeLogClient) UpdateOne(tl *TimeLog) *TimeLogUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *TimeLogClient) UpdateOneID(id int) *TimeLogUpdateOne {
+func (c *TimeLogClient) UpdateOneID(id uuid.UUID) *TimeLogUpdateOne {
 	mutation := newTimeLogMutation(c.config, OpUpdateOne, withTimeLogID(id))
 	return &TimeLogUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -581,7 +582,7 @@ func (c *TimeLogClient) DeleteOne(tl *TimeLog) *TimeLogDeleteOne {
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *TimeLogClient) DeleteOneID(id int) *TimeLogDeleteOne {
+func (c *TimeLogClient) DeleteOneID(id uuid.UUID) *TimeLogDeleteOne {
 	builder := c.Delete().Where(timelog.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -598,17 +599,49 @@ func (c *TimeLogClient) Query() *TimeLogQuery {
 }
 
 // Get returns a TimeLog entity by its id.
-func (c *TimeLogClient) Get(ctx context.Context, id int) (*TimeLog, error) {
+func (c *TimeLogClient) Get(ctx context.Context, id uuid.UUID) (*TimeLog, error) {
 	return c.Query().Where(timelog.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *TimeLogClient) GetX(ctx context.Context, id int) *TimeLog {
+func (c *TimeLogClient) GetX(ctx context.Context, id uuid.UUID) *TimeLog {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
 	}
 	return obj
+}
+
+// QueryVolunteer queries the volunteer edge of a TimeLog.
+func (c *TimeLogClient) QueryVolunteer(tl *TimeLog) *VolunteerQuery {
+	query := (&VolunteerClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := tl.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(timelog.Table, timelog.FieldID, id),
+			sqlgraph.To(volunteer.Table, volunteer.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, timelog.VolunteerTable, timelog.VolunteerColumn),
+		)
+		fromV = sqlgraph.Neighbors(tl.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryEvent queries the event edge of a TimeLog.
+func (c *TimeLogClient) QueryEvent(tl *TimeLog) *EventQuery {
+	query := (&EventClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := tl.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(timelog.Table, timelog.FieldID, id),
+			sqlgraph.To(event.Table, event.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, timelog.EventTable, timelog.EventColumn),
+		)
+		fromV = sqlgraph.Neighbors(tl.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // Hooks returns the client hooks.

@@ -30,13 +30,32 @@ var (
 	}
 	// TimeLogsColumns holds the columns for the "time_logs" table.
 	TimeLogsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "hours", Type: field.TypeInt},
+		{Name: "minutes", Type: field.TypeInt},
+		{Name: "date", Type: field.TypeTime},
+		{Name: "time_log_volunteer", Type: field.TypeUUID},
+		{Name: "time_log_event", Type: field.TypeInt, Nullable: true},
 	}
 	// TimeLogsTable holds the schema information for the "time_logs" table.
 	TimeLogsTable = &schema.Table{
 		Name:       "time_logs",
 		Columns:    TimeLogsColumns,
 		PrimaryKey: []*schema.Column{TimeLogsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "time_logs_volunteers_volunteer",
+				Columns:    []*schema.Column{TimeLogsColumns[4]},
+				RefColumns: []*schema.Column{VolunteersColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "time_logs_events_event",
+				Columns:    []*schema.Column{TimeLogsColumns[5]},
+				RefColumns: []*schema.Column{EventsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
 	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
@@ -77,4 +96,6 @@ var (
 )
 
 func init() {
+	TimeLogsTable.ForeignKeys[0].RefTable = VolunteersTable
+	TimeLogsTable.ForeignKeys[1].RefTable = EventsTable
 }

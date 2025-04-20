@@ -4,6 +4,8 @@ package timelog
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/google/uuid"
 )
 
 const (
@@ -11,13 +13,47 @@ const (
 	Label = "time_log"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldHours holds the string denoting the hours field in the database.
+	FieldHours = "hours"
+	// FieldMinutes holds the string denoting the minutes field in the database.
+	FieldMinutes = "minutes"
+	// FieldDate holds the string denoting the date field in the database.
+	FieldDate = "date"
+	// EdgeVolunteer holds the string denoting the volunteer edge name in mutations.
+	EdgeVolunteer = "volunteer"
+	// EdgeEvent holds the string denoting the event edge name in mutations.
+	EdgeEvent = "event"
 	// Table holds the table name of the timelog in the database.
 	Table = "time_logs"
+	// VolunteerTable is the table that holds the volunteer relation/edge.
+	VolunteerTable = "time_logs"
+	// VolunteerInverseTable is the table name for the Volunteer entity.
+	// It exists in this package in order to avoid circular dependency with the "volunteer" package.
+	VolunteerInverseTable = "volunteers"
+	// VolunteerColumn is the table column denoting the volunteer relation/edge.
+	VolunteerColumn = "time_log_volunteer"
+	// EventTable is the table that holds the event relation/edge.
+	EventTable = "time_logs"
+	// EventInverseTable is the table name for the Event entity.
+	// It exists in this package in order to avoid circular dependency with the "event" package.
+	EventInverseTable = "events"
+	// EventColumn is the table column denoting the event relation/edge.
+	EventColumn = "time_log_event"
 )
 
 // Columns holds all SQL columns for timelog fields.
 var Columns = []string{
 	FieldID,
+	FieldHours,
+	FieldMinutes,
+	FieldDate,
+}
+
+// ForeignKeys holds the SQL foreign-keys that are owned by the "time_logs"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"time_log_volunteer",
+	"time_log_event",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -27,8 +63,18 @@ func ValidColumn(column string) bool {
 			return true
 		}
 	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
+			return true
+		}
+	}
 	return false
 }
+
+var (
+	// DefaultID holds the default value on creation for the "id" field.
+	DefaultID func() uuid.UUID
+)
 
 // OrderOption defines the ordering options for the TimeLog queries.
 type OrderOption func(*sql.Selector)
@@ -36,4 +82,47 @@ type OrderOption func(*sql.Selector)
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByHours orders the results by the hours field.
+func ByHours(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldHours, opts...).ToFunc()
+}
+
+// ByMinutes orders the results by the minutes field.
+func ByMinutes(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMinutes, opts...).ToFunc()
+}
+
+// ByDate orders the results by the date field.
+func ByDate(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDate, opts...).ToFunc()
+}
+
+// ByVolunteerField orders the results by volunteer field.
+func ByVolunteerField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newVolunteerStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByEventField orders the results by event field.
+func ByEventField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newEventStep(), sql.OrderByField(field, opts...))
+	}
+}
+func newVolunteerStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(VolunteerInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, VolunteerTable, VolunteerColumn),
+	)
+}
+func newEventStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(EventInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, EventTable, EventColumn),
+	)
 }

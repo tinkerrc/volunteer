@@ -13,35 +13,41 @@ service VolunteerService {
   // rpc GetUser(GetUserRequest) returns (GetUserResponse);
   // rpc ListUsers(GetUserRequest) returns (GetUserResponse);
   // rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
-  // volunteers
+  // === VOLUNTEERS
+  // Registration
   rpc CreateVolunteer(CreateVolunteerRequest) returns (CreateVolunteerResponse);
+  // Requires user
   rpc GetVolunteer(GetVolunteerRequest) returns (GetVolunteerResponse);
+  // Requires volunteer
   rpc GetVolunteerProfile(GetVolunteerProfileRequest) returns (GetVolunteerProfileResponse);
+  // Requires user
   rpc ListVolunteers(ListVolunteersRequest) returns (ListVolunteersResponse);
+  // Requires user
   rpc UpdateVolunteer(UpdateVolunteerRequest) returns (UpdateVolunteerResponse);
+  // Requires volunteer
   rpc UpdateVolunteerProfile(UpdateVolunteerProfileRequest) returns (UpdateVolunteerProfileResponse);
-  // time logs
+  // === TIME LOGS
   rpc CreateTimeLog(CreateTimeLogRequest) returns (CreateTimeLogResponse);
   rpc ListTimeLogs(ListTimeLogsRequest) returns (ListTimeLogsResponse);
   rpc UpdateTimeLog(UpdateTimeLogRequest) returns (UpdateTimeLogResponse);
   rpc DeleteTimeLog(DeleteTimeLogRequest) returns (DeleteTimeLogResponse);
-  // volunteer training
+  // === VOLUNTEER TRAINING
   rpc StartTraining(StartTrainingRequest) returns (StartTrainingResponse);
   rpc FinishTraining(FinishTrainingRequest) returns (FinishTrainingResponse);
   rpc ListTrainings(ListTrainingsRequest) returns (ListTrainingsResponse);
   rpc DeleteTraining(DeleteTrainingRequest) returns (DeleteTrainingResponse);
-  // certs
+  // === CERTS
   rpc CreateCert(CreateCertRequest) returns (CreateCertResponse);
   rpc ListCerts(ListCertsRequest) returns (ListCertsResponse);
   rpc GetCert(GetCertRequest) returns (GetCertResponse);
   rpc UpdateCert(UpdateCertRequest) returns (UpdateCertResponse);
   rpc DeleteCert(DeleteCertRequest) returns (DeleteCertResponse);
-  // events
+  // === EVENTS
   rpc CreateEvent(CreateEventRequest) returns (CreateEventResponse);
   rpc ListEvents(ListEventsRequest) returns (ListEventsResponse);
   rpc UpdateEvent(UpdateEventRequest) returns (UpdateEventResponse);
   rpc DeleteEvent(DeleteEventRequest) returns (DeleteEventResponse);
-  // event volunteers
+  // === EVENT VOLUNTEERS
   rpc ListEventVolunteers(ListEventVolunteersRequest) returns (ListEventVolunteersResponse);
   rpc AddEventVolunteers(AddEventVolunteersRequest) returns (AddEventVolunteersResponse);
   rpc RemoveEventVolunteers(RemoveEventVolunteersRequest) returns (RemoveEventVolunteersResponse);
@@ -193,6 +199,7 @@ message TimeLog {
   string volunteer_id = 2;
   optional string event_id = 3;
   Duration duration = 4;
+  google.type.Date date = 5;
 }
 
 message ListTimeLogsRequest {

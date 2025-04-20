@@ -4,11 +4,16 @@ package ent
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
+	"github.com/tinkerrc/volunteer/ent/event"
 	"github.com/tinkerrc/volunteer/ent/timelog"
+	"github.com/tinkerrc/volunteer/ent/volunteer"
 )
 
 // TimeLogCreate is the builder for creating a TimeLog entity.
@@ -18,6 +23,68 @@ type TimeLogCreate struct {
 	hooks    []Hook
 }
 
+// SetHours sets the "hours" field.
+func (tlc *TimeLogCreate) SetHours(i int) *TimeLogCreate {
+	tlc.mutation.SetHours(i)
+	return tlc
+}
+
+// SetMinutes sets the "minutes" field.
+func (tlc *TimeLogCreate) SetMinutes(i int) *TimeLogCreate {
+	tlc.mutation.SetMinutes(i)
+	return tlc
+}
+
+// SetDate sets the "date" field.
+func (tlc *TimeLogCreate) SetDate(t time.Time) *TimeLogCreate {
+	tlc.mutation.SetDate(t)
+	return tlc
+}
+
+// SetID sets the "id" field.
+func (tlc *TimeLogCreate) SetID(u uuid.UUID) *TimeLogCreate {
+	tlc.mutation.SetID(u)
+	return tlc
+}
+
+// SetNillableID sets the "id" field if the given value is not nil.
+func (tlc *TimeLogCreate) SetNillableID(u *uuid.UUID) *TimeLogCreate {
+	if u != nil {
+		tlc.SetID(*u)
+	}
+	return tlc
+}
+
+// SetVolunteerID sets the "volunteer" edge to the Volunteer entity by ID.
+func (tlc *TimeLogCreate) SetVolunteerID(id uuid.UUID) *TimeLogCreate {
+	tlc.mutation.SetVolunteerID(id)
+	return tlc
+}
+
+// SetVolunteer sets the "volunteer" edge to the Volunteer entity.
+func (tlc *TimeLogCreate) SetVolunteer(v *Volunteer) *TimeLogCreate {
+	return tlc.SetVolunteerID(v.ID)
+}
+
+// SetEventID sets the "event" edge to the Event entity by ID.
+func (tlc *TimeLogCreate) SetEventID(id int) *TimeLogCreate {
+	tlc.mutation.SetEventID(id)
+	return tlc
+}
+
+// SetNillableEventID sets the "event" edge to the Event entity by ID if the given value is not nil.
+func (tlc *TimeLogCreate) SetNillableEventID(id *int) *TimeLogCreate {
+	if id != nil {
+		tlc = tlc.SetEventID(*id)
+	}
+	return tlc
+}
+
+// SetEvent sets the "event" edge to the Event entity.
+func (tlc *TimeLogCreate) SetEvent(e *Event) *TimeLogCreate {
+	return tlc.SetEventID(e.ID)
+}
+
 // Mutation returns the TimeLogMutation object of the builder.
 func (tlc *TimeLogCreate) Mutation() *TimeLogMutation {
 	return tlc.mutation
@@ -25,6 +92,7 @@ func (tlc *TimeLogCreate) Mutation() *TimeLogMutation {
 
 // Save creates the TimeLog in the database.
 func (tlc *TimeLogCreate) Save(ctx context.Context) (*TimeLog, error) {
+	tlc.defaults()
 	return withHooks(ctx, tlc.sqlSave, tlc.mutation, tlc.hooks)
 }
 
@@ -50,8 +118,28 @@ func (tlc *TimeLogCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (tlc *TimeLogCreate) defaults() {
+	if _, ok := tlc.mutation.ID(); !ok {
+		v := timelog.DefaultID()
+		tlc.mutation.SetID(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (tlc *TimeLogCreate) check() error {
+	if _, ok := tlc.mutation.Hours(); !ok {
+		return &ValidationError{Name: "hours", err: errors.New(`ent: missing required field "TimeLog.hours"`)}
+	}
+	if _, ok := tlc.mutation.Minutes(); !ok {
+		return &ValidationError{Name: "minutes", err: errors.New(`ent: missing required field "TimeLog.minutes"`)}
+	}
+	if _, ok := tlc.mutation.Date(); !ok {
+		return &ValidationError{Name: "date", err: errors.New(`ent: missing required field "TimeLog.date"`)}
+	}
+	if len(tlc.mutation.VolunteerIDs()) == 0 {
+		return &ValidationError{Name: "volunteer", err: errors.New(`ent: missing required edge "TimeLog.volunteer"`)}
+	}
 	return nil
 }
 
@@ -66,8 +154,13 @@ func (tlc *TimeLogCreate) sqlSave(ctx context.Context) (*TimeLog, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != nil {
+		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
+			_node.ID = *id
+		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
+			return nil, err
+		}
+	}
 	tlc.mutation.id = &_node.ID
 	tlc.mutation.done = true
 	return _node, nil
@@ -76,8 +169,58 @@ func (tlc *TimeLogCreate) sqlSave(ctx context.Context) (*TimeLog, error) {
 func (tlc *TimeLogCreate) createSpec() (*TimeLog, *sqlgraph.CreateSpec) {
 	var (
 		_node = &TimeLog{config: tlc.config}
-		_spec = sqlgraph.NewCreateSpec(timelog.Table, sqlgraph.NewFieldSpec(timelog.FieldID, field.TypeInt))
+		_spec = sqlgraph.NewCreateSpec(timelog.Table, sqlgraph.NewFieldSpec(timelog.FieldID, field.TypeUUID))
 	)
+	if id, ok := tlc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = &id
+	}
+	if value, ok := tlc.mutation.Hours(); ok {
+		_spec.SetField(timelog.FieldHours, field.TypeInt, value)
+		_node.Hours = value
+	}
+	if value, ok := tlc.mutation.Minutes(); ok {
+		_spec.SetField(timelog.FieldMinutes, field.TypeInt, value)
+		_node.Minutes = value
+	}
+	if value, ok := tlc.mutation.Date(); ok {
+		_spec.SetField(timelog.FieldDate, field.TypeTime, value)
+		_node.Date = value
+	}
+	if nodes := tlc.mutation.VolunteerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   timelog.VolunteerTable,
+			Columns: []string{timelog.VolunteerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(volunteer.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.time_log_volunteer = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := tlc.mutation.EventIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   timelog.EventTable,
+			Columns: []string{timelog.EventColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.time_log_event = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
 	return _node, _spec
 }
 
@@ -99,6 +242,7 @@ func (tlcb *TimeLogCreateBulk) Save(ctx context.Context) ([]*TimeLog, error) {
 	for i := range tlcb.builders {
 		func(i int, root context.Context) {
 			builder := tlcb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*TimeLogMutation)
 				if !ok {
@@ -125,10 +269,6 @@ func (tlcb *TimeLogCreateBulk) Save(ctx context.Context) ([]*TimeLog, error) {
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
-				if specs[i].ID.Value != nil {
-					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
-				}
 				mutation.done = true
 				return nodes[i], nil
 			})
