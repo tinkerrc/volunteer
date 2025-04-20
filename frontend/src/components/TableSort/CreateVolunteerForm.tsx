@@ -2,7 +2,7 @@ import { VolunteerService } from '@/proto/api/v1/api_pb';
 import { transport } from '@/utils/client';
 import { useAuth0 } from '@auth0/auth0-react';
 import { createClient } from '@connectrpc/connect';
-import { Button, Group, TextInput } from '@mantine/core';
+import { Button, Center, Group, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useMemo } from 'react';
 
@@ -53,15 +53,17 @@ export const CreateVolunteerForm = () => {
     }
 
     return (
-        <form onSubmit={form.onSubmit(submitForm)}>
-            <TextInput withAsterisk label="Email" placeholder='your@email.com' key={form.key('email')} {...form.getInputProps('email')} />
-            <TextInput withAsterisk label="First Name" placeholder='Jane' key={form.key('firstName')} {...form.getInputProps('firstName')} />
-            <TextInput label="Middle Name" placeholder='Jane' key={form.key('middleName')} {...form.getInputProps('middleName')} />
-            <TextInput withAsterisk label="Last Name" placeholder='Doe' key={form.key('lastName')} {...form.getInputProps('lastName')} />
-            <TextInput withAsterisk label="Phone Number" placeholder='5556667788' key={form.key('phone')} {...form.getInputProps('phone')} />
-            <Group justify="flex-end" mt="md">
-                <Button type="submit">Create</Button>
-            </Group>
-        </form>
+        <Center bg="var(--mantine-color-gray-light)">
+            <form onSubmit={form.onSubmit(submitForm)}>
+                <TextInput withAsterisk label="Email" placeholder='your@email.com' key={form.key('email')} {...form.getInputProps('email')} />
+                <TextInput withAsterisk label="First Name" placeholder='Jane' key={form.key('firstName')} {...form.getInputProps('firstName')} />
+                <TextInput label="Middle Name" placeholder='Jane' key={form.key('middleName')} {...form.getInputProps('middleName')} />
+                <TextInput withAsterisk label="Last Name" placeholder='Doe' key={form.key('lastName')} {...form.getInputProps('lastName')} />
+                <TextInput withAsterisk label="Phone Number" placeholder='5556667788' key={form.key('phone')} {...form.getInputProps('phone')} />
+                <Group justify="flex-end" mt="md">
+                    <Button type="submit">Create</Button>
+                </Group>
+            </form>
+        </Center>
     )
 };
