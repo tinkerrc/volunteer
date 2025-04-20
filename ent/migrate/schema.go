@@ -84,6 +84,13 @@ var (
 		Name:       "volunteers",
 		Columns:    VolunteersColumns,
 		PrimaryKey: []*schema.Column{VolunteersColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "volunteer_first_name_last_name",
+				Unique:  false,
+				Columns: []*schema.Column{VolunteersColumns[2], VolunteersColumns[4]},
+			},
+		},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
