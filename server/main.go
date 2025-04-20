@@ -37,7 +37,7 @@ func main() {
 		authentication.WithClientSecret(auth0ClientSecret),
 	)
 	if err != nil {
-		log.Fatalf("failed to initialize auth0 client")
+		log.Fatalf("failed to initialize auth0 client: %v", err)
 	}
 
 	host := os.Getenv("PG_HOST")
