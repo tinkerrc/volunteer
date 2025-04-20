@@ -7,8 +7,6 @@ const transport = createConnectTransport({
     baseUrl: "https://api.yolovms.org"
 })
 
-function useClient(){
+export function useClient() {
     return useMemo(() => createClient(VolunteerService, transport), [])
 }
-
-export default useClient
