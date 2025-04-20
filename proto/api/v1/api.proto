@@ -45,6 +45,7 @@ service VolunteerService {
   // Requires user
   rpc DeleteTraining(DeleteTrainingRequest) returns (DeleteTrainingResponse);
   // === CERTS
+  // Requires user
   rpc CreateCert(CreateCertRequest) returns (CreateCertResponse);
   rpc ListCerts(ListCertsRequest) returns (ListCertsResponse);
   rpc GetCert(GetCertRequest) returns (GetCertResponse);
