@@ -1,10 +1,11 @@
 import { Event, VolunteerService } from '@/proto/api/v1/api_pb';
-import { useClient } from '@/utils/client';
+import { transport } from '@/utils/client';
 import { intervalToString } from '@/utils/protobuf';
 import { useAuth0 } from '@auth0/auth0-react';
+import { createClient } from '@connectrpc/connect';
 import { Group, ScrollArea, Table, Text } from '@mantine/core';
 import cx from 'clsx';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import classes from './EventList.module.css';
 
 export function EventList() {
@@ -12,6 +13,7 @@ export function EventList() {
     let initState: string[] = [];
     const [selection, setSelection] = useState(initState);
     const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
+    const client = useMemo(() => createClient(VolunteerService, transport), [VolunteerService]);
     useEffect(() => {
         const getEvents = async () => {
             try {
@@ -28,7 +30,7 @@ export function EventList() {
                 console.log("got access token")
                 const headers = new Headers();
                 headers.set("Authorization", `Bearer ${accessToken}`)
-                const res = await useClient(VolunteerService).listEvents({ pageNumber: 1, pageSize: 50 }, { headers })
+                const res = await client.listEvents({ pageNumber: 1, pageSize: 50 }, { headers })
                 console.log("got events")
                 setEvents(res.events)
             } catch (err) {
