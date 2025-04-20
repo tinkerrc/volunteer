@@ -24,7 +24,7 @@ export function EventList() {
                 const accessToken = await getAccessTokenSilently({
                     authorizationParams: {
                         // audience: `https://dev-v8cbdhmtmu4lj338.us.auth0.com/api/v2/`,
-                        audience: "https://api.yolovms.org/",
+                        audience: "https://api.yolovms.org",
                         scope: "read:current_user",
                     },
                 });

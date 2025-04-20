@@ -42,7 +42,7 @@ func Authenticate(db *ent.Client) func(context.Context, *http.Request) (any, err
 		validator.RS256,
 		issuerURL.String(),
 		// []string{"https://dev-v8cbdhmtmu4lj338.us.auth0.com/api/v2/"},
-		[]string{"https://api.yolovms.org/"},
+		[]string{"https://api.yolovms.org"},
 		validator.WithCustomClaims(
 			func() validator.CustomClaims {
 				return &CustomClaims{}
