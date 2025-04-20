@@ -12,6 +12,8 @@ import {
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import classes from './Nav.module.css';
+import { LoginButton } from '@/components/LoginButton/LoginButton';
+
 
 interface NavbarLinkProps {
     icon: typeof IconHome2;
@@ -65,7 +67,9 @@ export function Nav() {
             </div>
 
             <Stack justify="center" gap={0} mb="md">
-                <NavbarLink icon={IconSwitchHorizontal} label="Change account" to="/login" />
+                <LoginButton />
+
+                
                 <NavbarLink icon={IconLogout} label="Logout" to="/logout" />
             </Stack>
         </nav>
