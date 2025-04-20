@@ -7,7 +7,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(<Auth0Provider
   clientId="xtR3z01pmtfqLnsC2Y2Vjl25pLTPDkQC"
   authorizationParams={{
     redirect_uri: window.location.origin,
-    audience: "https://dev-v8cbdhmtmu4lj338.us.auth0.com/api/v2/",
+    audience: "https://api.yolovms.org/",
     scope: "read:current_user update:current_user_metadata"
   }}
 >
