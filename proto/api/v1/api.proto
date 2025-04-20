@@ -29,8 +29,9 @@ service VolunteerService {
   // === TIME LOGS
   // Requires volunteer
   rpc CreateTimeLog(CreateTimeLogRequest) returns (CreateTimeLogResponse);
-  // Requires user
+  // Requires user or volunteer
   rpc ListTimeLogs(ListTimeLogsRequest) returns (ListTimeLogsResponse);
+  // Requires volunteer
   rpc UpdateTimeLog(UpdateTimeLogRequest) returns (UpdateTimeLogResponse);
   rpc DeleteTimeLog(DeleteTimeLogRequest) returns (DeleteTimeLogResponse);
   // === VOLUNTEER TRAINING
@@ -205,7 +206,7 @@ message TimeLog {
 message ListTimeLogsRequest {
   int32 page_size = 1;
   int32 page_number = 2;
-  string volunteer_id = 3;
+  optional string volunteer_id = 3;
 }
 
 message ListTimeLogsResponse {
@@ -214,8 +215,6 @@ message ListTimeLogsResponse {
 
 message UpdateTimeLogRequest {
   string id = 1;
-  optional string volunteer_id = 2;
-  optional string event_id = 3;
   optional Duration duration = 4;
   optional google.protobuf.Timestamp date = 5;
 }

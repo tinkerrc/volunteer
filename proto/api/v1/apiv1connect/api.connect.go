@@ -165,8 +165,11 @@ type VolunteerServiceClient interface {
 	// Requires volunteer
 	UpdateVolunteerProfile(context.Context, *connect.Request[v1.UpdateVolunteerProfileRequest]) (*connect.Response[v1.UpdateVolunteerProfileResponse], error)
 	// === TIME LOGS
+	// Requires volunteer
 	CreateTimeLog(context.Context, *connect.Request[v1.CreateTimeLogRequest]) (*connect.Response[v1.CreateTimeLogResponse], error)
+	// Requires user or volunteer
 	ListTimeLogs(context.Context, *connect.Request[v1.ListTimeLogsRequest]) (*connect.Response[v1.ListTimeLogsResponse], error)
+	// Requires volunteer
 	UpdateTimeLog(context.Context, *connect.Request[v1.UpdateTimeLogRequest]) (*connect.Response[v1.UpdateTimeLogResponse], error)
 	DeleteTimeLog(context.Context, *connect.Request[v1.DeleteTimeLogRequest]) (*connect.Response[v1.DeleteTimeLogResponse], error)
 	// === VOLUNTEER TRAINING
@@ -541,8 +544,11 @@ type VolunteerServiceHandler interface {
 	// Requires volunteer
 	UpdateVolunteerProfile(context.Context, *connect.Request[v1.UpdateVolunteerProfileRequest]) (*connect.Response[v1.UpdateVolunteerProfileResponse], error)
 	// === TIME LOGS
+	// Requires volunteer
 	CreateTimeLog(context.Context, *connect.Request[v1.CreateTimeLogRequest]) (*connect.Response[v1.CreateTimeLogResponse], error)
+	// Requires user or volunteer
 	ListTimeLogs(context.Context, *connect.Request[v1.ListTimeLogsRequest]) (*connect.Response[v1.ListTimeLogsResponse], error)
+	// Requires volunteer
 	UpdateTimeLog(context.Context, *connect.Request[v1.UpdateTimeLogRequest]) (*connect.Response[v1.UpdateTimeLogResponse], error)
 	DeleteTimeLog(context.Context, *connect.Request[v1.DeleteTimeLogRequest]) (*connect.Response[v1.DeleteTimeLogResponse], error)
 	// === VOLUNTEER TRAINING
