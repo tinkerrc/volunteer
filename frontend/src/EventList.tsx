@@ -1,39 +1,38 @@
-import React from 'react';
 import { NavLink } from 'react-router-dom';
 import styles from './EventList.module.css';
 
-const Event = ({ date, day, title, time, slots, onClick }) => {
-  return (
-    <div className={styles.card1}>
-      <div className={styles.frameGroup}>
-        <div className={styles.monParent}>
-          <div className={styles.upcomingEvents}>{day}</div>
-          <b className={styles.may26}>
-            <p className={styles.june}>{date.split(' ')[0]}</p>
-            <p className={styles.june}>{date.split(' ')[1]}</p>
-          </b>
-        </div>
-        <div className={styles.frameChild} />
-        <div className={styles.familySupportGroupParent}>
-          <div className={styles.familySupportGroup1}>{title}</div>
-          <div className={styles.pm3pmParent}>
-            <div className={styles.pm3pm}>{time}</div>
-            <div className={styles.frameItem} />
-            <div className={styles.filledSlots1}>{slots}</div>
-          </div>
-        </div>
-      </div>
-      <div className={styles.frameParent2}>
-        <div className={styles.manageVolunteersContainer} onClick={onClick}>
-          <div className={styles.manageVolunteers}>Request Volunteers</div>
-        </div>
-        <img className={styles.rimoreFillIcon1} alt="" src="ri:more-fill.png" />
-      </div>
-    </div>
-  );
-};
+// const Event = ({ date, day, title, time, slots, onClick }) => {
+//   return (
+//     <div className={styles.card1}>
+//       <div className={styles.frameGroup}>
+//         <div className={styles.monParent}>
+//           <div className={styles.upcomingEvents}>{day}</div>
+//           <b className={styles.may26}>
+//             <p className={styles.june}>{date.split(' ')[0]}</p>
+//             <p className={styles.june}>{date.split(' ')[1]}</p>
+//           </b>
+//         </div>
+//         <div className={styles.frameChild} />
+//         <div className={styles.familySupportGroupParent}>
+//           <div className={styles.familySupportGroup1}>{title}</div>
+//           <div className={styles.pm3pmParent}>
+//             <div className={styles.pm3pm}>{time}</div>
+//             <div className={styles.frameItem} />
+//             <div className={styles.filledSlots1}>{slots}</div>
+//           </div>
+//         </div>
+//       </div>
+//       <div className={styles.frameParent2}>
+//         <div className={styles.manageVolunteersContainer} onClick={onClick}>
+//           <div className={styles.manageVolunteers}>Request Volunteers</div>
+//         </div>
+//         <img className={styles.rimoreFillIcon1} alt="" src="ri:more-fill.png" />
+//       </div>
+//     </div>
+//   );
+// };
 
-const EventList = ({ goto }) => {
+export const EventList = () => {
   return (
     <div className={styles.finalDash}>
       <div className={styles.finalDashChild} />
@@ -95,8 +94,8 @@ const EventList = ({ goto }) => {
           <div className={styles.next6Months}>Next 6 Months</div>
         </div>
         <div className={styles.cardParent}>
-          <Event day="TUES" date="May 13" title="Peer Support Group" time="2pm – 3pm" slots="1/2 Filled Slots" onClick={() => { }} />
-          <Event day="MON" date="May 19" title="Peer Support Group" time="12pm – 2pm" slots="0/2 Filled Slots" />
+          {/* <Event day="TUES" date="May 13" title="Peer Support Group" time="2pm – 3pm" slots="1/2 Filled Slots" onClick={() => goto("vol")} />
+          <Event day="MON" date="May 19" title="Peer Support Group" time="12pm – 2pm" slots="0/2 Filled Slots" /> */}
         </div>
       </div>
 
@@ -130,5 +129,3 @@ const EventList = ({ goto }) => {
     </div>
   );
 };
-
-export default EventList;
