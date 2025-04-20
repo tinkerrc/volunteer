@@ -99,6 +99,12 @@ const (
 	// VolunteerServiceUpdateEventProcedure is the fully-qualified name of the VolunteerService's
 	// UpdateEvent RPC.
 	VolunteerServiceUpdateEventProcedure = "/api.v1.VolunteerService/UpdateEvent"
+	// VolunteerServiceAddEventCertsProcedure is the fully-qualified name of the VolunteerService's
+	// AddEventCerts RPC.
+	VolunteerServiceAddEventCertsProcedure = "/api.v1.VolunteerService/AddEventCerts"
+	// VolunteerServiceRemoveEventCertsProcedure is the fully-qualified name of the VolunteerService's
+	// RemoveEventCerts RPC.
+	VolunteerServiceRemoveEventCertsProcedure = "/api.v1.VolunteerService/RemoveEventCerts"
 	// VolunteerServiceDeleteEventProcedure is the fully-qualified name of the VolunteerService's
 	// DeleteEvent RPC.
 	VolunteerServiceDeleteEventProcedure = "/api.v1.VolunteerService/DeleteEvent"
@@ -138,6 +144,8 @@ var (
 	volunteerServiceCreateEventMethodDescriptor            = volunteerServiceServiceDescriptor.Methods().ByName("CreateEvent")
 	volunteerServiceListEventsMethodDescriptor             = volunteerServiceServiceDescriptor.Methods().ByName("ListEvents")
 	volunteerServiceUpdateEventMethodDescriptor            = volunteerServiceServiceDescriptor.Methods().ByName("UpdateEvent")
+	volunteerServiceAddEventCertsMethodDescriptor          = volunteerServiceServiceDescriptor.Methods().ByName("AddEventCerts")
+	volunteerServiceRemoveEventCertsMethodDescriptor       = volunteerServiceServiceDescriptor.Methods().ByName("RemoveEventCerts")
 	volunteerServiceDeleteEventMethodDescriptor            = volunteerServiceServiceDescriptor.Methods().ByName("DeleteEvent")
 	volunteerServiceListEventVolunteersMethodDescriptor    = volunteerServiceServiceDescriptor.Methods().ByName("ListEventVolunteers")
 	volunteerServiceAddEventVolunteersMethodDescriptor     = volunteerServiceServiceDescriptor.Methods().ByName("AddEventVolunteers")
@@ -194,11 +202,16 @@ type VolunteerServiceClient interface {
 	// Requires user
 	DeleteCert(context.Context, *connect.Request[v1.DeleteCertRequest]) (*connect.Response[v1.DeleteCertResponse], error)
 	// === EVENTS
-	// Requires admin
+	// Requires user
 	CreateEvent(context.Context, *connect.Request[v1.CreateEventRequest]) (*connect.Response[v1.CreateEventResponse], error)
-	// Requires admin
+	// Requires user
 	ListEvents(context.Context, *connect.Request[v1.ListEventsRequest]) (*connect.Response[v1.ListEventsResponse], error)
+	// Requires user
 	UpdateEvent(context.Context, *connect.Request[v1.UpdateEventRequest]) (*connect.Response[v1.UpdateEventResponse], error)
+	// Requires user
+	AddEventCerts(context.Context, *connect.Request[v1.AddEventCertsRequest]) (*connect.Response[v1.AddEventCertsResponse], error)
+	// Requires user
+	RemoveEventCerts(context.Context, *connect.Request[v1.RemoveEventCertsRequest]) (*connect.Response[v1.RemoveEventCertsResponse], error)
 	DeleteEvent(context.Context, *connect.Request[v1.DeleteEventRequest]) (*connect.Response[v1.DeleteEventResponse], error)
 	// === EVENT VOLUNTEERS
 	ListEventVolunteers(context.Context, *connect.Request[v1.ListEventVolunteersRequest]) (*connect.Response[v1.ListEventVolunteersResponse], error)
@@ -348,6 +361,18 @@ func NewVolunteerServiceClient(httpClient connect.HTTPClient, baseURL string, op
 			connect.WithSchema(volunteerServiceUpdateEventMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		addEventCerts: connect.NewClient[v1.AddEventCertsRequest, v1.AddEventCertsResponse](
+			httpClient,
+			baseURL+VolunteerServiceAddEventCertsProcedure,
+			connect.WithSchema(volunteerServiceAddEventCertsMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		removeEventCerts: connect.NewClient[v1.RemoveEventCertsRequest, v1.RemoveEventCertsResponse](
+			httpClient,
+			baseURL+VolunteerServiceRemoveEventCertsProcedure,
+			connect.WithSchema(volunteerServiceRemoveEventCertsMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 		deleteEvent: connect.NewClient[v1.DeleteEventRequest, v1.DeleteEventResponse](
 			httpClient,
 			baseURL+VolunteerServiceDeleteEventProcedure,
@@ -399,6 +424,8 @@ type volunteerServiceClient struct {
 	createEvent            *connect.Client[v1.CreateEventRequest, v1.CreateEventResponse]
 	listEvents             *connect.Client[v1.ListEventsRequest, v1.ListEventsResponse]
 	updateEvent            *connect.Client[v1.UpdateEventRequest, v1.UpdateEventResponse]
+	addEventCerts          *connect.Client[v1.AddEventCertsRequest, v1.AddEventCertsResponse]
+	removeEventCerts       *connect.Client[v1.RemoveEventCertsRequest, v1.RemoveEventCertsResponse]
 	deleteEvent            *connect.Client[v1.DeleteEventRequest, v1.DeleteEventResponse]
 	listEventVolunteers    *connect.Client[v1.ListEventVolunteersRequest, v1.ListEventVolunteersResponse]
 	addEventVolunteers     *connect.Client[v1.AddEventVolunteersRequest, v1.AddEventVolunteersResponse]
@@ -515,6 +542,16 @@ func (c *volunteerServiceClient) UpdateEvent(ctx context.Context, req *connect.R
 	return c.updateEvent.CallUnary(ctx, req)
 }
 
+// AddEventCerts calls api.v1.VolunteerService.AddEventCerts.
+func (c *volunteerServiceClient) AddEventCerts(ctx context.Context, req *connect.Request[v1.AddEventCertsRequest]) (*connect.Response[v1.AddEventCertsResponse], error) {
+	return c.addEventCerts.CallUnary(ctx, req)
+}
+
+// RemoveEventCerts calls api.v1.VolunteerService.RemoveEventCerts.
+func (c *volunteerServiceClient) RemoveEventCerts(ctx context.Context, req *connect.Request[v1.RemoveEventCertsRequest]) (*connect.Response[v1.RemoveEventCertsResponse], error) {
+	return c.removeEventCerts.CallUnary(ctx, req)
+}
+
 // DeleteEvent calls api.v1.VolunteerService.DeleteEvent.
 func (c *volunteerServiceClient) DeleteEvent(ctx context.Context, req *connect.Request[v1.DeleteEventRequest]) (*connect.Response[v1.DeleteEventResponse], error) {
 	return c.deleteEvent.CallUnary(ctx, req)
@@ -585,11 +622,16 @@ type VolunteerServiceHandler interface {
 	// Requires user
 	DeleteCert(context.Context, *connect.Request[v1.DeleteCertRequest]) (*connect.Response[v1.DeleteCertResponse], error)
 	// === EVENTS
-	// Requires admin
+	// Requires user
 	CreateEvent(context.Context, *connect.Request[v1.CreateEventRequest]) (*connect.Response[v1.CreateEventResponse], error)
-	// Requires admin
+	// Requires user
 	ListEvents(context.Context, *connect.Request[v1.ListEventsRequest]) (*connect.Response[v1.ListEventsResponse], error)
+	// Requires user
 	UpdateEvent(context.Context, *connect.Request[v1.UpdateEventRequest]) (*connect.Response[v1.UpdateEventResponse], error)
+	// Requires user
+	AddEventCerts(context.Context, *connect.Request[v1.AddEventCertsRequest]) (*connect.Response[v1.AddEventCertsResponse], error)
+	// Requires user
+	RemoveEventCerts(context.Context, *connect.Request[v1.RemoveEventCertsRequest]) (*connect.Response[v1.RemoveEventCertsResponse], error)
 	DeleteEvent(context.Context, *connect.Request[v1.DeleteEventRequest]) (*connect.Response[v1.DeleteEventResponse], error)
 	// === EVENT VOLUNTEERS
 	ListEventVolunteers(context.Context, *connect.Request[v1.ListEventVolunteersRequest]) (*connect.Response[v1.ListEventVolunteersResponse], error)
@@ -735,6 +777,18 @@ func NewVolunteerServiceHandler(svc VolunteerServiceHandler, opts ...connect.Han
 		connect.WithSchema(volunteerServiceUpdateEventMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	volunteerServiceAddEventCertsHandler := connect.NewUnaryHandler(
+		VolunteerServiceAddEventCertsProcedure,
+		svc.AddEventCerts,
+		connect.WithSchema(volunteerServiceAddEventCertsMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	volunteerServiceRemoveEventCertsHandler := connect.NewUnaryHandler(
+		VolunteerServiceRemoveEventCertsProcedure,
+		svc.RemoveEventCerts,
+		connect.WithSchema(volunteerServiceRemoveEventCertsMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	volunteerServiceDeleteEventHandler := connect.NewUnaryHandler(
 		VolunteerServiceDeleteEventProcedure,
 		svc.DeleteEvent,
@@ -805,6 +859,10 @@ func NewVolunteerServiceHandler(svc VolunteerServiceHandler, opts ...connect.Han
 			volunteerServiceListEventsHandler.ServeHTTP(w, r)
 		case VolunteerServiceUpdateEventProcedure:
 			volunteerServiceUpdateEventHandler.ServeHTTP(w, r)
+		case VolunteerServiceAddEventCertsProcedure:
+			volunteerServiceAddEventCertsHandler.ServeHTTP(w, r)
+		case VolunteerServiceRemoveEventCertsProcedure:
+			volunteerServiceRemoveEventCertsHandler.ServeHTTP(w, r)
 		case VolunteerServiceDeleteEventProcedure:
 			volunteerServiceDeleteEventHandler.ServeHTTP(w, r)
 		case VolunteerServiceListEventVolunteersProcedure:
@@ -908,6 +966,14 @@ func (UnimplementedVolunteerServiceHandler) ListEvents(context.Context, *connect
 
 func (UnimplementedVolunteerServiceHandler) UpdateEvent(context.Context, *connect.Request[v1.UpdateEventRequest]) (*connect.Response[v1.UpdateEventResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.VolunteerService.UpdateEvent is not implemented"))
+}
+
+func (UnimplementedVolunteerServiceHandler) AddEventCerts(context.Context, *connect.Request[v1.AddEventCertsRequest]) (*connect.Response[v1.AddEventCertsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.VolunteerService.AddEventCerts is not implemented"))
+}
+
+func (UnimplementedVolunteerServiceHandler) RemoveEventCerts(context.Context, *connect.Request[v1.RemoveEventCertsRequest]) (*connect.Response[v1.RemoveEventCertsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.VolunteerService.RemoveEventCerts is not implemented"))
 }
 
 func (UnimplementedVolunteerServiceHandler) DeleteEvent(context.Context, *connect.Request[v1.DeleteEventRequest]) (*connect.Response[v1.DeleteEventResponse], error) {
