@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './dashboard.module.css';
+import styles from './Dashboard.module.css';
 
 const Event = ({ date, day, title, time, slots, onClick }) => {
   return (
