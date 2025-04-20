@@ -1,4 +1,4 @@
-import { AppShell, AppShellMain, AppShellNavbar } from '@mantine/core';
+import { AppShell, AppShellMain, AppShellNavbar, Table } from '@mantine/core';
 import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom';
 import { Nav } from './components/Nav/Nav';
 import { CertsPage } from './pages/Certs.page';
@@ -28,6 +28,14 @@ const router = createBrowserRouter([
       {
         path: '/certs',
         element: <CertsPage />,
+      },
+      {
+        path: '/volunteers',
+        element: <Table />,
+      },
+      {
+        path: '/volunteers/add',
+        element: <Add />,
       },
     ],
   },
