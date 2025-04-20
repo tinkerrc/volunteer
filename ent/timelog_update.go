@@ -99,13 +99,13 @@ func (tlu *TimeLogUpdate) SetVolunteer(v *Volunteer) *TimeLogUpdate {
 }
 
 // SetEventID sets the "event" edge to the Event entity by ID.
-func (tlu *TimeLogUpdate) SetEventID(id int) *TimeLogUpdate {
+func (tlu *TimeLogUpdate) SetEventID(id uuid.UUID) *TimeLogUpdate {
 	tlu.mutation.SetEventID(id)
 	return tlu
 }
 
 // SetNillableEventID sets the "event" edge to the Event entity by ID if the given value is not nil.
-func (tlu *TimeLogUpdate) SetNillableEventID(id *int) *TimeLogUpdate {
+func (tlu *TimeLogUpdate) SetNillableEventID(id *uuid.UUID) *TimeLogUpdate {
 	if id != nil {
 		tlu = tlu.SetEventID(*id)
 	}
@@ -233,7 +233,7 @@ func (tlu *TimeLogUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{timelog.EventColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -246,7 +246,7 @@ func (tlu *TimeLogUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{timelog.EventColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
@@ -342,13 +342,13 @@ func (tluo *TimeLogUpdateOne) SetVolunteer(v *Volunteer) *TimeLogUpdateOne {
 }
 
 // SetEventID sets the "event" edge to the Event entity by ID.
-func (tluo *TimeLogUpdateOne) SetEventID(id int) *TimeLogUpdateOne {
+func (tluo *TimeLogUpdateOne) SetEventID(id uuid.UUID) *TimeLogUpdateOne {
 	tluo.mutation.SetEventID(id)
 	return tluo
 }
 
 // SetNillableEventID sets the "event" edge to the Event entity by ID if the given value is not nil.
-func (tluo *TimeLogUpdateOne) SetNillableEventID(id *int) *TimeLogUpdateOne {
+func (tluo *TimeLogUpdateOne) SetNillableEventID(id *uuid.UUID) *TimeLogUpdateOne {
 	if id != nil {
 		tluo = tluo.SetEventID(*id)
 	}
@@ -506,7 +506,7 @@ func (tluo *TimeLogUpdateOne) sqlSave(ctx context.Context) (_node *TimeLog, err 
 			Columns: []string{timelog.EventColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeUUID),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -519,7 +519,7 @@ func (tluo *TimeLogUpdateOne) sqlSave(ctx context.Context) (_node *TimeLog, err 
 			Columns: []string{timelog.EventColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

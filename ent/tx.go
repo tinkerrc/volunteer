@@ -16,6 +16,8 @@ type Tx struct {
 	Certification *CertificationClient
 	// Event is the client for interacting with the Event builders.
 	Event *EventClient
+	// EventVolunteer is the client for interacting with the EventVolunteer builders.
+	EventVolunteer *EventVolunteerClient
 	// TimeLog is the client for interacting with the TimeLog builders.
 	TimeLog *TimeLogClient
 	// User is the client for interacting with the User builders.
@@ -155,6 +157,7 @@ func (tx *Tx) Client() *Client {
 func (tx *Tx) init() {
 	tx.Certification = NewCertificationClient(tx.config)
 	tx.Event = NewEventClient(tx.config)
+	tx.EventVolunteer = NewEventVolunteerClient(tx.config)
 	tx.TimeLog = NewTimeLogClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 	tx.Volunteer = NewVolunteerClient(tx.config)

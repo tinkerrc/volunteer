@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/google/uuid"
+	"github.com/tinkerrc/volunteer/ent/eventvolunteer"
 	"github.com/tinkerrc/volunteer/ent/predicate"
 	"github.com/tinkerrc/volunteer/ent/timelog"
 	"github.com/tinkerrc/volunteer/ent/user"
@@ -27,11 +28,12 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeCertification = "Certification"
-	TypeEvent         = "Event"
-	TypeTimeLog       = "TimeLog"
-	TypeUser          = "User"
-	TypeVolunteer     = "Volunteer"
+	TypeCertification  = "Certification"
+	TypeEvent          = "Event"
+	TypeEventVolunteer = "EventVolunteer"
+	TypeTimeLog        = "TimeLog"
+	TypeUser           = "User"
+	TypeVolunteer      = "Volunteer"
 )
 
 // CertificationMutation represents an operation that mutates the Certification nodes in the graph.
@@ -303,7 +305,7 @@ type EventMutation struct {
 	config
 	op            Op
 	typ           string
-	id            *int
+	id            *uuid.UUID
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*Event, error)
@@ -330,7 +332,7 @@ func newEventMutation(c config, op Op, opts ...eventOption) *EventMutation {
 }
 
 // withEventID sets the ID field of the mutation.
-func withEventID(id int) eventOption {
+func withEventID(id uuid.UUID) eventOption {
 	return func(m *EventMutation) {
 		var (
 			err   error
@@ -380,9 +382,15 @@ func (m EventMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Event entities.
+func (m *EventMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *EventMutation) ID() (id int, exists bool) {
+func (m *EventMutation) ID() (id uuid.UUID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -393,12 +401,12 @@ func (m *EventMutation) ID() (id int, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *EventMutation) IDs(ctx context.Context) ([]int, error) {
+func (m *EventMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []int{id}, nil
+			return []uuid.UUID{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
@@ -562,6 +570,402 @@ func (m *EventMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Event edge %s", name)
 }
 
+// EventVolunteerMutation represents an operation that mutates the EventVolunteer nodes in the graph.
+type EventVolunteerMutation struct {
+	config
+	op               Op
+	typ              string
+	id               *uuid.UUID
+	clearedFields    map[string]struct{}
+	event            *uuid.UUID
+	clearedevent     bool
+	volunteer        *uuid.UUID
+	clearedvolunteer bool
+	done             bool
+	oldValue         func(context.Context) (*EventVolunteer, error)
+	predicates       []predicate.EventVolunteer
+}
+
+var _ ent.Mutation = (*EventVolunteerMutation)(nil)
+
+// eventvolunteerOption allows management of the mutation configuration using functional options.
+type eventvolunteerOption func(*EventVolunteerMutation)
+
+// newEventVolunteerMutation creates new mutation for the EventVolunteer entity.
+func newEventVolunteerMutation(c config, op Op, opts ...eventvolunteerOption) *EventVolunteerMutation {
+	m := &EventVolunteerMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeEventVolunteer,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withEventVolunteerID sets the ID field of the mutation.
+func withEventVolunteerID(id uuid.UUID) eventvolunteerOption {
+	return func(m *EventVolunteerMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *EventVolunteer
+		)
+		m.oldValue = func(ctx context.Context) (*EventVolunteer, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().EventVolunteer.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withEventVolunteer sets the old EventVolunteer of the mutation.
+func withEventVolunteer(node *EventVolunteer) eventvolunteerOption {
+	return func(m *EventVolunteerMutation) {
+		m.oldValue = func(context.Context) (*EventVolunteer, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m EventVolunteerMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m EventVolunteerMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of EventVolunteer entities.
+func (m *EventVolunteerMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *EventVolunteerMutation) ID() (id uuid.UUID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *EventVolunteerMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []uuid.UUID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().EventVolunteer.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetEventID sets the "event" edge to the Event entity by id.
+func (m *EventVolunteerMutation) SetEventID(id uuid.UUID) {
+	m.event = &id
+}
+
+// ClearEvent clears the "event" edge to the Event entity.
+func (m *EventVolunteerMutation) ClearEvent() {
+	m.clearedevent = true
+}
+
+// EventCleared reports if the "event" edge to the Event entity was cleared.
+func (m *EventVolunteerMutation) EventCleared() bool {
+	return m.clearedevent
+}
+
+// EventID returns the "event" edge ID in the mutation.
+func (m *EventVolunteerMutation) EventID() (id uuid.UUID, exists bool) {
+	if m.event != nil {
+		return *m.event, true
+	}
+	return
+}
+
+// EventIDs returns the "event" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// EventID instead. It exists only for internal usage by the builders.
+func (m *EventVolunteerMutation) EventIDs() (ids []uuid.UUID) {
+	if id := m.event; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetEvent resets all changes to the "event" edge.
+func (m *EventVolunteerMutation) ResetEvent() {
+	m.event = nil
+	m.clearedevent = false
+}
+
+// SetVolunteerID sets the "volunteer" edge to the Volunteer entity by id.
+func (m *EventVolunteerMutation) SetVolunteerID(id uuid.UUID) {
+	m.volunteer = &id
+}
+
+// ClearVolunteer clears the "volunteer" edge to the Volunteer entity.
+func (m *EventVolunteerMutation) ClearVolunteer() {
+	m.clearedvolunteer = true
+}
+
+// VolunteerCleared reports if the "volunteer" edge to the Volunteer entity was cleared.
+func (m *EventVolunteerMutation) VolunteerCleared() bool {
+	return m.clearedvolunteer
+}
+
+// VolunteerID returns the "volunteer" edge ID in the mutation.
+func (m *EventVolunteerMutation) VolunteerID() (id uuid.UUID, exists bool) {
+	if m.volunteer != nil {
+		return *m.volunteer, true
+	}
+	return
+}
+
+// VolunteerIDs returns the "volunteer" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// VolunteerID instead. It exists only for internal usage by the builders.
+func (m *EventVolunteerMutation) VolunteerIDs() (ids []uuid.UUID) {
+	if id := m.volunteer; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetVolunteer resets all changes to the "volunteer" edge.
+func (m *EventVolunteerMutation) ResetVolunteer() {
+	m.volunteer = nil
+	m.clearedvolunteer = false
+}
+
+// Where appends a list predicates to the EventVolunteerMutation builder.
+func (m *EventVolunteerMutation) Where(ps ...predicate.EventVolunteer) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the EventVolunteerMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *EventVolunteerMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.EventVolunteer, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *EventVolunteerMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *EventVolunteerMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (EventVolunteer).
+func (m *EventVolunteerMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *EventVolunteerMutation) Fields() []string {
+	fields := make([]string, 0, 0)
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *EventVolunteerMutation) Field(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *EventVolunteerMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	return nil, fmt.Errorf("unknown EventVolunteer field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *EventVolunteerMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown EventVolunteer field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *EventVolunteerMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *EventVolunteerMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *EventVolunteerMutation) AddField(name string, value ent.Value) error {
+	return fmt.Errorf("unknown EventVolunteer numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *EventVolunteerMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *EventVolunteerMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *EventVolunteerMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown EventVolunteer nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *EventVolunteerMutation) ResetField(name string) error {
+	return fmt.Errorf("unknown EventVolunteer field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *EventVolunteerMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.event != nil {
+		edges = append(edges, eventvolunteer.EdgeEvent)
+	}
+	if m.volunteer != nil {
+		edges = append(edges, eventvolunteer.EdgeVolunteer)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *EventVolunteerMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case eventvolunteer.EdgeEvent:
+		if id := m.event; id != nil {
+			return []ent.Value{*id}
+		}
+	case eventvolunteer.EdgeVolunteer:
+		if id := m.volunteer; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *EventVolunteerMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *EventVolunteerMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *EventVolunteerMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearedevent {
+		edges = append(edges, eventvolunteer.EdgeEvent)
+	}
+	if m.clearedvolunteer {
+		edges = append(edges, eventvolunteer.EdgeVolunteer)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *EventVolunteerMutation) EdgeCleared(name string) bool {
+	switch name {
+	case eventvolunteer.EdgeEvent:
+		return m.clearedevent
+	case eventvolunteer.EdgeVolunteer:
+		return m.clearedvolunteer
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *EventVolunteerMutation) ClearEdge(name string) error {
+	switch name {
+	case eventvolunteer.EdgeEvent:
+		m.ClearEvent()
+		return nil
+	case eventvolunteer.EdgeVolunteer:
+		m.ClearVolunteer()
+		return nil
+	}
+	return fmt.Errorf("unknown EventVolunteer unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *EventVolunteerMutation) ResetEdge(name string) error {
+	switch name {
+	case eventvolunteer.EdgeEvent:
+		m.ResetEvent()
+		return nil
+	case eventvolunteer.EdgeVolunteer:
+		m.ResetVolunteer()
+		return nil
+	}
+	return fmt.Errorf("unknown EventVolunteer edge %s", name)
+}
+
 // TimeLogMutation represents an operation that mutates the TimeLog nodes in the graph.
 type TimeLogMutation struct {
 	config
@@ -576,7 +980,7 @@ type TimeLogMutation struct {
 	clearedFields    map[string]struct{}
 	volunteer        *uuid.UUID
 	clearedvolunteer bool
-	event            *int
+	event            *uuid.UUID
 	clearedevent     bool
 	done             bool
 	oldValue         func(context.Context) (*TimeLog, error)
@@ -875,7 +1279,7 @@ func (m *TimeLogMutation) ResetVolunteer() {
 }
 
 // SetEventID sets the "event" edge to the Event entity by id.
-func (m *TimeLogMutation) SetEventID(id int) {
+func (m *TimeLogMutation) SetEventID(id uuid.UUID) {
 	m.event = &id
 }
 
@@ -890,7 +1294,7 @@ func (m *TimeLogMutation) EventCleared() bool {
 }
 
 // EventID returns the "event" edge ID in the mutation.
-func (m *TimeLogMutation) EventID() (id int, exists bool) {
+func (m *TimeLogMutation) EventID() (id uuid.UUID, exists bool) {
 	if m.event != nil {
 		return *m.event, true
 	}
@@ -900,7 +1304,7 @@ func (m *TimeLogMutation) EventID() (id int, exists bool) {
 // EventIDs returns the "event" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // EventID instead. It exists only for internal usage by the builders.
-func (m *TimeLogMutation) EventIDs() (ids []int) {
+func (m *TimeLogMutation) EventIDs() (ids []uuid.UUID) {
 	if id := m.event; id != nil {
 		ids = append(ids, *id)
 	}

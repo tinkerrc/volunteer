@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package api.v1;
 
-import "google/type/date.proto";
+import "google/protobuf/timestamp.proto";
 import "google/type/timeofday.proto";
 
 option go_package = "github.com/tinkerrc/volunteer/proto/api/v1;apiv1";
@@ -182,9 +182,10 @@ message Duration {
 }
 
 message CreateTimeLogRequest {
-  string volunteer_id = 1;
-  optional string event_id = 2;
-  Duration duration = 3;
+  string volunteer_id = 2;
+  optional string event_id = 3;
+  Duration duration = 4;
+  google.protobuf.Timestamp date = 5;
 }
 
 message CreateTimeLogResponse {
@@ -196,7 +197,7 @@ message TimeLog {
   string volunteer_id = 2;
   optional string event_id = 3;
   Duration duration = 4;
-  google.type.Date date = 5;
+  google.protobuf.Timestamp date = 5;
 }
 
 message ListTimeLogsRequest {
@@ -214,6 +215,7 @@ message UpdateTimeLogRequest {
   optional string volunteer_id = 2;
   optional string event_id = 3;
   optional Duration duration = 4;
+  optional google.protobuf.Timestamp date = 5;
 }
 
 message UpdateTimeLogResponse {}
@@ -280,8 +282,8 @@ message Training {
   string id = 1;
   string volunteer_id = 2;
   string cert_id = 3;
-  optional google.type.Date start_date = 4;
-  optional google.type.Date end_date = 5;
+  optional google.protobuf.Timestamp start_date = 4;
+  optional google.protobuf.Timestamp end_date = 5;
   bool is_certified = 6;
 }
 
@@ -314,7 +316,7 @@ message Event {
   string description = 3;
   Duration duration = 4;
   bool is_recurring = 5;
-  google.type.Date date = 6;
+  google.protobuf.Timestamp date = 6;
   google.type.TimeOfDay time_of_day = 7;
   string recur_description = 8;
   repeated string cert_ids = 10;
@@ -325,7 +327,7 @@ message CreateEventRequest {
   string description = 3;
   Duration duration = 4;
   bool is_recurring = 5;
-  google.type.Date date = 6;
+  google.protobuf.Timestamp date = 6;
   google.type.TimeOfDay time_of_day = 7;
   string recur_description = 8; // recurring-only
   repeated string cert_ids = 10;
@@ -352,7 +354,7 @@ message UpdateEventRequest {
   optional string description = 3;
   optional Duration duration = 4;
   optional bool is_recurring = 5;
-  optional google.type.Date date = 6;
+  optional google.protobuf.Timestamp date = 6;
   optional google.type.TimeOfDay time_of_day = 7;
   optional string recur_description = 8; // recurring-only
   repeated string cert_ids = 10;

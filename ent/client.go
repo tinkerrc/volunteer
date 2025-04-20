@@ -18,6 +18,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/tinkerrc/volunteer/ent/certification"
 	"github.com/tinkerrc/volunteer/ent/event"
+	"github.com/tinkerrc/volunteer/ent/eventvolunteer"
 	"github.com/tinkerrc/volunteer/ent/timelog"
 	"github.com/tinkerrc/volunteer/ent/user"
 	"github.com/tinkerrc/volunteer/ent/volunteer"
@@ -32,6 +33,8 @@ type Client struct {
 	Certification *CertificationClient
 	// Event is the client for interacting with the Event builders.
 	Event *EventClient
+	// EventVolunteer is the client for interacting with the EventVolunteer builders.
+	EventVolunteer *EventVolunteerClient
 	// TimeLog is the client for interacting with the TimeLog builders.
 	TimeLog *TimeLogClient
 	// User is the client for interacting with the User builders.
@@ -51,6 +54,7 @@ func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Certification = NewCertificationClient(c.config)
 	c.Event = NewEventClient(c.config)
+	c.EventVolunteer = NewEventVolunteerClient(c.config)
 	c.TimeLog = NewTimeLogClient(c.config)
 	c.User = NewUserClient(c.config)
 	c.Volunteer = NewVolunteerClient(c.config)
@@ -144,13 +148,14 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:           ctx,
-		config:        cfg,
-		Certification: NewCertificationClient(cfg),
-		Event:         NewEventClient(cfg),
-		TimeLog:       NewTimeLogClient(cfg),
-		User:          NewUserClient(cfg),
-		Volunteer:     NewVolunteerClient(cfg),
+		ctx:            ctx,
+		config:         cfg,
+		Certification:  NewCertificationClient(cfg),
+		Event:          NewEventClient(cfg),
+		EventVolunteer: NewEventVolunteerClient(cfg),
+		TimeLog:        NewTimeLogClient(cfg),
+		User:           NewUserClient(cfg),
+		Volunteer:      NewVolunteerClient(cfg),
 	}, nil
 }
 
@@ -168,13 +173,14 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:           ctx,
-		config:        cfg,
-		Certification: NewCertificationClient(cfg),
-		Event:         NewEventClient(cfg),
-		TimeLog:       NewTimeLogClient(cfg),
-		User:          NewUserClient(cfg),
-		Volunteer:     NewVolunteerClient(cfg),
+		ctx:            ctx,
+		config:         cfg,
+		Certification:  NewCertificationClient(cfg),
+		Event:          NewEventClient(cfg),
+		EventVolunteer: NewEventVolunteerClient(cfg),
+		TimeLog:        NewTimeLogClient(cfg),
+		User:           NewUserClient(cfg),
+		Volunteer:      NewVolunteerClient(cfg),
 	}, nil
 }
 
@@ -203,21 +209,21 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.Certification.Use(hooks...)
-	c.Event.Use(hooks...)
-	c.TimeLog.Use(hooks...)
-	c.User.Use(hooks...)
-	c.Volunteer.Use(hooks...)
+	for _, n := range []interface{ Use(...Hook) }{
+		c.Certification, c.Event, c.EventVolunteer, c.TimeLog, c.User, c.Volunteer,
+	} {
+		n.Use(hooks...)
+	}
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
-	c.Certification.Intercept(interceptors...)
-	c.Event.Intercept(interceptors...)
-	c.TimeLog.Intercept(interceptors...)
-	c.User.Intercept(interceptors...)
-	c.Volunteer.Intercept(interceptors...)
+	for _, n := range []interface{ Intercept(...Interceptor) }{
+		c.Certification, c.Event, c.EventVolunteer, c.TimeLog, c.User, c.Volunteer,
+	} {
+		n.Intercept(interceptors...)
+	}
 }
 
 // Mutate implements the ent.Mutator interface.
@@ -227,6 +233,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Certification.mutate(ctx, m)
 	case *EventMutation:
 		return c.Event.mutate(ctx, m)
+	case *EventVolunteerMutation:
+		return c.EventVolunteer.mutate(ctx, m)
 	case *TimeLogMutation:
 		return c.TimeLog.mutate(ctx, m)
 	case *UserMutation:
@@ -432,7 +440,7 @@ func (c *EventClient) UpdateOne(e *Event) *EventUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *EventClient) UpdateOneID(id int) *EventUpdateOne {
+func (c *EventClient) UpdateOneID(id uuid.UUID) *EventUpdateOne {
 	mutation := newEventMutation(c.config, OpUpdateOne, withEventID(id))
 	return &EventUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -449,7 +457,7 @@ func (c *EventClient) DeleteOne(e *Event) *EventDeleteOne {
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *EventClient) DeleteOneID(id int) *EventDeleteOne {
+func (c *EventClient) DeleteOneID(id uuid.UUID) *EventDeleteOne {
 	builder := c.Delete().Where(event.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -466,12 +474,12 @@ func (c *EventClient) Query() *EventQuery {
 }
 
 // Get returns a Event entity by its id.
-func (c *EventClient) Get(ctx context.Context, id int) (*Event, error) {
+func (c *EventClient) Get(ctx context.Context, id uuid.UUID) (*Event, error) {
 	return c.Query().Where(event.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *EventClient) GetX(ctx context.Context, id int) *Event {
+func (c *EventClient) GetX(ctx context.Context, id uuid.UUID) *Event {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -501,6 +509,171 @@ func (c *EventClient) mutate(ctx context.Context, m *EventMutation) (Value, erro
 		return (&EventDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Event mutation op: %q", m.Op())
+	}
+}
+
+// EventVolunteerClient is a client for the EventVolunteer schema.
+type EventVolunteerClient struct {
+	config
+}
+
+// NewEventVolunteerClient returns a client for the EventVolunteer from the given config.
+func NewEventVolunteerClient(c config) *EventVolunteerClient {
+	return &EventVolunteerClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `eventvolunteer.Hooks(f(g(h())))`.
+func (c *EventVolunteerClient) Use(hooks ...Hook) {
+	c.hooks.EventVolunteer = append(c.hooks.EventVolunteer, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `eventvolunteer.Intercept(f(g(h())))`.
+func (c *EventVolunteerClient) Intercept(interceptors ...Interceptor) {
+	c.inters.EventVolunteer = append(c.inters.EventVolunteer, interceptors...)
+}
+
+// Create returns a builder for creating a EventVolunteer entity.
+func (c *EventVolunteerClient) Create() *EventVolunteerCreate {
+	mutation := newEventVolunteerMutation(c.config, OpCreate)
+	return &EventVolunteerCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of EventVolunteer entities.
+func (c *EventVolunteerClient) CreateBulk(builders ...*EventVolunteerCreate) *EventVolunteerCreateBulk {
+	return &EventVolunteerCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *EventVolunteerClient) MapCreateBulk(slice any, setFunc func(*EventVolunteerCreate, int)) *EventVolunteerCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &EventVolunteerCreateBulk{err: fmt.Errorf("calling to EventVolunteerClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*EventVolunteerCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &EventVolunteerCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for EventVolunteer.
+func (c *EventVolunteerClient) Update() *EventVolunteerUpdate {
+	mutation := newEventVolunteerMutation(c.config, OpUpdate)
+	return &EventVolunteerUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *EventVolunteerClient) UpdateOne(ev *EventVolunteer) *EventVolunteerUpdateOne {
+	mutation := newEventVolunteerMutation(c.config, OpUpdateOne, withEventVolunteer(ev))
+	return &EventVolunteerUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *EventVolunteerClient) UpdateOneID(id uuid.UUID) *EventVolunteerUpdateOne {
+	mutation := newEventVolunteerMutation(c.config, OpUpdateOne, withEventVolunteerID(id))
+	return &EventVolunteerUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for EventVolunteer.
+func (c *EventVolunteerClient) Delete() *EventVolunteerDelete {
+	mutation := newEventVolunteerMutation(c.config, OpDelete)
+	return &EventVolunteerDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *EventVolunteerClient) DeleteOne(ev *EventVolunteer) *EventVolunteerDeleteOne {
+	return c.DeleteOneID(ev.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *EventVolunteerClient) DeleteOneID(id uuid.UUID) *EventVolunteerDeleteOne {
+	builder := c.Delete().Where(eventvolunteer.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &EventVolunteerDeleteOne{builder}
+}
+
+// Query returns a query builder for EventVolunteer.
+func (c *EventVolunteerClient) Query() *EventVolunteerQuery {
+	return &EventVolunteerQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeEventVolunteer},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a EventVolunteer entity by its id.
+func (c *EventVolunteerClient) Get(ctx context.Context, id uuid.UUID) (*EventVolunteer, error) {
+	return c.Query().Where(eventvolunteer.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *EventVolunteerClient) GetX(ctx context.Context, id uuid.UUID) *EventVolunteer {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryEvent queries the event edge of a EventVolunteer.
+func (c *EventVolunteerClient) QueryEvent(ev *EventVolunteer) *EventQuery {
+	query := (&EventClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ev.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(eventvolunteer.Table, eventvolunteer.FieldID, id),
+			sqlgraph.To(event.Table, event.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, eventvolunteer.EventTable, eventvolunteer.EventColumn),
+		)
+		fromV = sqlgraph.Neighbors(ev.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryVolunteer queries the volunteer edge of a EventVolunteer.
+func (c *EventVolunteerClient) QueryVolunteer(ev *EventVolunteer) *VolunteerQuery {
+	query := (&VolunteerClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ev.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(eventvolunteer.Table, eventvolunteer.FieldID, id),
+			sqlgraph.To(volunteer.Table, volunteer.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, eventvolunteer.VolunteerTable, eventvolunteer.VolunteerColumn),
+		)
+		fromV = sqlgraph.Neighbors(ev.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *EventVolunteerClient) Hooks() []Hook {
+	return c.hooks.EventVolunteer
+}
+
+// Interceptors returns the client interceptors.
+func (c *EventVolunteerClient) Interceptors() []Interceptor {
+	return c.inters.EventVolunteer
+}
+
+func (c *EventVolunteerClient) mutate(ctx context.Context, m *EventVolunteerMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&EventVolunteerCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&EventVolunteerUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&EventVolunteerUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&EventVolunteerDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown EventVolunteer mutation op: %q", m.Op())
 	}
 }
 
@@ -938,9 +1111,9 @@ func (c *VolunteerClient) mutate(ctx context.Context, m *VolunteerMutation) (Val
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Certification, Event, TimeLog, User, Volunteer []ent.Hook
+		Certification, Event, EventVolunteer, TimeLog, User, Volunteer []ent.Hook
 	}
 	inters struct {
-		Certification, Event, TimeLog, User, Volunteer []ent.Interceptor
+		Certification, Event, EventVolunteer, TimeLog, User, Volunteer []ent.Interceptor
 	}
 )

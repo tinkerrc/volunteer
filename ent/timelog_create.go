@@ -67,13 +67,13 @@ func (tlc *TimeLogCreate) SetVolunteer(v *Volunteer) *TimeLogCreate {
 }
 
 // SetEventID sets the "event" edge to the Event entity by ID.
-func (tlc *TimeLogCreate) SetEventID(id int) *TimeLogCreate {
+func (tlc *TimeLogCreate) SetEventID(id uuid.UUID) *TimeLogCreate {
 	tlc.mutation.SetEventID(id)
 	return tlc
 }
 
 // SetNillableEventID sets the "event" edge to the Event entity by ID if the given value is not nil.
-func (tlc *TimeLogCreate) SetNillableEventID(id *int) *TimeLogCreate {
+func (tlc *TimeLogCreate) SetNillableEventID(id *uuid.UUID) *TimeLogCreate {
 	if id != nil {
 		tlc = tlc.SetEventID(*id)
 	}
@@ -212,7 +212,7 @@ func (tlc *TimeLogCreate) createSpec() (*TimeLog, *sqlgraph.CreateSpec) {
 			Columns: []string{timelog.EventColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

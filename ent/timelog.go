@@ -30,7 +30,7 @@ type TimeLog struct {
 	// The values are being populated by the TimeLogQuery when eager-loading is set.
 	Edges              TimeLogEdges `json:"edges"`
 	time_log_volunteer *uuid.UUID
-	time_log_event     *int
+	time_log_event     *uuid.UUID
 	selectValues       sql.SelectValues
 }
 
@@ -81,7 +81,7 @@ func (*TimeLog) scanValues(columns []string) ([]any, error) {
 		case timelog.ForeignKeys[0]: // time_log_volunteer
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		case timelog.ForeignKeys[1]: // time_log_event
-			values[i] = new(sql.NullInt64)
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -129,11 +129,11 @@ func (tl *TimeLog) assignValues(columns []string, values []any) error {
 				*tl.time_log_volunteer = *value.S.(*uuid.UUID)
 			}
 		case timelog.ForeignKeys[1]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field time_log_event", value)
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field time_log_event", values[i])
 			} else if value.Valid {
-				tl.time_log_event = new(int)
-				*tl.time_log_event = int(value.Int64)
+				tl.time_log_event = new(uuid.UUID)
+				*tl.time_log_event = *value.S.(*uuid.UUID)
 			}
 		default:
 			tl.selectValues.Set(columns[i], values[i])
