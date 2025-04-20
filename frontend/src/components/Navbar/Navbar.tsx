@@ -10,6 +10,7 @@ import {
     IconUser
 } from '@tabler/icons-react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import classes from './Navbar.module.css';
 
 interface NavbarLinkProps {
@@ -39,12 +40,13 @@ const navData = [
 export function Navbar() {
     const [active, setActive] = useState(0);
 
+    let navigate = useNavigate()
     const links = navData.map((link, index) => (
         <NavbarLink
             {...link}
             key={link.label}
             active={index === active}
-            onClick={() => setActive(index)}
+            onClick={() => { setActive(index); navigate(link.to) }}
         />
     ));
 
