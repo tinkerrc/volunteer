@@ -16,7 +16,7 @@ func (s *APIServer) UpdateCert(
 ) (*connect.Response[apiv1.UpdateCertResponse], error) {
 	err := s.ensureAdmin(ctx)
 	if err != nil {
-		return nil, connect.NewError(connect.CodePermissionDenied, errors.New("unauthorized"))
+		return nil, err
 	}
 	m := req.Msg
 	cid, err := uuid.Parse(m.Id)

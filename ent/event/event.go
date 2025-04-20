@@ -4,6 +4,7 @@ package event
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/google/uuid"
 )
 
@@ -12,13 +13,43 @@ const (
 	Label = "event"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldName holds the string denoting the name field in the database.
+	FieldName = "name"
+	// FieldDescription holds the string denoting the description field in the database.
+	FieldDescription = "description"
+	// FieldIsRecurring holds the string denoting the is_recurring field in the database.
+	FieldIsRecurring = "is_recurring"
+	// FieldIsRecurActive holds the string denoting the is_recur_active field in the database.
+	FieldIsRecurActive = "is_recur_active"
+	// FieldRecurDescription holds the string denoting the recur_description field in the database.
+	FieldRecurDescription = "recur_description"
+	// FieldStart holds the string denoting the start field in the database.
+	FieldStart = "start"
+	// FieldEnd holds the string denoting the end field in the database.
+	FieldEnd = "end"
+	// EdgeCerts holds the string denoting the certs edge name in mutations.
+	EdgeCerts = "certs"
 	// Table holds the table name of the event in the database.
 	Table = "events"
+	// CertsTable is the table that holds the certs relation/edge.
+	CertsTable = "certs"
+	// CertsInverseTable is the table name for the Cert entity.
+	// It exists in this package in order to avoid circular dependency with the "cert" package.
+	CertsInverseTable = "certs"
+	// CertsColumn is the table column denoting the certs relation/edge.
+	CertsColumn = "event_certs"
 )
 
 // Columns holds all SQL columns for event fields.
 var Columns = []string{
 	FieldID,
+	FieldName,
+	FieldDescription,
+	FieldIsRecurring,
+	FieldIsRecurActive,
+	FieldRecurDescription,
+	FieldStart,
+	FieldEnd,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -42,4 +73,60 @@ type OrderOption func(*sql.Selector)
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByName orders the results by the name field.
+func ByName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldName, opts...).ToFunc()
+}
+
+// ByDescription orders the results by the description field.
+func ByDescription(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDescription, opts...).ToFunc()
+}
+
+// ByIsRecurring orders the results by the is_recurring field.
+func ByIsRecurring(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldIsRecurring, opts...).ToFunc()
+}
+
+// ByIsRecurActive orders the results by the is_recur_active field.
+func ByIsRecurActive(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldIsRecurActive, opts...).ToFunc()
+}
+
+// ByRecurDescription orders the results by the recur_description field.
+func ByRecurDescription(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRecurDescription, opts...).ToFunc()
+}
+
+// ByStart orders the results by the start field.
+func ByStart(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStart, opts...).ToFunc()
+}
+
+// ByEnd orders the results by the end field.
+func ByEnd(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldEnd, opts...).ToFunc()
+}
+
+// ByCertsCount orders the results by certs count.
+func ByCertsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newCertsStep(), opts...)
+	}
+}
+
+// ByCerts orders the results by certs terms.
+func ByCerts(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCertsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newCertsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CertsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, CertsTable, CertsColumn),
+	)
 }

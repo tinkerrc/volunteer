@@ -18,7 +18,7 @@ func (s *APIServer) FinishTraining(
 ) (*connect.Response[apiv1.FinishTrainingResponse], error) {
 	err := s.ensureAdmin(ctx)
 	if err != nil {
-		return nil, connect.NewError(connect.CodePermissionDenied, errors.New("unauthorized"))
+		return nil, err
 	}
 	m := req.Msg
 	tid, err := uuid.Parse(m.Id)

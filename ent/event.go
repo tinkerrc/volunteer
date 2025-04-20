@@ -5,6 +5,7 @@ package ent
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -14,10 +15,45 @@ import (
 
 // Event is the model entity for the Event schema.
 type Event struct {
-	config
+	config `json:"-"`
 	// ID of the ent.
-	ID           uuid.UUID `json:"id,omitempty"`
+	ID uuid.UUID `json:"id,omitempty"`
+	// Name holds the value of the "name" field.
+	Name string `json:"name,omitempty"`
+	// Description holds the value of the "description" field.
+	Description string `json:"description,omitempty"`
+	// IsRecurring holds the value of the "is_recurring" field.
+	IsRecurring bool `json:"is_recurring,omitempty"`
+	// IsRecurActive holds the value of the "is_recur_active" field.
+	IsRecurActive *bool `json:"is_recur_active,omitempty"`
+	// RecurDescription holds the value of the "recur_description" field.
+	RecurDescription *string `json:"recur_description,omitempty"`
+	// Start holds the value of the "start" field.
+	Start *time.Time `json:"start,omitempty"`
+	// End holds the value of the "end" field.
+	End *time.Time `json:"end,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the EventQuery when eager-loading is set.
+	Edges        EventEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// EventEdges holds the relations/edges for other nodes in the graph.
+type EventEdges struct {
+	// Certs holds the value of the certs edge.
+	Certs []*Cert `json:"certs,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// CertsOrErr returns the Certs value or an error if the edge
+// was not loaded in eager-loading.
+func (e EventEdges) CertsOrErr() ([]*Cert, error) {
+	if e.loadedTypes[0] {
+		return e.Certs, nil
+	}
+	return nil, &NotLoadedError{edge: "certs"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -25,6 +61,12 @@ func (*Event) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case event.FieldIsRecurring, event.FieldIsRecurActive:
+			values[i] = new(sql.NullBool)
+		case event.FieldName, event.FieldDescription, event.FieldRecurDescription:
+			values[i] = new(sql.NullString)
+		case event.FieldStart, event.FieldEnd:
+			values[i] = new(sql.NullTime)
 		case event.FieldID:
 			values[i] = new(uuid.UUID)
 		default:
@@ -48,6 +90,52 @@ func (e *Event) assignValues(columns []string, values []any) error {
 			} else if value != nil {
 				e.ID = *value
 			}
+		case event.FieldName:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field name", values[i])
+			} else if value.Valid {
+				e.Name = value.String
+			}
+		case event.FieldDescription:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field description", values[i])
+			} else if value.Valid {
+				e.Description = value.String
+			}
+		case event.FieldIsRecurring:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field is_recurring", values[i])
+			} else if value.Valid {
+				e.IsRecurring = value.Bool
+			}
+		case event.FieldIsRecurActive:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field is_recur_active", values[i])
+			} else if value.Valid {
+				e.IsRecurActive = new(bool)
+				*e.IsRecurActive = value.Bool
+			}
+		case event.FieldRecurDescription:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field recur_description", values[i])
+			} else if value.Valid {
+				e.RecurDescription = new(string)
+				*e.RecurDescription = value.String
+			}
+		case event.FieldStart:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field start", values[i])
+			} else if value.Valid {
+				e.Start = new(time.Time)
+				*e.Start = value.Time
+			}
+		case event.FieldEnd:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field end", values[i])
+			} else if value.Valid {
+				e.End = new(time.Time)
+				*e.End = value.Time
+			}
 		default:
 			e.selectValues.Set(columns[i], values[i])
 		}
@@ -59,6 +147,11 @@ func (e *Event) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (e *Event) Value(name string) (ent.Value, error) {
 	return e.selectValues.Get(name)
+}
+
+// QueryCerts queries the "certs" edge of the Event entity.
+func (e *Event) QueryCerts() *CertQuery {
+	return NewEventClient(e.config).QueryCerts(e)
 }
 
 // Update returns a builder for updating this Event.
@@ -83,7 +176,35 @@ func (e *Event) Unwrap() *Event {
 func (e *Event) String() string {
 	var builder strings.Builder
 	builder.WriteString("Event(")
-	builder.WriteString(fmt.Sprintf("id=%v", e.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", e.ID))
+	builder.WriteString("name=")
+	builder.WriteString(e.Name)
+	builder.WriteString(", ")
+	builder.WriteString("description=")
+	builder.WriteString(e.Description)
+	builder.WriteString(", ")
+	builder.WriteString("is_recurring=")
+	builder.WriteString(fmt.Sprintf("%v", e.IsRecurring))
+	builder.WriteString(", ")
+	if v := e.IsRecurActive; v != nil {
+		builder.WriteString("is_recur_active=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := e.RecurDescription; v != nil {
+		builder.WriteString("recur_description=")
+		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
+	if v := e.Start; v != nil {
+		builder.WriteString("start=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
+	builder.WriteString(", ")
+	if v := e.End; v != nil {
+		builder.WriteString("end=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

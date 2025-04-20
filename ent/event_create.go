@@ -4,11 +4,14 @@ package ent
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
+	"github.com/tinkerrc/volunteer/ent/cert"
 	"github.com/tinkerrc/volunteer/ent/event"
 )
 
@@ -17,6 +20,80 @@ type EventCreate struct {
 	config
 	mutation *EventMutation
 	hooks    []Hook
+}
+
+// SetName sets the "name" field.
+func (ec *EventCreate) SetName(s string) *EventCreate {
+	ec.mutation.SetName(s)
+	return ec
+}
+
+// SetDescription sets the "description" field.
+func (ec *EventCreate) SetDescription(s string) *EventCreate {
+	ec.mutation.SetDescription(s)
+	return ec
+}
+
+// SetIsRecurring sets the "is_recurring" field.
+func (ec *EventCreate) SetIsRecurring(b bool) *EventCreate {
+	ec.mutation.SetIsRecurring(b)
+	return ec
+}
+
+// SetIsRecurActive sets the "is_recur_active" field.
+func (ec *EventCreate) SetIsRecurActive(b bool) *EventCreate {
+	ec.mutation.SetIsRecurActive(b)
+	return ec
+}
+
+// SetNillableIsRecurActive sets the "is_recur_active" field if the given value is not nil.
+func (ec *EventCreate) SetNillableIsRecurActive(b *bool) *EventCreate {
+	if b != nil {
+		ec.SetIsRecurActive(*b)
+	}
+	return ec
+}
+
+// SetRecurDescription sets the "recur_description" field.
+func (ec *EventCreate) SetRecurDescription(s string) *EventCreate {
+	ec.mutation.SetRecurDescription(s)
+	return ec
+}
+
+// SetNillableRecurDescription sets the "recur_description" field if the given value is not nil.
+func (ec *EventCreate) SetNillableRecurDescription(s *string) *EventCreate {
+	if s != nil {
+		ec.SetRecurDescription(*s)
+	}
+	return ec
+}
+
+// SetStart sets the "start" field.
+func (ec *EventCreate) SetStart(t time.Time) *EventCreate {
+	ec.mutation.SetStart(t)
+	return ec
+}
+
+// SetNillableStart sets the "start" field if the given value is not nil.
+func (ec *EventCreate) SetNillableStart(t *time.Time) *EventCreate {
+	if t != nil {
+		ec.SetStart(*t)
+	}
+	return ec
+}
+
+// SetEnd sets the "end" field.
+func (ec *EventCreate) SetEnd(t time.Time) *EventCreate {
+	ec.mutation.SetEnd(t)
+	return ec
+}
+
+// SetNillableEnd sets the "end" field if the given value is not nil.
+func (ec *EventCreate) SetNillableEnd(t *time.Time) *EventCreate {
+	if t != nil {
+		ec.SetEnd(*t)
+	}
+	return ec
 }
 
 // SetID sets the "id" field.
@@ -31,6 +108,21 @@ func (ec *EventCreate) SetNillableID(u *uuid.UUID) *EventCreate {
 		ec.SetID(*u)
 	}
 	return ec
+}
+
+// AddCertIDs adds the "certs" edge to the Cert entity by IDs.
+func (ec *EventCreate) AddCertIDs(ids ...uuid.UUID) *EventCreate {
+	ec.mutation.AddCertIDs(ids...)
+	return ec
+}
+
+// AddCerts adds the "certs" edges to the Cert entity.
+func (ec *EventCreate) AddCerts(c ...*Cert) *EventCreate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return ec.AddCertIDs(ids...)
 }
 
 // Mutation returns the EventMutation object of the builder.
@@ -76,6 +168,15 @@ func (ec *EventCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (ec *EventCreate) check() error {
+	if _, ok := ec.mutation.Name(); !ok {
+		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Event.name"`)}
+	}
+	if _, ok := ec.mutation.Description(); !ok {
+		return &ValidationError{Name: "description", err: errors.New(`ent: missing required field "Event.description"`)}
+	}
+	if _, ok := ec.mutation.IsRecurring(); !ok {
+		return &ValidationError{Name: "is_recurring", err: errors.New(`ent: missing required field "Event.is_recurring"`)}
+	}
 	return nil
 }
 
@@ -110,6 +211,50 @@ func (ec *EventCreate) createSpec() (*Event, *sqlgraph.CreateSpec) {
 	if id, ok := ec.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
+	}
+	if value, ok := ec.mutation.Name(); ok {
+		_spec.SetField(event.FieldName, field.TypeString, value)
+		_node.Name = value
+	}
+	if value, ok := ec.mutation.Description(); ok {
+		_spec.SetField(event.FieldDescription, field.TypeString, value)
+		_node.Description = value
+	}
+	if value, ok := ec.mutation.IsRecurring(); ok {
+		_spec.SetField(event.FieldIsRecurring, field.TypeBool, value)
+		_node.IsRecurring = value
+	}
+	if value, ok := ec.mutation.IsRecurActive(); ok {
+		_spec.SetField(event.FieldIsRecurActive, field.TypeBool, value)
+		_node.IsRecurActive = &value
+	}
+	if value, ok := ec.mutation.RecurDescription(); ok {
+		_spec.SetField(event.FieldRecurDescription, field.TypeString, value)
+		_node.RecurDescription = &value
+	}
+	if value, ok := ec.mutation.Start(); ok {
+		_spec.SetField(event.FieldStart, field.TypeTime, value)
+		_node.Start = &value
+	}
+	if value, ok := ec.mutation.End(); ok {
+		_spec.SetField(event.FieldEnd, field.TypeTime, value)
+		_node.End = &value
+	}
+	if nodes := ec.mutation.CertsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   event.CertsTable,
+			Columns: []string{event.CertsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(cert.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

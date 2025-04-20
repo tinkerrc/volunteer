@@ -191,8 +191,10 @@ type VolunteerServiceClient interface {
 	GetCert(context.Context, *connect.Request[v1.GetCertRequest]) (*connect.Response[v1.GetCertResponse], error)
 	// Requires user
 	UpdateCert(context.Context, *connect.Request[v1.UpdateCertRequest]) (*connect.Response[v1.UpdateCertResponse], error)
+	// Requires user
 	DeleteCert(context.Context, *connect.Request[v1.DeleteCertRequest]) (*connect.Response[v1.DeleteCertResponse], error)
 	// === EVENTS
+	// Requires admin
 	CreateEvent(context.Context, *connect.Request[v1.CreateEventRequest]) (*connect.Response[v1.CreateEventResponse], error)
 	ListEvents(context.Context, *connect.Request[v1.ListEventsRequest]) (*connect.Response[v1.ListEventsResponse], error)
 	UpdateEvent(context.Context, *connect.Request[v1.UpdateEventRequest]) (*connect.Response[v1.UpdateEventResponse], error)
@@ -579,8 +581,10 @@ type VolunteerServiceHandler interface {
 	GetCert(context.Context, *connect.Request[v1.GetCertRequest]) (*connect.Response[v1.GetCertResponse], error)
 	// Requires user
 	UpdateCert(context.Context, *connect.Request[v1.UpdateCertRequest]) (*connect.Response[v1.UpdateCertResponse], error)
+	// Requires user
 	DeleteCert(context.Context, *connect.Request[v1.DeleteCertRequest]) (*connect.Response[v1.DeleteCertResponse], error)
 	// === EVENTS
+	// Requires admin
 	CreateEvent(context.Context, *connect.Request[v1.CreateEventRequest]) (*connect.Response[v1.CreateEventResponse], error)
 	ListEvents(context.Context, *connect.Request[v1.ListEventsRequest]) (*connect.Response[v1.ListEventsResponse], error)
 	UpdateEvent(context.Context, *connect.Request[v1.UpdateEventRequest]) (*connect.Response[v1.UpdateEventResponse], error)

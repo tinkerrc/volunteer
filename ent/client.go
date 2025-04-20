@@ -495,6 +495,22 @@ func (c *EventClient) GetX(ctx context.Context, id uuid.UUID) *Event {
 	return obj
 }
 
+// QueryCerts queries the certs edge of a Event.
+func (c *EventClient) QueryCerts(e *Event) *CertQuery {
+	query := (&CertClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(event.Table, event.FieldID, id),
+			sqlgraph.To(cert.Table, cert.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, event.CertsTable, event.CertsColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *EventClient) Hooks() []Hook {
 	return c.hooks.Event

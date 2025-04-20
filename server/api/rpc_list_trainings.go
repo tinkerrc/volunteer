@@ -21,7 +21,7 @@ func (s *APIServer) ListTrainings(
 ) (*connect.Response[apiv1.ListTrainingsResponse], error) {
 	err := s.ensureAdmin(ctx)
 	if err != nil {
-		return nil, connect.NewError(connect.CodePermissionDenied, errors.New("unauthorized"))
+		return nil, err
 	}
 	m := req.Msg
 	if m.PageSize > 50 {

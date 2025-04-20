@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -12,6 +13,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
+	"github.com/tinkerrc/volunteer/ent/cert"
 	"github.com/tinkerrc/volunteer/ent/event"
 	"github.com/tinkerrc/volunteer/ent/predicate"
 )
@@ -23,6 +25,7 @@ type EventQuery struct {
 	order      []event.OrderOption
 	inters     []Interceptor
 	predicates []predicate.Event
+	withCerts  *CertQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -57,6 +60,28 @@ func (eq *EventQuery) Unique(unique bool) *EventQuery {
 func (eq *EventQuery) Order(o ...event.OrderOption) *EventQuery {
 	eq.order = append(eq.order, o...)
 	return eq
+}
+
+// QueryCerts chains the current query on the "certs" edge.
+func (eq *EventQuery) QueryCerts() *CertQuery {
+	query := (&CertClient{config: eq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := eq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := eq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(event.Table, event.FieldID, selector),
+			sqlgraph.To(cert.Table, cert.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, event.CertsTable, event.CertsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first Event entity from the query.
@@ -251,14 +276,38 @@ func (eq *EventQuery) Clone() *EventQuery {
 		order:      append([]event.OrderOption{}, eq.order...),
 		inters:     append([]Interceptor{}, eq.inters...),
 		predicates: append([]predicate.Event{}, eq.predicates...),
+		withCerts:  eq.withCerts.Clone(),
 		// clone intermediate query.
 		sql:  eq.sql.Clone(),
 		path: eq.path,
 	}
 }
 
+// WithCerts tells the query-builder to eager-load the nodes that are connected to
+// the "certs" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *EventQuery) WithCerts(opts ...func(*CertQuery)) *EventQuery {
+	query := (&CertClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	eq.withCerts = query
+	return eq
+}
+
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
+//
+// Example:
+//
+//	var v []struct {
+//		Name string `json:"name,omitempty"`
+//		Count int `json:"count,omitempty"`
+//	}
+//
+//	client.Event.Query().
+//		GroupBy(event.FieldName).
+//		Aggregate(ent.Count()).
+//		Scan(ctx, &v)
 func (eq *EventQuery) GroupBy(field string, fields ...string) *EventGroupBy {
 	eq.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &EventGroupBy{build: eq}
@@ -270,6 +319,16 @@ func (eq *EventQuery) GroupBy(field string, fields ...string) *EventGroupBy {
 
 // Select allows the selection one or more fields/columns for the given query,
 // instead of selecting all fields in the entity.
+//
+// Example:
+//
+//	var v []struct {
+//		Name string `json:"name,omitempty"`
+//	}
+//
+//	client.Event.Query().
+//		Select(event.FieldName).
+//		Scan(ctx, &v)
 func (eq *EventQuery) Select(fields ...string) *EventSelect {
 	eq.ctx.Fields = append(eq.ctx.Fields, fields...)
 	sbuild := &EventSelect{EventQuery: eq}
@@ -311,8 +370,11 @@ func (eq *EventQuery) prepareQuery(ctx context.Context) error {
 
 func (eq *EventQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Event, error) {
 	var (
-		nodes = []*Event{}
-		_spec = eq.querySpec()
+		nodes       = []*Event{}
+		_spec       = eq.querySpec()
+		loadedTypes = [1]bool{
+			eq.withCerts != nil,
+		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Event).scanValues(nil, columns)
@@ -320,6 +382,7 @@ func (eq *EventQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Event,
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &Event{config: eq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -331,7 +394,46 @@ func (eq *EventQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Event,
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := eq.withCerts; query != nil {
+		if err := eq.loadCerts(ctx, query, nodes,
+			func(n *Event) { n.Edges.Certs = []*Cert{} },
+			func(n *Event, e *Cert) { n.Edges.Certs = append(n.Edges.Certs, e) }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
+}
+
+func (eq *EventQuery) loadCerts(ctx context.Context, query *CertQuery, nodes []*Event, init func(*Event), assign func(*Event, *Cert)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*Event)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.Cert(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(event.CertsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.event_certs
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "event_certs" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "event_certs" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
 }
 
 func (eq *EventQuery) sqlCount(ctx context.Context) (int, error) {
