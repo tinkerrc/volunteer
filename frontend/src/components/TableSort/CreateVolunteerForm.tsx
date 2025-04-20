@@ -14,7 +14,7 @@ interface CreateVolunteerData {
     phone: string;
 }
 
-export const CreateVolunteerForm = async () => {
+export const CreateVolunteerForm = () => {
     const { isAuthenticated, getAccessTokenSilently } = useAuth0();
 
     const client = useMemo(() => createClient(VolunteerService, transport), [VolunteerService]);
